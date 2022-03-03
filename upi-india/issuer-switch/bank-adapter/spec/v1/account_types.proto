@@ -1,0 +1,148 @@
+// Copyright 2022 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
+
+import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_outer_classname = "AccountTypesProto";
+option java_multiple_files = true;
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
+option go_api_flag = "OPAQUE_V0";
+
+// Provides information about an account.
+message AccountInfo {
+  // Information about an account as per India's UPI standards.
+  AccountReference account_reference = 1;
+  // The name of the account.
+  string display_name = 2;
+  // Alias set by the customer to easily identify an account.
+  string account_alias = 3;
+  // Boolean field indicating if Aadhaar is enabled for the account.
+  bool aadhaar_enabled = 4;
+}
+
+// Balance information for a given account.
+message BalanceInfo {
+  // The currency and value of the current balance.
+  Amount current_balance = 1;
+  // The currency and value of the available balance.
+  Amount available_balance = 2;
+  // The allowed credit limit on the account.
+  Amount credit_limit = 3;
+}
+
+// The fund holding period duration.
+message ValidityPeriod {
+  // The date and time at which the fund holding period begins.
+  google.protobuf.Timestamp start_date_time = 1;
+  // The date and time at which the fund holding period ends.
+  google.protobuf.Timestamp end_date_time = 2;
+}
+
+// Request to hold funds in an account.
+message HoldFundsRequest {
+  // An identifier for this request. This is used to correlate a hold
+  // funds request to a release funds request. In UPI, this field maps to the
+  // Unified Mandate Number (UMN).
+  string request_id = 1;
+  // Payer in the transaction.
+  SettlementParticipant payer = 2;
+  // Payee in the transaction.
+  SettlementParticipant payee = 3;
+  // Specifies the amount to be held and the holding type rule.
+  HoldAmount hold_amount = 4;
+  // Identifier for the mandate creation transaction.
+  string transaction_id = 5;
+  // Specifies the validity period for the funds to be held.
+  ValidityPeriod validity_period = 6;
+  // Free form string describing the hold request.
+  string description = 7;
+  // Additional payment information specific to India's UPI requirements.
+  PaymentAdditionalInfo payment_additional_info = 8;
+  // If the hold funds call is triggered to update an existing hold on funds,
+  // then this field will contain the original hold funds reference and the
+  // amount held originally. In other cases, this field will be omitted in the
+  // request.
+  HoldDetails original_hold_details = 9;
+}
+
+// Response for the HoldFunds method.
+message HoldFundsResponse {
+  // The bank's reference for the funds held in an account.
+  string hold_reference = 1;
+}
+
+// Request to release previously held funds in an account.
+message ReleaseFundsRequest {
+  // An identifier for this request which must be the same as the identifier for
+  // a previous hold funds request. This is used to correlate a hold
+  // funds request to a release funds request. In UPI, this field maps to the
+  // Unified Mandate Number (UMN).
+  string request_id = 1;
+  // Payer in the transaction.
+  SettlementParticipant payer = 2;
+  // Payee in the transaction.
+  SettlementParticipant payee = 3;
+  // Identifier of the original hold funds transaction.
+  string original_transaction_id = 4;
+  // The bank's reference for the funds held in the account which are being
+  // released. It specifies the amount held and the hold reference returned when
+  // the funds were initially held in the account.
+  HoldDetails hold_details = 5;
+  // Additional information for executing the request.
+  PaymentAdditionalInfo additional_info = 6;
+}
+
+// Request to search for accounts, given a customer reference.
+message SearchAccountsRequest {
+  // Reference of customer used to search for accounts.
+  CustomerReference customer_reference = 1;
+}
+
+// Response for the SearchAccount method.
+message SearchAccountsResponse {
+  // List of accounts matching the search criteria.
+  repeated AccountInfo accounts = 1;
+}
+
+// Request to retrieve an account balance.
+message RetrieveBalanceRequest {
+  // Identifies the customer or bank account whose account balance is to be
+  // retrieved. Either a customer reference or a bank account reference will be
+  // provided. Only one of the two will be specified.
+  oneof reference {
+    // The combination of a reference type and reference number that uniquely
+    // identifies a bank customer. This field will be used if the customer is
+    // identified based on a unique resident identifier (like Aadhaar) or based
+    // on the customer's mobile number.
+    CustomerReference customer_reference = 1;
+    // A reference to uniquely identify a customer's bank account based on
+    // India's UPI standards.
+    AccountReference account_reference = 2;
+  }
+  // Participant requesting the balance retrieval.
+  Participant participant = 3;
+}
+
+// Response for the RetrieveBalance method.
+message RetrieveBalanceResponse {
+  // Details of account balance.
+  BalanceInfo balance_info = 1;
+  // The account whose balance was retrieved.
+  AccountReference account_reference = 2;
+}

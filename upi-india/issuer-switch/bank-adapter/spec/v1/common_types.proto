@@ -1,0 +1,442 @@
+// Copyright 2022 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option java_outer_classname = "CommonTypesProto";
+option java_multiple_files = true;
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
+option go_api_flag = "OPAQUE_V0";
+
+// Provides additional reason about a particular error response returned by the
+// Bank Adapter. Not all reasons can be returned by all APIs. The list of
+// reasons that can be returned by a particular API are documented along with
+// the API.
+//
+// For any API, if the bank adapter returns an error reason that is not
+// acceptable for that particular API, then the Google Cloud Issuer Gateway
+// will default to INVALID_TRANSACTION.
+enum ErrorReason {
+  // Unspecified error reason.
+  ERROR_REASON_UNSPECIFIED = 0;
+  // The account under consideration for the operation is blocked (as defined
+  // by the bank's policies).
+  ACCT_BLOCKED = 1;
+  // The account under consideration for the operation is dormant (as defined
+  // by the bank's policies).
+  ACCT_DORMANT = 2;
+  // The account under consideration for the operation is frozen (as defined
+  // by the bank's policies).
+  ACCT_FROZEN = 3;
+  // The account under consideration for the operation is inactive (as defined
+  // by the bank's policies).
+  ACCT_INACTIVE = 4;
+  // The account is associated with multiple customers.
+  ACCT_MULTIPLE_CUSTOMERS = 5;
+  // The account details specified are invalid and not found in the bank's
+  // systems.
+  ACCT_NOT_FOUND = 6;
+  // The debit card has expired.
+  CARD_EXPIRED = 7;
+  // The bank card management system is down.
+  CARD_MANAGEMENT_SYSTEM_FAILURE = 8;
+  // The debit card is inactive.
+  INACTIVE_DEBIT_CARD = 9;
+  // The ATM PIN provided is incorrect.
+  INCORRECT_ATM_PIN = 10;
+  // The OTP provided is invalid.
+  INCORRECT_OTP = 11;
+  // The funds in the bank account are insufficient to perform the requested
+  // operation.
+  INSUFFICIENT_FUNDS = 12;
+  // The debit card is invalid.
+  INVALID_DEBIT_CARD = 13;
+  // The parameters provided are invalid.
+  INVALID_PARAMETERS = 14;
+  // The path invoked is not supported by the Bank Adapter service.
+  INVALID_PATH = 15;
+  // The requested transaction is invalid and will not be performed.
+  INVALID_TRANSACTION = 16;
+  // The maximum allowed balance for the account has been exceeded.
+  MAX_BALANCE_EXCEEDED = 17;
+  // More than one customer is associated with the same mobile number.
+  MOBILE_NUMBER_MULTIPLE_CUSTOMERS = 18;
+  // The OTP provided has expired.
+  OTP_EXPIRED = 19;
+  // The debit card is restricted.
+  RESTRICTED_DEBIT_CARD = 20;
+  // The requested operation could not be performed because of an error/bug in
+  // the Bank Adapter service.
+  SERVICE_ERROR = 21;
+  // The requested operation could not be performed because the Bank Adapter
+  // service or one or more of the bank's services are unavailable.
+  SERVICE_UNAVAILAIBLE = 22;
+  // The requested transaction is not permitted.
+  TRANSACTION_NOT_PERMITTED = 23;
+}
+
+// Unique identification of an account according to India's UPI standards.
+message AccountReference {
+  // IFSC code of a bank's branch.
+  string ifsc_code = 1;
+  // Type of account.
+  string account_type = 2;
+  // Unique number for the account in a bank and branch.
+  string account_number = 3;
+}
+
+// The combination of a reference type and reference number that uniquely
+// identifies a bank customer. The customer can either be a physical person or a
+// business.
+message CustomerReference {
+  // Types of identification used to uniquely identify a bank's customer. The
+  // admissible values will evolve over time.
+  enum ReferenceType {
+    // Unspecified reference type.
+    REFERENCE_TYPE_UNSPECIFIED = 0;
+    // Mobile phone number as reference.
+    MOBILE_PHONE_NUMBER = 1;
+    // Unique identifier used to identify residents of a country such as Aadhaar
+    // in India or SSN in the USA.
+    RESIDENT_ID = 2;
+  }
+  // Types of identification used to uniquely identify a bank's customer.
+  ReferenceType reference_type = 1;
+  // The value identifying the customer. The type of the value will be based on
+  // the referenceType field.
+  //
+  // When using `mobile_phone_number` as the reference type, this value will
+  // contain a mobile phone number including country code.
+  //
+  // When using `resident_id` as the reference type, this value will
+  // contain a given's country unique identification number, such as Aadhaar
+  // number in India.
+  string reference_value = 2;
+}
+
+// Represents an monetary amount in a given currency.
+message Amount {
+  // The 3-letter currency code as defined in ISO 4217.
+  string currency_code = 1;
+  // The amount with fractional digits, where fractions can have between 2 and 4
+  // digits. Negative amounts are represented with a prefix -ve sign. The
+  // decimal separator is a dot. In India, only 2 digits will be used after the
+  // decimal separator.
+  string amount = 2;
+}
+
+// Risk information specific to India's UPI Standards.
+message RiskInfo {
+  // Entity providing the risk score.
+  string risk_score_provider = 1;
+  // Numeric value of risk evaluation ranging from 0 (No Risk) to 100 (Maximum
+  // Risk).
+  string risk_score_value = 2;
+  // Type of risk.
+  string risk_type = 3;
+}
+
+// Information about a person or entity participating in a transaction.
+message Participant {
+  // The type of the participant.
+  enum Persona {
+    // Unspecified persona.
+    PERSONA_UNSPECIFIED = 0;
+    // Participant is a person.
+    PERSON = 1;
+    // Participant is an entity.
+    ENTITY = 2;
+  }
+  // The virtual payment address (VPA) of the settlement participant.
+  string virtual_payment_address = 1;
+  // The type of the participant. Could either a person or an entity.
+  Persona persona = 2;
+  // The name of the participant.
+  string name = 3;
+  // The combination of a reference type and reference number that uniquely
+  // identifies a bank customer. The Issuer Switch populates this field with the
+  // customer's unique resident identifier (like India's Aadhaar) or mobile
+  // number.
+  CustomerReference customer_reference = 4;
+}
+
+// Provides additional informations about an entity.
+message AdditionalInfo {
+  // Field name.
+  string name = 1;
+  // Field value.
+  string value = 2;
+}
+
+// The name of a merchant who is a party in a payment settlement. Includes
+// multiple possible names for the merchant.
+message MerchantName {
+  // The name the merchant is commonly known as.
+  string brand = 1;
+  // The merchant's Legal Name.
+  string legal = 2;
+  // The franchise name under which the merchant operates.
+  string franchise = 3;
+}
+
+// Additional merchant information specific to India's UPI requirements.
+message MerchantAdditionalInfo {
+  // Indicates whether it is a small or large merchant.
+  enum Type {
+    // Unspecified merchant type.
+    TYPE_UNSPECIFIED = 0;
+    // Small merchant.
+    SMALL = 1;
+    // Large merchant.
+    LARGE = 2;
+  }
+
+  // Indicates whether it is an online or offline merchant.
+  enum Genre {
+    // Unspecified merchant genre.
+    GENRE_UNSPECIFIED = 0;
+    // Online merchant.
+    ONLINE = 1;
+    // Offline merchant
+    OFFLINE = 2;
+  }
+
+  // Indicates whether the merchant has been onboarded by a bank or an
+  // aggregator.
+  enum OnboardingType {
+    // Unspecified merchant onboarding type.
+    ONBOARDING_TYPE_UNSPECIFIED = 0;
+    // Onboarded by bank.
+    BANK = 1;
+    // Onboarded by aggreagator.
+    AGGREGATOR = 2;
+  }
+
+  // Indicates the type of ownership for the merchant.
+  enum OwnershipType {
+    // Unspecified merchant ownership type.
+    OWNERSHIP_TYPE_UNSPECIFIED = 0;
+    // Properiety ownership.
+    PROPRIETARY = 1;
+    // Partnership ownership.
+    PARTNERSHIP = 2;
+    // Public ownership.
+    PUBLIC = 3;
+    // Private ownership.
+    PRIVATE = 4;
+    // Other ownership model.
+    OTHERS = 5;
+  }
+  // Merchant Category code as specified by UPI (A four-digit number listed in
+  // ISO 18245 for retail financial services).
+  string category_code = 1;
+  // A unique identifier for the merchant store where the payment occurs.
+  string store_id = 2;
+  // A unique identifier for the POS terminal in the store where the payment
+  // occurs.
+  string terminal_id = 3;
+  // Indicates the type of merchant.
+  Type type = 4;
+  // Indicates the genre of the merchant.
+  Genre genre = 5;
+  // Indicates by whom the merchant has been onboarded.
+  OnboardingType onboarding_type = 6;
+  // Indicates the type of ownership for the merchant.
+  OwnershipType ownership_type = 7;
+  // Additional information about the merchant.
+  repeated AdditionalInfo additional_info = 8;
+}
+
+// Information about a merchant entity participating in a payment settlement.
+message MerchantInfo {
+  // A unique identifier for the merchant.
+  string id = 1;
+  // The name of the merchant who is a party in the payment. Includes multiple
+  // possible names for the merchant.
+  MerchantName name = 2;
+  // India specific merchant additional information.
+  MerchantAdditionalInfo additional_info = 3;
+}
+
+// Contains all information about a participant in a payment settlement (either
+// the payer or the payee).
+message SettlementParticipant {
+  // The participant information.
+  Participant participant = 1;
+  // Unique identification of an account according to India's UPI standards.
+  AccountReference account = 2;
+  // Information about a merchant who is a participant in the payment. This
+  // field will be specified only if the participant is a merchant.
+  MerchantInfo merchant_info = 3;
+}
+
+// Additional payment information specific to India's UPI requirements.
+message PaymentAdditionalInfo {
+  // Indicates who initiated the payment.
+  enum SubType {
+    // Unspecified sub-type.
+    SUB_TYPE_UNSPECIFIED = 0;
+    // Pay subtype - initiated by payer.
+    PAY = 1;
+    // Collect subtype - initiated by payee.
+    COLLECT = 2;
+  }
+
+  // Specifies how the payment was inititated.
+  enum InitiationMode {
+    // Unspecified payment initation mode.
+    INITIATION_MODE_UNSPECIFIED = 0;
+    // Default.
+    DEFAULT_INITIATION_MODE = 1;
+    // QR Code.
+    QR_CODE = 2;
+    // Secure QR Code.
+    SECURE_QR_CODE = 3;
+    // Bharat QR Code.
+    BHARAT_QR_CODE = 4;
+    // Intent.
+    INTENT = 5;
+    // Secure Intent.
+    SECURE_INTENT = 6;
+    // NFC(Near Field Communication).
+    NFC = 7;
+    // BLE (Bluetooth).
+    BLUETOOTH = 8;
+    // UHF(Ultra High Frequency).
+    ULTRA_HIGH_FREQUENCY = 9;
+    // Aadhaar.
+    AADHAR = 10;
+    // SDK (Software Development Kit).
+    SDK = 11;
+    // UPI-Mandate.
+    UPI_MANDATE = 12;
+    // FIR (Foreign Inward Remittance).
+    FOREIGN_INWARD_REMITTANCE = 13;
+    // QR Mandate.
+    QR_MANDATE = 14;
+    // BBPS.
+    BBPS = 15;
+    // Future purpose.
+    FUTURE_PURPOSE = 16;
+  }
+
+  // The purpose field is specially used for SEBI transactions.
+  enum Purpose {
+    // Unspecified purpose.
+    PURPOSE_UNSPECIFIED = 0;
+    // Default.
+    DEFAULT_PURPOSE = 1;
+    // SEBI.
+    SEBI = 2;
+    // AMC.
+    AMC = 3;
+    // Travel.
+    TRAVEL = 4;
+    // Hospitality.
+    HOSPITALITY = 5;
+    // Hospital.
+    HOSPITAL = 6;
+    // Telecom.
+    TELECOM = 7;
+    // Insurance.
+    INSURANCE = 8;
+    // Education.
+    EDUCATION = 9;
+    // Gifting.
+    GIFTING = 10;
+    // Others.
+    OTHER_PURPOSES = 11;
+    // Purpose type 11.
+    PURPOSE_TYPE_11 = 12;
+    // Purpose type 12.
+    PURPOSE_TYPE_12 = 13;
+    // Purpose type 13.
+    PURPOSE_TYPE_13 = 14;
+    // Preapproved disbursement.
+    PREAPPROVED_DISBURSEMENT = 15;
+  }
+
+  // The category of the transaction.
+  enum ReferenceCategory {
+    // Unspecified reference category.
+    REFERENCE_CATEGORY_UNSPECIFIED = 0;
+    // Null.
+    NULL = 1;
+    // Advertisement.
+    ADVERTISEMENT = 2;
+    // Invoice.
+    INVOICE = 3;
+    // Others, for future use.
+    OTHER_REFERENCE_CATEGORIES = 4;
+  }
+
+  // Consumer reference number to identify (like Loan number, etc).
+  string consumer_reference_number = 1;
+  // A reference URL for the settlement.
+  string reference_link = 2;
+  // Settlement origination date/time as specified by the message originator.
+  // Formatted as specified in RFC 3339.
+  google.protobuf.Timestamp date_time = 3;
+  // Original date/time of the settlement. Formatted as specified in RFC 3339.
+  google.protobuf.Timestamp original_settlement_date_time = 4;
+  // Original transaction ID when reversal/refund has to be done.
+  string original_payment_id = 5;
+  // Indicates if the payment initiated by the payer (pay) or the payee
+  // (collect).
+  SubType sub_type = 6;
+  // Specifies how the payment was inititated.
+  InitiationMode initiation_mode = 7;
+  // The purpose field is specially used for SEBI txn.
+  Purpose purpose = 8;
+  // Retrieval Reference Number (RRN) used uniquely identify the original
+  // transaction based on the ISO 8583 standard.
+  string original_retrieval_reference_number = 9;
+  // If **referenceLink** is present, then this field is mandatory. The field is
+  // used to identify the category of the transaction.
+  ReferenceCategory reference_category = 10;
+  // Risk information specific to India's UPI Standards.
+  repeated RiskInfo risk_info = 11;
+  // Each additional info can be used to present more detailed information about
+  // the entity is attached to.
+  repeated AdditionalInfo miscellaneous = 12;
+}
+
+// Specifies the amount to be held and the holding rule.
+message HoldAmount {
+  // The holding rule for the hold funds request.
+  enum HoldingRule {
+    // Unspecified holding rule.
+    HOLDING_RULE_UNSPECIFIED = 0;
+    // Rule specifying that the exact amount is to be held.
+    EXACT = 1;
+    // Rule specifying the maximum amount to be held.
+    MAX = 2;
+  }
+  // The amount to be held in the account.
+  Amount instructed_amount = 1;
+  // The holding rule.
+  HoldingRule holding_rule = 2;
+}
+
+// Specifies the amount held and the holding reference.
+message HoldDetails {
+  // The bank's reference for the funds held in the account.
+  string reference = 1;
+  // The amount held in the account.
+  HoldAmount amount = 2;
+}

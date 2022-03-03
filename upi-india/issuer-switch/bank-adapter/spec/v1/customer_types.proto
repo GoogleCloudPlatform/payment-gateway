@@ -1,0 +1,99 @@
+// Copyright 2022 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
+
+import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
+
+option java_outer_classname = "CustomerTypesProto";
+option java_multiple_files = true;
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
+option go_api_flag = "OPAQUE_V0;
+
+// Information about a customer's debit card that will be validated by the bank
+// before sending an OTP to the customer's mobile phone or for validating an OTP
+// received by the customer.
+message DebitCardInfo {
+  // The last 6 digits of the customer's debit card.
+  string card_number = 1;
+  // The expiry date of the debit card in MMYY format.
+  string expiry = 2;
+}
+
+// Request body for MPIN updated notification.
+message NotifyMPINUpdatedRequest {
+  // Participant to be notified about the MPIN update.
+  Participant participant = 1;
+  // Unique identification of an account according to India's UPI standards.
+  AccountReference account = 2;
+}
+
+// The response once a registration request has been processed and an OTP has
+// been generated and sent to a customer's mobile phone.
+message InitiateRegistrationResponse {
+  // URL the customer should use to enter the OTP received on their mobile.
+  string validation_page_link = 1;
+}
+
+// Request for initiating registration of a customer's bank account for UPI.
+message InitiateRegistrationRequest {
+  // Identifies the customer or bank account registering for UPI. An OTP is sent
+  // to the mobile number associated with the customer/bank account. Either a
+  // customer reference or a bank account reference will be provided. Only one
+  // of the two will be specified.
+  oneof reference {
+    // The combination of a reference type and reference number that uniquely
+    // identifies a bank customer. This field will be used if the customer is
+    // identified based on a unique resident identifier (like Aadhaar) or based
+    // on the customer's mobile number.
+    CustomerReference customer_reference = 1;
+    // A reference to uniquely identify a customer's bank account based on
+    // India's UPI standards.
+    AccountReference account_reference = 2;
+  }
+  // Information about a customer's debit card that will be provided if the
+  // issuer bank supports the ATM_REDIRECT mode of registration.
+  DebitCardInfo debit_card_info = 3;
+  // Participant initiating the registration.
+  Participant participant = 4;
+}
+
+// Request for a previously initiated registration to be validated.
+message ValidateRegistrationRequest {
+  // Identifies the customer or bank account whose registration for UPI is to be
+  // validated. Either a customer reference or a bank account reference will be
+  // provided. Only one of the two will be specified.
+  oneof reference {
+    // The combination of a reference type and reference number that uniquely
+    // identifies a bank customer. This field will be used if the customer is
+    // identified based on a unique resident identifier (like Aadhaar) or based
+    // on the customer's mobile number.
+    CustomerReference customer_reference = 1;
+    // A reference to uniquely identify a customer's bank account based on
+    // India's UPI standards.
+    AccountReference account_reference = 2;
+  }
+  // Information about a customer's debit card that needs to be validated by the
+  // bank.
+  DebitCardInfo debit_card_info = 3;
+  // The ATM pin for the debit card that needs to be validated by the bank.
+  string atm_pin = 4;
+  // The OTP received on the customer's mobile phone that needs to be validated
+  // by the bank.
+  string otp = 5;
+  // Participant validating the registration.
+  Participant participant = 6;
+}
