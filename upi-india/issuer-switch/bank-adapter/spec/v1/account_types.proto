@@ -146,3 +146,4 @@ message RetrieveBalanceResponse {
   // The account whose balance was retrieved.
   AccountReference account_reference = 2;
 }
+

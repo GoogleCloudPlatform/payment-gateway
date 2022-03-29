@@ -18,6 +18,7 @@ package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
 
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/account_types.proto";
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/customer_types.proto";
+import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/issue_types.proto";
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/payment_settlement_types.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
@@ -27,7 +28,7 @@ option java_multiple_files = true;
 option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
 option go_api_flag = "OPAQUE_V0";
 
-// A service interface for Bank Adapter.
+// A service interface for the Issuer Switch Bank Adapter.
 service BankAdapterService {
   // Search and return a list of accounts associated with a given customer. The
   // customer may be identified in one of many ways (mobile number, email,
@@ -40,22 +41,22 @@ service BankAdapterService {
   // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
   // response should contain one of the following values:
   //
-  // * `ACCT_BLOCKED` = Account linked with customer identifier is blocked
+  // * `ACCT_BLOCKED` = Account linked with customer identifier is blocked.
   //
-  // * `ACCT_DORMANT` = Account linked with customer identifier is dormant
+  // * `ACCT_DORMANT` = Account linked with customer identifier is dormant.
   //
-  // * `ACCT_FROZEN` = Account linked with customer identifier is frozen
+  // * `ACCT_FROZEN` = Account linked with customer identifier is frozen.
   //
-  // * `ACCT_INACTIVE` = Account linked with customer identifier is inactive
+  // * `ACCT_INACTIVE` = Account linked with customer identifier is inactive.
   //
   // * `ACCT_NOT_FOUND` = No account(s) were found in the bank's systems linked
-  // with the customer identifier
+  // with the customer identifier.
   //
   // * `ACCT_MULTIPLE_CUSTOMERS` = Indicates that the account is associated
-  // with multiple customers
+  // with multiple customers.
   //
   // * `MOBILE_NUMBER_MULTIPLE_CUSTOMERS` = Indicates that the same mobile
-  // number is associated with multiple customers in the bank's systems
+  // number is associated with multiple customers in the bank's systems.
   //
   // _Note:_ This API will be invoked in the UPI `ReqListAccount` API flow.
   rpc SearchAccounts(SearchAccountsRequest) returns (SearchAccountsResponse) {
@@ -72,15 +73,15 @@ service BankAdapterService {
   // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
   // response should contain one of the following values:
   //
-  // * `ACCT_BLOCKED` = Account is blocked
+  // * `ACCT_BLOCKED` = Account is blocked.
   //
-  // * `ACCT_DORMANT` = Account is dormant
+  // * `ACCT_DORMANT` = Account is dormant.
   //
-  // * `ACCT_FROZEN` = Account is frozen
+  // * `ACCT_FROZEN` = Account is frozen.
   //
-  // * `ACCT_INACTIVE` = Account is inactive
+  // * `ACCT_INACTIVE` = Account is inactive.
   //
-  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems
+  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
   //
   // _Note:_ This API will be invoked in the UPI `ReqBalEnq` API flow.
   rpc RetrieveBalance(RetrieveBalanceRequest)
@@ -98,22 +99,22 @@ service BankAdapterService {
   // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
   // response should contain one of the following values:
   //
-  // * `ACCT_BLOCKED` = Account is blocked
+  // * `ACCT_BLOCKED` = Account is blocked.
   //
-  // * `ACCT_DORMANT` = Account is dormant
+  // * `ACCT_DORMANT` = Account is dormant.
   //
-  // * `ACCT_FROZEN` = Account is frozen
+  // * `ACCT_FROZEN` = Account is frozen.
   //
-  // * `ACCT_INACTIVE` = Account is inactive
+  // * `ACCT_INACTIVE` = Account is inactive.
   //
-  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems
+  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
   //
-  // * `INSUFFICIENT_FUNDS` = Insufficient funds in account to process request
+  // * `INSUFFICIENT_FUNDS` = Insufficient funds in account to process request.
   //
-  // * `INVALID_TRANSACTION` = Invalid transaction
+  // * `INVALID_TRANSACTION` = Invalid transaction.
   //
   // * `TRANSACTION_NOT_PERMITTED` = Requested transaction is not permitted for
-  // account
+  // account.
   //
   // _Note:_ This API will be invoked in the UPI `ReqMandate` API flow.
   rpc HoldFunds(HoldFundsRequest) returns (HoldFundsResponse) {
@@ -130,22 +131,22 @@ service BankAdapterService {
   // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
   // response should contain one of the following values:
   //
-  // * `ACCT_BLOCKED` = Account is blocked
+  // * `ACCT_BLOCKED` = Account is blocked.
   //
-  // * `ACCT_DORMANT` = Account is dormant
+  // * `ACCT_DORMANT` = Account is dormant.
   //
-  // * `ACCT_FROZEN` = Account is frozen
+  // * `ACCT_FROZEN` = Account is frozen.
   //
-  // * `ACCT_INACTIVE` = Account is inactive
+  // * `ACCT_INACTIVE` = Account is inactive.
   //
-  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems
+  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
   //
-  // * `INSUFFICIENT_FUNDS` = Insufficient funds in account to process request
+  // * `INSUFFICIENT_FUNDS` = Insufficient funds in account to process request.
   //
-  // * `INVALID_TRANSACTION` = Invalid transaction
+  // * `INVALID_TRANSACTION` = Invalid transaction.
   //
   // * `TRANSACTION_NOT_PERMITTED` = Requested transaction is not permitted for
-  // account
+  // account.
   //
   // _Note:_ This API will be invoked in the UPI `ReqMandate` API flow.
   rpc ReleaseFunds(ReleaseFundsRequest) returns (google.protobuf.Empty) {
@@ -155,7 +156,7 @@ service BankAdapterService {
     };
   }
 
-  // Request issued by the payment gateway for the bank to execute a single
+  // Request issued by the Issuer Switch for the bank to execute a single
   // payment settlement operation. The operation is either to debit a payer's
   // account or to credit a payee's account.
   //
@@ -166,32 +167,32 @@ service BankAdapterService {
   //
   // * `ACCT_BLOCKED` = Indicates that the payer account is blocked, if the
   // settlement request is for a _debit_ or that the payee account is blocked,
-  // if the settlement request is for a _credit_
+  // if the settlement request is for a _credit_.
   //
   // * `ACCT_DORMANT` = Indicates that the payer account is dormant, if the
   // settlement request is for a _debit_ or that the payee account is dormant,
-  // if the settlement request is for a _credit_
+  // if the settlement request is for a _credit_.
   //
   // * `ACCT_FROZEN` = Indicates that the payer account is frozen, if the
   // settlement request is for a _debit_ or that the payee account is frozen,
-  // if the settlement request is for a _credit_
+  // if the settlement request is for a _credit_.
   //
   // * `ACCT_INACTIVE` = Indicates that the payer account is inactive, if the
   // settlement request is for a _debit_ or that the payee account is inactive,
-  // if the settlement request is for a _credit_
+  // if the settlement request is for a _credit_.
   //
   // * `ACCT_NOT_FOUND` = Indicates that the payer account is not found, if the
   // settlement request is for a _debit_ or that the payee account is not found,
-  // if the settlement request is for a _credit_
+  // if the settlement request is for a _credit_.
   //
   // * `INSUFFICIENT_FUNDS` = Returned if the settlement type is _debit_ and the
-  // payer's account does not have sufficient funds for the instructed amount
+  // payer's account does not have sufficient funds for the instructed amount.
   //
-  // * `INVALID_TRANSACTION` = Requested settlement cannot be performed
+  // * `INVALID_TRANSACTION` = Requested settlement cannot be performed.
   //
   // * `MAX_BALANCE_EXCEEDED` = Returned if the settlement type is `credit` and
   // the payee's account's maximum balance allowed value will be breached with
-  // the instructed amount
+  // the instructed amount.
   //
   // _Note:_ This API will be invoked in the UPI `ReqPay` API flow.
   rpc SettlePayment(SettlePaymentRequest) returns (SettlePaymentResponse) {
@@ -208,10 +209,112 @@ service BankAdapterService {
   // If no matching payments are found, then this API must return a HTTP status
   // of 200 with an empty list of payments in the response.
   //
-  // _Note:_ This API will be invoked in the UPI `ReqChkTxn` API flow.
+  // _Note:_ This API will be invoked in the UPI `ReqChkTxn` (transaction type
+  // `ChkTxn`) API flow.
   rpc SearchPayments(SearchPaymentsRequest) returns (SearchPaymentsResponse) {
     option (google.api.http) = {
       post: "/v1/payments:search"
+      body: "*"
+    };
+  }
+
+  // **Note**: *Implementation of this Bank Adapter API is optional. Implement
+  // this API only if your bank wants to handle the unresolved payments all by
+  // itself.*
+  //
+  // Payment settlements done using the Bank Adapter service might fail because
+  // of various reasons such as time-out of the [SettlePayment][] API or network
+  // failure. In the event of such a failure, the Issuer Switch does not receive
+  // the final status of the payment settlement. To handle unresolved payments,
+  // you can configure the Issuer Switch in either `Search & Settle` or `Resolve
+  // Payment` mode.
+  //
+  // * `Search & Settle` - This is the default configuration of the Issuer
+  // Switch. In this mode, the Issuer Switch handles the orchestration using the
+  // [SearchPayments][] API to obtain the status of a payment settlement, and
+  // based on the state of the payment, it invokes the [SettlePayment][] API to
+  // settle the payments.
+  // * `Resolve Payment` - In this mode the Issuer Switch delegates the task of
+  // checking the current status of a payment settlement and its possible
+  // re-execution to the bank adapter service / bank's core services. Use this
+  // mode if your bank wants to handle the unresolved payments all by itself. To
+  // enable this mode, you must implement the [ResolvePayment][] API. If the
+  // Issuer Switch is configured in this mode, then the [ResolvePayment][] API
+  // is invoked for all the unresolved transactions.
+  //
+  // Based on the NPCI request, the Issuer Switch invokes the [ResolvePayment][]
+  // API to resolve the payment settlement transaction and obtain its final
+  // status. This API is invoked to resolve a unresolved payment settlement of
+  // the following types:
+  //
+  // * Debit Reversal
+  // * Credit
+  //
+  // **Note:** The Issuer Switch will not invoke this API if the final status of
+  // the payment settlement operation is already available with it.
+  //
+  // If the bank adapter service attempts to resolve the payment, but is unable
+  // to resolve it successfully, then this API must return a HTTP status of 200
+  // with the ResolvePaymentResponse containing [ResolutionStatus][] as FAILED
+  // and the appropriate error code in [ResolvePaymentResult][]. Specifically, a
+  // non-200 HTTP status must be returned only when the bank adapter service
+  // itself fails and not when the resolution of the payment settlement fails.
+  //
+  // The [ErrorReason][] values that are allowed in the
+  // [PaymentAdjustmentError][] in the [ResolvePaymentResult][] are:
+  //
+  //  * `ACCT_INACTIVE` = Indicates that the payer account is inactive, if the
+  // settlement request is for a _debit reversal_ or that the payee account is
+  // inactive, if the settlement request is for a _credit_.
+  //
+  // * `ACCT_FROZEN` = Indicates that the payer account is frozen, if the
+  // settlement request is for a _debit reversal_ or that the payee account is
+  // frozen, if the settlement request is for a _credit_.
+  //
+  // * `UNABLE_TO_UPDATE_BANK_SERVICES` = Indicates that the bank adapter
+  // service could not update the bank's services.
+  //
+  // * `PARTY_INSTRUCTIONS` = Indicates that the resolution of the payment
+  // failed due to party instructions.
+  //
+  // * `DUPLICATE_PROCESSING` = Indicates that the resolution request is a
+  // duplicate.
+  //
+  // * `PAYMENT_UDIR_RET_114` = Indicates that the resolution failed due to
+  // error `114` as part of beneficiary bank attempting to resolve a `TCC`
+  // case.
+  //
+  // * `PAYMENT_UDIR_RET_115` = Indicates that the resolution failed due to
+  // error `115` as part of beneficiary bank attempting to resolve a `TCC`
+  // case.
+  //
+  // * `PAYMENT_UDIR_RET_116` = Indicates that the resolution failed due to
+  // error `116` as part of beneficiary bank attempting to resolve a `TCC`
+  // case.
+  //
+  // * `PAYMENT_UDIR_RET_117` = Indicates that the resolution failed due to
+  // error `117` as part of beneficiary bank attempting to resolve a `TCC`
+  // case.
+  //
+  // * `PAYMENT_UDIR_RET_118` = Indicates that the resolution failed due to
+  // error `118` as part of beneficiary bank attempting to resolve a `TCC`
+  // case.
+  //
+  // * `PAYMENT_UDIR_RET_119` = Indicates that the resolution failed due to
+  // error `119` as part of beneficiary bank attempting to resolve a `TCC`
+  // case.
+  //
+  // * `PAYMENT_UDIR_RET_120` = Indicates that the resolution failed due to
+  // error `120` as part of beneficiary bank attempting to resolve a `TCC`
+  // case.
+  //
+  // _Note:_ This API will be invoked as part of UPI's Online Dispute and Issue
+  // Resolution (`UDIR`) flows. Specifically, this API will be invoked in the
+  // UPI `ReqChkTxn` (transaction type `AUTOUPDATE`) and `ReqComplaint`
+  // (transaction type `Complaint`) API flow.
+  rpc ResolvePayment(ResolvePaymentRequest) returns (ResolvePaymentResponse) {
+    option (google.api.http) = {
+      post: "/v1/payments:resolveSingle"
       body: "*"
     };
   }
@@ -229,20 +332,20 @@ service BankAdapterService {
   // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
   // response should contain one of the following values:
   //
-  // * `ACCT_BLOCKED` = Account is blocked
+  // * `ACCT_BLOCKED` = Account is blocked.
   //
-  // * `ACCT_DORMANT` = Account is dormant
+  // * `ACCT_DORMANT` = Account is dormant.
   //
-  // * `ACCT_FROZEN` = Account is frozen
+  // * `ACCT_FROZEN` = Account is frozen.
   //
-  // * `ACCT_INACTIVE` = Account is inactive
+  // * `ACCT_INACTIVE` = Account is inactive.
   //
-  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems
+  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
   //
-  // * `INVALID_DEBIT_CARD` = Debit card details provided are invalid
+  // * `INVALID_DEBIT_CARD` = Debit card details provided are invalid.
   //
   // * `MOBILE_NUMBER_MULTIPLE_CUSTOMERS` = Mobile number is linked with
-  // multiple customers
+  // multiple customers.
   //
   // _Note:_ This API will be invoked in the UPI `ReqOtp` API flow.
   rpc InitiateRegistration(InitiateRegistrationRequest)
@@ -270,32 +373,32 @@ service BankAdapterService {
   // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
   // response should contain one of the following values:
   //
-  // * `ACCT_BLOCKED` = Account is blocked
+  // * `ACCT_BLOCKED` = Account is blocked.
   //
-  // * `ACCT_DORMANT` = Account is dormant
+  // * `ACCT_DORMANT` = Account is dormant.
   //
-  // * `ACCT_FROZEN` = Account is frozen
+  // * `ACCT_FROZEN` = Account is frozen.
   //
-  // * `ACCT_INACTIVE` = Account is inactive
+  // * `ACCT_INACTIVE` = Account is inactive.
   //
-  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems
+  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
   //
-  // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Bank card management system is down
+  // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Bank card management system is down.
   //
-  // * `INACTIVE_DEBIT_CARD` = Debit card is inactive
+  // * `INACTIVE_DEBIT_CARD` = Debit card is inactive.
   //
-  // * `INCORRECT_ATM_PIN` = Incorrect ATM pin
+  // * `INCORRECT_ATM_PIN` = Incorrect ATM pin.
   //
-  // * `INCORRECT_OTP` = OTP provided is incorrect
+  // * `INCORRECT_OTP` = OTP provided is incorrect.
   //
-  // * `INVALID_DEBIT_CARD` = Debit card details provided are invalid
+  // * `INVALID_DEBIT_CARD` = Debit card details provided are invalid.
   //
   // * `MOBILE_NUMBER_MULTIPLE_CUSTOMERS` = Mobile number is linked with
-  // multiple customers
+  // multiple customers.
   //
-  // * `OTP_EXPIRED` = Specified OTP has expired
+  // * `OTP_EXPIRED` = Specified OTP has expired.
   //
-  // * `RESTRICTED_DEBIT_CARD` = Debit card is restricted
+  // * `RESTRICTED_DEBIT_CARD` = Debit card is restricted.
   //
   // _Note:_ This API will be invoked in the UPI `ReqRegMob` API flow.
   rpc ValidateRegistration(ValidateRegistrationRequest)
@@ -307,12 +410,12 @@ service BankAdapterService {
   }
 
   // This is an API to notify the bank adapter about the successful updation of
-  // a user's MPIN in the Google Cloud Payment Gateway issuer switch.
+  // a user's MPIN in the Issuer Switch.
   //
   // The validation of the current M-PIN of a user, and the updation to a new
-  // M-PIN is handled by the Google Cloud Payment Gateway issuer switch. The
-  // bank adapter is invoked after the new M-PIN has been updated successfully
-  // by the issuer switch for any further processing by the bank's systems.
+  // M-PIN is handled by the Issuer Switch. The bank adapter is invoked after
+  // the new M-PIN has been updated successfully by the issuer switch for any
+  // further processing by the bank's systems.
   //
   // The NPCI circular RMD-014 requires issuer banks to send an SMS notification
   // to customers when the UPI M-PIN is successfully set for a user. This is to
@@ -325,15 +428,15 @@ service BankAdapterService {
   // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
   // response should contain one of the following values:
   //
-  // * `ACCT_BLOCKED` = Account is blocked
+  // * `ACCT_BLOCKED` = Account is blocked.
   //
-  // * `ACCT_DORMANT` = Account is dormant
+  // * `ACCT_DORMANT` = Account is dormant.
   //
-  // * `ACCT_FROZEN` = Account is frozen
+  // * `ACCT_FROZEN` = Account is frozen.
   //
-  // * `ACCT_INACTIVE` = Account is inactive
+  // * `ACCT_INACTIVE` = Account is inactive.
   //
-  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems
+  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
   //
   // _Note:_ This API will be invoked in the UPI `ReqSetCre` API flow.
   rpc NotifyMPINUpdated(NotifyMPINUpdatedRequest)
@@ -343,4 +446,43 @@ service BankAdapterService {
       body: "*"
     };
   }
+
+  // Validates a customer's government issued ID against the KYC (Know Your
+  // Customer) details stored by the bank for that customer.
+  //
+  // The request will contain the following information:
+  //
+  // 1. ID type and the ID value that needs to be validated.
+  // 2. Account type and the account number of the customer.
+  //
+  // *Note:* Issuer Switch supports only the PAN (Permanent Account Number) ID
+  // type in the current release.
+  //
+  // Set the `valid` field in the response to `TRUE`, if the ID matches the
+  // account details of the customer in the request, and to `FALSE` otherwise.
+  //
+  // This API should return a `400` HTTP status code if it is unable to process
+  // the request. The `reason` field in the
+  // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
+  // response should contain one of the following values:
+  //
+  // * `ACCT_BLOCKED` = Account is blocked.
+  //
+  // * `ACCT_DORMANT` = Account is dormant.
+  //
+  // * `ACCT_FROZEN` = Account is frozen.
+  //
+  // * `ACCT_INACTIVE` = Account is inactive.
+  //
+  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
+  //
+  // _Note:_ This API will be invoked in the UPI `ReqValCust` API flow.
+  rpc ValidateCustomer(CustomerValidationRequest)
+      returns (CustomerValidationResponse) {
+    option (google.api.http) = {
+      post: "/v1/users:validateCustomer"
+      body: "*"
+    };
+  }
 }
+

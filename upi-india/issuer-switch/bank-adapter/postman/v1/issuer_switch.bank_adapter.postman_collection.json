@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "437a8277-5e2f-4d9b-abd6-c26a4a3a907b",
+    "_postman_id": "04156763-ef8e-47dc-8a25-fbb1a907dd21",
     "name": "Google Cloud Issuer Switch - Bank Adapter APIs",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -160,7 +160,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "d7df2a1b-d6e8-459b-a8bb-d9c1789476b7",
                 "type": "text"
               }
             ],
@@ -175,8 +175,13 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/accounts:search",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "accounts:search"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "accounts:search"
+              ]
             }
           },
           "response": []
@@ -363,7 +368,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "f32df659-618f-4909-9aeb-fd390e19fd25",
                 "type": "text"
               }
             ],
@@ -378,8 +383,14 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/accounts/balance:retrieve",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "accounts", "balance:retrieve"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "accounts",
+                "balance:retrieve"
+              ]
             }
           },
           "response": []
@@ -489,7 +500,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "6af4bf3d-781d-41e6-a5ce-31dcac7f64d0",
                 "type": "text"
               }
             ],
@@ -499,8 +510,14 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/accounts/funds:hold",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "accounts", "funds:hold"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "accounts",
+                "funds:hold"
+              ]
             }
           },
           "response": []
@@ -605,7 +622,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "c1d483b9-dea4-40f6-9f33-9db5c8ecd8fc",
                 "type": "text"
               }
             ],
@@ -615,8 +632,14 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/accounts/funds:hold",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "accounts", "funds:hold"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "accounts",
+                "funds:hold"
+              ]
             }
           },
           "response": []
@@ -710,7 +733,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "0bab52ab-9a31-43a3-86ba-a5eb7df985b2",
                 "type": "text"
               }
             ],
@@ -725,8 +748,14 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/accounts/funds:release",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "accounts", "funds:release"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "accounts",
+                "funds:release"
+              ]
             }
           },
           "response": []
@@ -946,7 +975,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "a04c870c-a07a-4f02-b1e4-dd5cbcf8f9d9",
                 "type": "text"
               }
             ],
@@ -961,8 +990,13 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/payments:search",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "payments:search"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "payments:search"
+              ]
             }
           },
           "response": []
@@ -979,8 +1013,7 @@
                   "    \"required\": [",
                   "        \"backendSettlementId\",",
                   "        \"settlementTime\",",
-                  "        \"settledAmount\",",
-                  "        \"miscellaneous\"",
+                  "        \"settledAmount\"",
                   "    ],",
                   "    \"properties\": {",
                   "        \"backendSettlementId\": {",
@@ -1108,7 +1141,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "30e673a1-7bc6-49b8-9f99-caa7320b66ff",
                 "type": "text"
               }
             ],
@@ -1123,8 +1156,13 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/payments:settleSingle",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "payments:settleSingle"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "payments:settleSingle"
+              ]
             }
           },
           "response": []
@@ -1141,8 +1179,7 @@
                   "    \"required\": [",
                   "        \"backendSettlementId\",",
                   "        \"settlementTime\",",
-                  "        \"settledAmount\",",
-                  "        \"miscellaneous\"",
+                  "        \"settledAmount\"",
                   "    ],",
                   "    \"properties\": {",
                   "        \"backendSettlementId\": {",
@@ -1270,7 +1307,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "02aa1709-0d07-4e65-b707-13c18be58fdc",
                 "type": "text"
               }
             ],
@@ -1285,8 +1322,13 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/payments:settleSingle",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "payments:settleSingle"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "payments:settleSingle"
+              ]
             }
           },
           "response": []
@@ -1303,8 +1345,7 @@
                   "    \"required\": [",
                   "        \"backendSettlementId\",",
                   "        \"settlementTime\",",
-                  "        \"settledAmount\",",
-                  "        \"miscellaneous\"",
+                  "        \"settledAmount\"",
                   "    ],",
                   "    \"properties\": {",
                   "        \"backendSettlementId\": {",
@@ -1432,7 +1473,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "a48084d1-6297-4591-9589-e703542ac613",
                 "type": "text"
               }
             ],
@@ -1447,8 +1488,13 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/payments:settleSingle",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "payments:settleSingle"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "payments:settleSingle"
+              ]
             }
           },
           "response": []
@@ -1465,8 +1511,7 @@
                   "    \"required\": [",
                   "        \"backendSettlementId\",",
                   "        \"settlementTime\",",
-                  "        \"settledAmount\",",
-                  "        \"miscellaneous\"",
+                  "        \"settledAmount\"",
                   "    ],",
                   "    \"properties\": {",
                   "        \"backendSettlementId\": {",
@@ -1594,7 +1639,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "",
+                "value": "feb1c2be-a272-433d-be1d-ab36701e1aaf",
                 "type": "text"
               }
             ],
@@ -1609,8 +1654,537 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/payments:settleSingle",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "payments:settleSingle"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "payments:settleSingle"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "resolveSingle-debit-reversal-complaint",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const schema = {",
+                  "  \"type\": \"object\",",
+                  "  \"required\": [",
+                  "    \"resolutionStatus\",",
+                  "    \"resolvePaymentResponse\"",
+                  "  ],",
+                  "  \"properties\": {",
+                  "    \"resolutionStatus\": {",
+                  "      \"type\": \"string\",",
+                  "      \"enum\": [",
+                  "        \"STATE_UNSPECIFIED\",",
+                  "        \"SUCCEEDED\",",
+                  "        \"FAILED\"",
+                  "      ]",
+                  "    },",
+                  "    \"resolvePaymentResponse\": {",
+                  "      \"oneOf\": [",
+                  "        {",
+                  "          \"type\": \"object\",",
+                  "          \"required\": [",
+                  "            \"success\"",
+                  "          ],",
+                  "          \"properties\": {",
+                  "            \"success\": {",
+                  "              \"type\": \"object\",",
+                  "              \"required\": [",
+                  "                \"metadata\",",
+                  "                \"type\"",
+                  "              ],",
+                  "              \"properties\": {",
+                  "                \"metadata\": {",
+                  "                  \"type\": \"object\",",
+                  "                  \"required\": [",
+                  "                    \"adjustmentId\",",
+                  "                    \"adjustmentRemarks\"",
+                  "                  ],",
+                  "                  \"properties\": {",
+                  "                    \"adjustmentId\": {",
+                  "                      \"type\": \"string\"",
+                  "                    },",
+                  "                    \"adjustmentRemarks\": {",
+                  "                      \"type\": \"string\"",
+                  "                    }",
+                  "                  },",
+                  "                  \"additionalProperties\": false",
+                  "                },",
+                  "                \"settlementResponse\": {",
+                  "                  \"type\": \"object\",",
+                  "                  \"required\": [",
+                  "                    \"backendSettlementId\",",
+                  "                    \"settlementTime\",",
+                  "                    \"settledAmount\",",
+                  "                  ],",
+                  "                  \"properties\": {",
+                  "                    \"backendSettlementId\": {",
+                  "                      \"type\": \"string\"",
+                  "                    },",
+                  "                    \"settlementTime\": {",
+                  "                      \"type\": \"string\"",
+                  "                    },",
+                  "                    \"settledAmount\": {",
+                  "                      \"type\": \"object\",",
+                  "                      \"required\": [",
+                  "                        \"currencyCode\",",
+                  "                        \"amount\"",
+                  "                      ],",
+                  "                      \"properties\": {",
+                  "                        \"currencyCode\": {",
+                  "                          \"type\": \"string\"",
+                  "                        },",
+                  "                        \"amount\": {",
+                  "                          \"type\": \"string\"",
+                  "                        }",
+                  "                      },",
+                  "                      \"additionalProperties\": false",
+                  "                    },",
+                  "                    \"miscellaneous\": {",
+                  "                      \"type\": \"array\",",
+                  "                      \"items\": {",
+                  "                        \"type\": \"object\",",
+                  "                        \"required\": [",
+                  "                          \"name\",",
+                  "                          \"value\"",
+                  "                        ],",
+                  "                        \"properties\": {",
+                  "                          \"name\": {",
+                  "                            \"type\": \"string\"",
+                  "                          },",
+                  "                          \"value\": {",
+                  "                            \"type\": \"string\"",
+                  "                          }",
+                  "                        },",
+                  "                        \"additionalProperties\": false",
+                  "                      }",
+                  "                    }",
+                  "                  },",
+                  "                  \"additionalProperties\": false",
+                  "                },",
+                  "                \"type\": {",
+                  "                  \"type\": \"string\",",
+                  "                  \"enum\": [",
+                  "                    \"TRANSACTION_ALREADY_RESOLVED\",",
+                  "                    \"TRANSACTION_RESOLVED_NOW \",",
+                  "                    \"ORIGINAL_TRANSACTION_NOT_FOUND\",",
+                  "                    \"ORIGINAL_TRANSACTION_DID_NOT_OCCUR \",",
+                  "                  ]                  ",
+                  "                }",
+                  "              },",
+                  "              \"additionalProperties\": false",
+                  "            }",
+                  "          },",
+                  "          \"additionalProperties\": false",
+                  "        },",
+                  "        {",
+                  "          \"type\": \"object\",",
+                  "          \"required\": [",
+                  "            \"error\"",
+                  "          ],",
+                  "          \"properties\": {",
+                  "            \"error\": {",
+                  "              \"type\": \"object\",",
+                  "              \"required\": [",
+                  "                \"errorReason\"",
+                  "              ],",
+                  "              \"properties\": {",
+                  "                \"errorReason\": {",
+                  "                  \"type\": \"string\",",
+                  "                  \"enum\": [",
+                  "                    \"ACCT_INACTIVE\",",
+                  "                    \"ACCT_FROZEN\",",
+                  "                    \"UNABLE_TO_UPDATE_BANK_SERVICES\",",
+                  "                    \"PARTY_INSTRUCTIONS\",",
+                  "                    \"DUPLICATE_PROCESSING\",",
+                  "                    \"PAYMENT_UDIR_RET_114\",",
+                  "                    \"PAYMENT_UDIR_RET_115\",",
+                  "                    \"PAYMENT_UDIR_RET_116\",",
+                  "                    \"PAYMENT_UDIR_RET_117\",",
+                  "                    \"PAYMENT_UDIR_RET_118\",",
+                  "                    \"PAYMENT_UDIR_RET_119\",",
+                  "                    \"PAYMENT_UDIR_RET_120\"",
+                  "                  ]",
+                  "                }",
+                  "              }",
+                  "            },",
+                  "            \"additionalProperties\": false",
+                  "          }",
+                  "        }",
+                  "      ]",
+                  "    }",
+                  "  },",
+                  "  \"additionalProperties\": false",
+                  "}",
+                  "",
+                  "const error_schema = {",
+                  "  \"type\": \"object\",",
+                  "  \"required\": [",
+                  "      \"code\",",
+                  "      \"details\",",
+                  "      \"message\"",
+                  "  ],",
+                  "  \"properties\": {",
+                  "      \"code\": {",
+                  "          \"type\": \"integer\"",
+                  "      },",
+                  "      \"details\": {",
+                  "          \"type\": \"array\",",
+                  "          \"items\": {",
+                  "              \"type\": \"object\",",
+                  "              \"required\": [",
+                  "                  \"@type\",",
+                  "                  \"domain\",",
+                  "                  \"metadata\",",
+                  "                  \"reason\"",
+                  "              ],",
+                  "              \"properties\": {",
+                  "                  \"@type\": {",
+                  "                      \"type\": \"string\"",
+                  "                  },",
+                  "                  \"domain\": {",
+                  "                      \"type\": \"string\"",
+                  "                  },",
+                  "                  \"metadata\": {",
+                  "                      \"type\": \"object\",",
+                  "                      \"required\": [",
+                  "                          \"service\"",
+                  "                      ],",
+                  "                      \"properties\": {",
+                  "                          \"service\": {",
+                  "                              \"type\": \"string\"",
+                  "                          }",
+                  "                      },",
+                  "                      \"additionalProperties\": false",
+                  "                  },",
+                  "                  \"reason\": {",
+                  "                      \"type\": \"string\"",
+                  "                  }",
+                  "              },",
+                  "              \"additionalProperties\": false",
+                  "          }",
+                  "      },",
+                  "      \"message\": {",
+                  "          \"type\": \"string\"",
+                  "      }",
+                  "  },",
+                  "  \"additionalProperties\": false",
+                  "};",
+                  "",
+                  "pm.test(\"response is valid\", function(){",
+                  "  if(pm.response.code === 200) {",
+                  "      pm.response.to.have.jsonSchema(schema);",
+                  "  } else {",
+                  "      pm.response.to.have.jsonSchema(error_schema);",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=UTF-8",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "ce49aa1f-c016-4482-b0a6-6f372f3a4d11",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"resolutionType\": \"RESOLVE_DEBIT_REVERSAL\",\n    \"resolutionWorkflow\":\"COMPLAINT_WORKFLOW\",\n    \"issueDetails\":{\n        \"type\" : \"COMPLAINT\",\n        \"reason\":\"PAYER_CREDIT_NOT_RECEIVED_FOR_DECLINED_P2P_TRANSACTION\",\n        \"initiationMode\":\"CUSTOMER_APP\",\n        \"originalSettlementCode\":\"RR\"\n    },\n    \"originalSettlePaymentInfo\":{\n    \"settlementType\": \"DEBIT\",\n    \"payer\": {\n        \"participant\": {\n            \"virtualPaymentAddress\": \"foo@okgoog\",\n            \"persona\": \"PERSON\",\n            \"name\": \"Test Payer Name\",\n            \"customerReference\": {\n            \"referenceType\": \"MOBILE_PHONE_NUMBER\",\n            \"referenceValue\": \"919876543210\"\n        }\n        },\n        \"account\": {\n            \"ifscCode\": \"GOOG0002373\",\n            \"accountType\": \"SAVINGS\",\n            \"accountNumber\": \"50100100670905\"\n        }\n    },\n    \"payee\": {\n        \"participant\": {\n            \"virtualPaymentAddress\": \"bar@okgoog\",\n            \"persona\": \"PERSON\",\n            \"name\": \"Test Payee Name\",\n            \"customerReference\": {\n            \"referenceType\": \"MOBILE_PHONE_NUMBER\",\n            \"referenceValue\": \"919012345678\"\n        }\n        },\n        \"account\": {\n            \"ifscCode\": \"GOOG0004444\",\n            \"accountType\": \"SAVINGS\",\n            \"accountNumber\": \"50100101672790\"\n        }\n    },\n    \"instructedAmount\": {\n        \"currencyCode\": \"INR\",\n        \"amount\": \"100.00\"\n    },\n    \"paymentId\": \"GOO20c1f927bb4146cabf105e1038f0ec77\",\n    \"retrievalReferenceNumber\": \"827005801052\",\n    \"description\": \"Test ReqPay-DEBIT\",\n    \"requestTime\": \"2022-01-31T04:21:41.150Z\",\n    \"additionalInfo\": {\n        \"consumerReferenceNumber\": \"9643075618712426270465674\",\n        \"referenceLink\": \"https://upi.goog.com\",\n        \"dateTime\": \"2022-01-31T04:21:41.150Z\",\n        \"subType\": \"PAY\",\n        \"initiationMode\": \"DEFAULT_INITIATION_MODE\",\n        \"purpose\": \"DEFAULT_PURPOSE\",\n        \"riskInfo\": [\n            {\n                \"riskScoreProvider\": \"XYZ\",\n                \"riskScoreValue\": \"30\",\n                \"riskType\": \"TXNRISK\"\n            },\n            {\n                \"riskScoreProvider\": \"NPCI\",\n                \"riskScoreValue\": \"99\",\n                \"riskType\": \"TXNRISK\"\n            }\n        ]\n    }\n}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base-url}}/v1/payments:resolveSingle",
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "payments:resolveSingle"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "resolveSingle-credit-autoupdate",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const schema = {",
+                  "  \"type\": \"object\",",
+                  "  \"required\": [",
+                  "    \"resolutionStatus\",",
+                  "    \"resolvePaymentResponse\"",
+                  "  ],",
+                  "  \"properties\": {",
+                  "    \"resolutionStatus\": {",
+                  "      \"type\": \"string\",",
+                  "      \"enum\": [",
+                  "        \"STATE_UNSPECIFIED\",",
+                  "        \"SUCCEEDED\",",
+                  "        \"FAILED\"",
+                  "      ]",
+                  "    },",
+                  "    \"resolvePaymentResponse\": {",
+                  "      \"oneOf\": [",
+                  "        {",
+                  "          \"type\": \"object\",",
+                  "          \"required\": [",
+                  "            \"success\"",
+                  "          ],",
+                  "          \"properties\": {",
+                  "            \"success\": {",
+                  "              \"type\": \"object\",",
+                  "              \"required\": [",
+                  "                \"metadata\",",
+                  "                \"type\"",
+                  "              ],",
+                  "              \"properties\": {",
+                  "                \"metadata\": {",
+                  "                  \"type\": \"object\",",
+                  "                  \"required\": [",
+                  "                    \"adjustmentId\",",
+                  "                    \"adjustmentRemarks\"",
+                  "                  ],",
+                  "                  \"properties\": {",
+                  "                    \"adjustmentId\": {",
+                  "                      \"type\": \"string\"",
+                  "                    },",
+                  "                    \"adjustmentRemarks\": {",
+                  "                      \"type\": \"string\"",
+                  "                    }",
+                  "                  },",
+                  "                  \"additionalProperties\": false",
+                  "                },",
+                  "                \"settlementResponse\": {",
+                  "                  \"type\": \"object\",",
+                  "                  \"required\": [",
+                  "                    \"backendSettlementId\",",
+                  "                    \"settlementTime\",",
+                  "                    \"settledAmount\",",
+                  "                  ],",
+                  "                  \"properties\": {",
+                  "                    \"backendSettlementId\": {",
+                  "                      \"type\": \"string\"",
+                  "                    },",
+                  "                    \"settlementTime\": {",
+                  "                      \"type\": \"string\"",
+                  "                    },",
+                  "                    \"settledAmount\": {",
+                  "                      \"type\": \"object\",",
+                  "                      \"required\": [",
+                  "                        \"currencyCode\",",
+                  "                        \"amount\"",
+                  "                      ],",
+                  "                      \"properties\": {",
+                  "                        \"currencyCode\": {",
+                  "                          \"type\": \"string\"",
+                  "                        },",
+                  "                        \"amount\": {",
+                  "                          \"type\": \"string\"",
+                  "                        }",
+                  "                      },",
+                  "                      \"additionalProperties\": false",
+                  "                    },",
+                  "                    \"miscellaneous\": {",
+                  "                      \"type\": \"array\",",
+                  "                      \"items\": {",
+                  "                        \"type\": \"object\",",
+                  "                        \"required\": [",
+                  "                          \"name\",",
+                  "                          \"value\"",
+                  "                        ],",
+                  "                        \"properties\": {",
+                  "                          \"name\": {",
+                  "                            \"type\": \"string\"",
+                  "                          },",
+                  "                          \"value\": {",
+                  "                            \"type\": \"string\"",
+                  "                          }",
+                  "                        },",
+                  "                        \"additionalProperties\": false",
+                  "                      }",
+                  "                    }",
+                  "                  },",
+                  "                  \"additionalProperties\": false",
+                  "                },",
+                  "                \"type\": {",
+                  "                  \"type\": \"string\",",
+                  "                  \"enum\": [",
+                  "                    \"TRANSACTION_ALREADY_RESOLVED\",",
+                  "                    \"TRANSACTION_RESOLVED_NOW \",",
+                  "                    \"ORIGINAL_TRANSACTION_NOT_FOUND\",",
+                  "                    \"ORIGINAL_TRANSACTION_DID_NOT_OCCUR \",",
+                  "                  ]                  ",
+                  "                }",
+                  "              },",
+                  "              \"additionalProperties\": false",
+                  "            }",
+                  "          },",
+                  "          \"additionalProperties\": false",
+                  "        },",
+                  "        {",
+                  "          \"type\": \"object\",",
+                  "          \"required\": [",
+                  "            \"error\"",
+                  "          ],",
+                  "          \"properties\": {",
+                  "            \"error\": {",
+                  "              \"type\": \"object\",",
+                  "              \"required\": [",
+                  "                \"errorReason\"",
+                  "              ],",
+                  "              \"properties\": {",
+                  "                \"errorReason\": {",
+                  "                  \"type\": \"string\",",
+                  "                  \"enum\": [",
+                  "                    \"ACCT_INACTIVE\",",
+                  "                    \"ACCT_FROZEN\",",
+                  "                    \"UNABLE_TO_UPDATE_BANK_SERVICES\",",
+                  "                    \"PARTY_INSTRUCTIONS\",",
+                  "                    \"DUPLICATE_PROCESSING\",",
+                  "                    \"PAYMENT_UDIR_RET_114\",",
+                  "                    \"PAYMENT_UDIR_RET_115\",",
+                  "                    \"PAYMENT_UDIR_RET_116\",",
+                  "                    \"PAYMENT_UDIR_RET_117\",",
+                  "                    \"PAYMENT_UDIR_RET_118\",",
+                  "                    \"PAYMENT_UDIR_RET_119\",",
+                  "                    \"PAYMENT_UDIR_RET_120\"",
+                  "                  ]",
+                  "                }",
+                  "              }",
+                  "            },",
+                  "            \"additionalProperties\": false",
+                  "          }",
+                  "        }",
+                  "      ]",
+                  "    }",
+                  "  },",
+                  "  \"additionalProperties\": false",
+                  "}",
+                  "",
+                  "const error_schema = {",
+                  "  \"type\": \"object\",",
+                  "  \"required\": [",
+                  "      \"code\",",
+                  "      \"details\",",
+                  "      \"message\"",
+                  "  ],",
+                  "  \"properties\": {",
+                  "      \"code\": {",
+                  "          \"type\": \"integer\"",
+                  "      },",
+                  "      \"details\": {",
+                  "          \"type\": \"array\",",
+                  "          \"items\": {",
+                  "              \"type\": \"object\",",
+                  "              \"required\": [",
+                  "                  \"@type\",",
+                  "                  \"domain\",",
+                  "                  \"metadata\",",
+                  "                  \"reason\"",
+                  "              ],",
+                  "              \"properties\": {",
+                  "                  \"@type\": {",
+                  "                      \"type\": \"string\"",
+                  "                  },",
+                  "                  \"domain\": {",
+                  "                      \"type\": \"string\"",
+                  "                  },",
+                  "                  \"metadata\": {",
+                  "                      \"type\": \"object\",",
+                  "                      \"required\": [",
+                  "                          \"service\"",
+                  "                      ],",
+                  "                      \"properties\": {",
+                  "                          \"service\": {",
+                  "                              \"type\": \"string\"",
+                  "                          }",
+                  "                      },",
+                  "                      \"additionalProperties\": false",
+                  "                  },",
+                  "                  \"reason\": {",
+                  "                      \"type\": \"string\"",
+                  "                  }",
+                  "              },",
+                  "              \"additionalProperties\": false",
+                  "          }",
+                  "      },",
+                  "      \"message\": {",
+                  "          \"type\": \"string\"",
+                  "      }",
+                  "  },",
+                  "  \"additionalProperties\": false",
+                  "};",
+                  "",
+                  "pm.test(\"response is valid\", function(){",
+                  "  if(pm.response.code === 200) {",
+                  "      pm.response.to.have.jsonSchema(schema);",
+                  "  } else {",
+                  "      pm.response.to.have.jsonSchema(error_schema);",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=UTF-8",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "7757f36d-f744-4fa7-8148-55add08af9f9",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolutionType\": \"RESOLVE_CREDIT\",\n  \"resolutionWorkflow\": \"AUTOUPDATE_WORKFLOW\",\n  \"originalSettlePaymentInfo\": {\n    \"settlementType\": \"CREDIT\",\n    \"payer\": {\n      \"participant\": {\n        \"virtualPaymentAddress\": \"foo@okgoog\",\n        \"persona\": \"PERSON\",\n        \"name\": \"Test Payer Name\",\n        \"customerReference\": {\n          \"referenceType\": \"MOBILE_PHONE_NUMBER\",\n          \"referenceValue\": \"919876543210\"\n        }\n      },\n      \"account\": {\n        \"ifscCode\": \"GOOG0002373\",\n        \"accountType\": \"SAVINGS\",\n        \"accountNumber\": \"50100100670905\"\n      }\n    },\n    \"payee\": {\n      \"participant\": {\n        \"virtualPaymentAddress\": \"bar@okgoog\",\n        \"persona\": \"PERSON\",\n        \"name\": \"Test Payee Name\",\n        \"customerReference\": {\n          \"referenceType\": \"MOBILE_PHONE_NUMBER\",\n          \"referenceValue\": \"919012345678\"\n        }\n      },\n      \"account\": {\n        \"ifscCode\": \"GOOG0004444\",\n        \"accountType\": \"SAVINGS\",\n        \"accountNumber\": \"50100101672790\"\n      }\n    },\n    \"instructedAmount\": {\n      \"currencyCode\": \"INR\",\n      \"amount\": \"100.00\"\n    },\n    \"paymentId\": \"GOO36f9d3d653814aec85fbc9ca0f2febd9\",\n    \"retrievalReferenceNumber\": \"767529931664\",\n    \"description\": \"Test ReqPay-DEBIT\",\n    \"requestTime\": \"2022-01-31T04:21:41.150Z\",\n    \"additionalInfo\": {\n      \"dateTime\": \"2022-01-31T04:21:41.150Z\",\n      \"subType\": \"PAY\",\n      \"initiationMode\": \"DEFAULT_INITIATION_MODE\",\n      \"purpose\": \"DEFAULT_PURPOSE\",\n      \"riskInfo\": [\n        {\n          \"riskScoreProvider\": \"XYZ\",\n          \"riskScoreValue\": \"30\",\n          \"riskType\": \"TXNRISK\"\n        },\n        {\n          \"riskScoreProvider\": \"NPCI\",\n          \"riskScoreValue\": \"99\",\n          \"riskType\": \"TXNRISK\"\n        }\n      ]\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base-url}}/v1/payments:resolveSingle",
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "payments:resolveSingle"
+              ]
             }
           },
           "response": []
@@ -1720,7 +2294,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "0e759da7-1ced-4801-8866-6932b9829180",
                 "type": "text"
               }
             ],
@@ -1735,8 +2309,13 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/users:initiateRegistration",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "users:initiateRegistration"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "users:initiateRegistration"
+              ]
             }
           },
           "response": []
@@ -1828,7 +2407,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "da9b200f-5823-43a5-904e-29beb715ec54",
                 "type": "text"
               }
             ],
@@ -1843,8 +2422,13 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/users:notifyMPINUpdated",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "users:notifyMPINUpdated"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "users:notifyMPINUpdated"
+              ]
             }
           },
           "response": []
@@ -1938,7 +2522,7 @@
               },
               {
                 "key": "X-Request-Id",
-                "value": "6dce17a8-fde0-41e3-8b8c-6508878f05e5",
+                "value": "319d1d28-1c38-471a-8c25-2c5e2d0202bf",
                 "type": "text"
               }
             ],
@@ -1953,8 +2537,303 @@
             },
             "url": {
               "raw": "{{base-url}}/v1/users:validateRegistration",
-              "host": ["{{base-url}}"],
-              "path": ["v1", "users:validateRegistration"]
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "users:validateRegistration"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "validateCustomer-global",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const schema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [",
+                  "        \"valid\",",
+                  "        \"accountNature\",",
+                  "        \"accountHolder\",",
+                  "        \"accountType\",",
+                  "        \"maskName\",",
+                  "        \"customerType\",",
+                  "        \"categoryCode\"",
+                  "    ],",
+                  "    \"properties\": {",
+                  "        \"valid\": {",
+                  "            \"type\": \"boolean\"",
+                  "        },",
+                  "        \"accountNature\": {",
+                  "            \"type\": \"string\"",
+                  "        },",
+                  "        \"accountHolder\": {",
+                  "            \"type\": \"string\"",
+                  "        },",
+                  "        \"accountType\": {",
+                  "            \"type\": \"string\"",
+                  "        },",
+                  "        \"maskName\": {",
+                  "            \"type\": \"string\"",
+                  "        },",
+                  "        \"customerType\": {",
+                  "            \"type\": \"string\"",
+                  "        },",
+                  "        \"categoryCode\": {",
+                  "            \"type\": \"string\"",
+                  "        }",
+                  "    },",
+                  "    \"additionalProperties\": false",
+                  "};",
+                  "",
+                  "const error_schema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [",
+                  "        \"code\",",
+                  "        \"details\",",
+                  "        \"message\"",
+                  "    ],",
+                  "    \"properties\": {",
+                  "        \"code\": {",
+                  "            \"type\": \"integer\"",
+                  "        },",
+                  "        \"details\": {",
+                  "            \"type\": \"array\",",
+                  "            \"items\": {",
+                  "                \"type\": \"object\",",
+                  "                \"required\": [",
+                  "                    \"@type\",",
+                  "                    \"domain\",",
+                  "                    \"metadata\",",
+                  "                    \"reason\"",
+                  "                ],",
+                  "                \"properties\": {",
+                  "                    \"@type\": {",
+                  "                        \"type\": \"string\"",
+                  "                    },",
+                  "                    \"domain\": {",
+                  "                        \"type\": \"string\"",
+                  "                    },",
+                  "                    \"metadata\": {",
+                  "                        \"type\": \"object\",",
+                  "                        \"required\": [",
+                  "                            \"service\"",
+                  "                        ],",
+                  "                        \"properties\": {",
+                  "                            \"service\": {",
+                  "                                \"type\": \"string\"",
+                  "                            }",
+                  "                        },",
+                  "                        \"additionalProperties\": false",
+                  "                    },",
+                  "                    \"reason\": {",
+                  "                        \"type\": \"string\"",
+                  "                    }",
+                  "                },",
+                  "                \"additionalProperties\": false",
+                  "            }",
+                  "        },",
+                  "        \"message\": {",
+                  "            \"type\": \"string\"",
+                  "        }",
+                  "    },",
+                  "    \"additionalProperties\": false",
+                  "};",
+                  " ",
+                  "pm.test(\"response is valid\", function(){",
+                  "    if(pm.response.code === 200) {",
+                  "        pm.response.to.have.jsonSchema(schema);",
+                  "    } else {",
+                  "        pm.response.to.have.jsonSchema(error_schema);",
+                  "        if (pm.response.code == 400) {",
+                  "            let jsonData = pm.response.json();",
+                  "            pm.expect(jsonData.details[0].reason).to.be.oneOf([\"ACCT_BLOCKED\", \"ACCT_DORMANT\", \"ACCT_FROZEN\", \"ACCT_INACTIVE\", \"ACCT_NOT_FOUND\"]);",
+                  "        }",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=UTF-8",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "4457e44d-1d85-4ab9-a2b8-4c1160699726",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": {\n        \"idType\": \"PAN\",\n        \"value\": \"GOOG7646LH\"\n    },\n    \"ref\": {\n        \"ifscCode\": \"GOOG0002373\",\n        \"accountNumber\": \"50100100670905\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{base-url}}/v1/users:validateCustomer",
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "users:validateCustomer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "validateCustomer-VPA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const schema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [",
+                  "        \"valid\",",
+                  "        \"accountNature\",",
+                  "        \"accountHolder\",",
+                  "        \"accountType\",",
+                  "        \"maskName\",",
+                  "        \"customerType\",",
+                  "        \"categoryCode\"",
+                  "    ],",
+                  "    \"properties\": {",
+                  "        \"valid\": {",
+                  "            \"type\": \"boolean\"",
+                  "        },",
+                  "        \"accountNature\": {",
+                  "            \"type\": \"string\"",
+                  "        },",
+                  "        \"accountHolder\": {",
+                  "            \"type\": \"string\"",
+                  "        },",
+                  "        \"accountType\": {",
+                  "            \"type\": \"string\"",
+                  "        },",
+                  "        \"maskName\": {",
+                  "            \"type\": \"string\"",
+                  "        },",
+                  "        \"customerType\": {",
+                  "            \"type\": \"string\"",
+                  "        },",
+                  "        \"categoryCode\": {",
+                  "            \"type\": \"string\"",
+                  "        }",
+                  "    },",
+                  "    \"additionalProperties\": false",
+                  "};",
+                  "",
+                  "const error_schema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [",
+                  "        \"code\",",
+                  "        \"details\",",
+                  "        \"message\"",
+                  "    ],",
+                  "    \"properties\": {",
+                  "        \"code\": {",
+                  "            \"type\": \"integer\"",
+                  "        },",
+                  "        \"details\": {",
+                  "            \"type\": \"array\",",
+                  "            \"items\": {",
+                  "                \"type\": \"object\",",
+                  "                \"required\": [",
+                  "                    \"@type\",",
+                  "                    \"domain\",",
+                  "                    \"metadata\",",
+                  "                    \"reason\"",
+                  "                ],",
+                  "                \"properties\": {",
+                  "                    \"@type\": {",
+                  "                        \"type\": \"string\"",
+                  "                    },",
+                  "                    \"domain\": {",
+                  "                        \"type\": \"string\"",
+                  "                    },",
+                  "                    \"metadata\": {",
+                  "                        \"type\": \"object\",",
+                  "                        \"required\": [",
+                  "                            \"service\"",
+                  "                        ],",
+                  "                        \"properties\": {",
+                  "                            \"service\": {",
+                  "                                \"type\": \"string\"",
+                  "                            }",
+                  "                        },",
+                  "                        \"additionalProperties\": false",
+                  "                    },",
+                  "                    \"reason\": {",
+                  "                        \"type\": \"string\"",
+                  "                    }",
+                  "                },",
+                  "                \"additionalProperties\": false",
+                  "            }",
+                  "        },",
+                  "        \"message\": {",
+                  "            \"type\": \"string\"",
+                  "        }",
+                  "    },",
+                  "    \"additionalProperties\": false",
+                  "};",
+                  " ",
+                  "pm.test(\"response is valid\", function(){",
+                  "    if(pm.response.code === 200) {",
+                  "        pm.response.to.have.jsonSchema(schema);",
+                  "    } else {",
+                  "        pm.response.to.have.jsonSchema(error_schema);",
+                  "        if (pm.response.code == 400) {",
+                  "            let jsonData = pm.response.json();",
+                  "            pm.expect(jsonData.details[0].reason).to.be.oneOf([\"ACCT_BLOCKED\", \"ACCT_DORMANT\", \"ACCT_FROZEN\", \"ACCT_INACTIVE\", \"ACCT_NOT_FOUND\"]);",
+                  "        }",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json; charset=UTF-8",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "af78ddc8-4494-4d35-a2ce-e3ae29c41e8d",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": {\n        \"idType\": \"PAN\",\n        \"value\": \"GOOG7646LH\"\n    },\n    \"ref\": {\n        \"ifscCode\": \"GOOG0002373\",\n        \"accountType\": \"SAVINGS\",\n        \"accountNumber\": \"50100100670905\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{base-url}}/v1/users:validateCustomer",
+              "host": [
+                "{{base-url}}"
+              ],
+              "path": [
+                "v1",
+                "users:validateCustomer"
+              ]
             }
           },
           "response": []
@@ -1967,14 +2846,18 @@
       "listen": "prerequest",
       "script": {
         "type": "text/javascript",
-        "exec": [""]
+        "exec": [
+          ""
+        ]
       }
     },
     {
       "listen": "test",
       "script": {
         "type": "text/javascript",
-        "exec": [""]
+        "exec": [
+          ""
+        ]
       }
     }
   ],
@@ -1985,3 +2868,4 @@
     }
   ]
 }
+

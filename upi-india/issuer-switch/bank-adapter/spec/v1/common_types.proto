@@ -88,6 +88,47 @@ enum ErrorReason {
   SERVICE_UNAVAILAIBLE = 22;
   // The requested transaction is not permitted.
   TRANSACTION_NOT_PERMITTED = 23;
+  // The requested settle/resolve payment could not be performed because the
+  // Bank Adapter service was unable to update the bank's services. This error
+  // code maps to the `UT1` error code as defined in NPCI's `UDIR`
+  // specification.
+  UNABLE_TO_UPDATE_BANK_SERVICES = 24;
+  // The requested settle/resolve payment could not be performed because of
+  // party instructions. This error code maps to the `UT3` error code as defined
+  // in NPCI's `UDIR` specification.
+  PARTY_INSTRUCTIONS = 25;
+  // The requested settle/resolve payment could not be performed because of
+  // duplicate processing. This error code maps to the `UT5` error code as
+  // defined in NPCI's `UDIR` specification.
+  DUPLICATE_PROCESSING = 26;
+  // The requested settle/resolve payment (credit) operation could not be
+  // performed because of other errors, and a reversal needs to be initiated.
+  // This error code maps to code `114` defined in NPCI's `UDIR` specification.
+  PAYMENT_UDIR_RET_114 = 27;
+  // The requested settle/resolve payment (credit) operation could not be
+  // performed because of other errors, and a reversal needs to be initiated.
+  // This error code maps to code `115` defined in NPCI's `UDIR` specification.
+  PAYMENT_UDIR_RET_115 = 28;
+  // The requested settle/resolve payment (credit) operation could not be
+  // performed because of other errors, and a reversal needs to be initiated.
+  // This error code maps to code `116` defined in NPCI's `UDIR` specification.
+  PAYMENT_UDIR_RET_116 = 29;
+  // The requested settle/resolve payment (credit) operation could not be
+  // performed because of other errors, and a reversal needs to be initiated.
+  // This error code maps to code `117` defined in NPCI's `UDIR` specification.
+  PAYMENT_UDIR_RET_117 = 30;
+  // The requested settle/resolve payment (credit) operation could not be
+  // performed because of other errors, and a reversal needs to be initiated.
+  // This error code maps to code `118` defined in NPCI's `UDIR` specification.
+  PAYMENT_UDIR_RET_118 = 31;
+  // The requested settle/resolve payment (credit) operation could not be
+  // performed because of other errors, and a reversal needs to be initiated.
+  // This error code maps to code `119` defined in NPCI's `UDIR` specification.
+  PAYMENT_UDIR_RET_119 = 32;
+  // The requested settle/resolve payment (credit) operation could not be
+  // performed because of other errors, and a reversal needs to be initiated.
+  // This error code maps to code `120` defined in NPCI's `UDIR` specification.
+  PAYMENT_UDIR_RET_120 = 33;
 }
 
 // Unique identification of an account according to India's UPI standards.
@@ -151,17 +192,18 @@ message RiskInfo {
   string risk_type = 3;
 }
 
+// The type of the customer.
+enum Persona {
+  // Unspecified persona.
+  PERSONA_UNSPECIFIED = 0;
+  // Customer is a person.
+  PERSON = 1;
+  // Customer is an entity.
+  ENTITY = 2;
+}
+
 // Information about a person or entity participating in a transaction.
 message Participant {
-  // The type of the participant.
-  enum Persona {
-    // Unspecified persona.
-    PERSONA_UNSPECIFIED = 0;
-    // Participant is a person.
-    PERSON = 1;
-    // Participant is an entity.
-    ENTITY = 2;
-  }
   // The virtual payment address (VPA) of the settlement participant.
   string virtual_payment_address = 1;
   // The type of the participant. Could either a person or an entity.
@@ -392,10 +434,6 @@ message PaymentAdditionalInfo {
   // Settlement origination date/time as specified by the message originator.
   // Formatted as specified in RFC 3339.
   google.protobuf.Timestamp date_time = 3;
-  // Original date/time of the settlement. Formatted as specified in RFC 3339.
-  google.protobuf.Timestamp original_settlement_date_time = 4;
-  // Original transaction ID when reversal/refund has to be done.
-  string original_payment_id = 5;
   // Indicates if the payment initiated by the payer (pay) or the payee
   // (collect).
   SubType sub_type = 6;
@@ -403,9 +441,6 @@ message PaymentAdditionalInfo {
   InitiationMode initiation_mode = 7;
   // The purpose field is specially used for SEBI txn.
   Purpose purpose = 8;
-  // Retrieval Reference Number (RRN) used uniquely identify the original
-  // transaction based on the ISO 8583 standard.
-  string original_retrieval_reference_number = 9;
   // If **referenceLink** is present, then this field is mandatory. The field is
   // used to identify the category of the transaction.
   ReferenceCategory reference_category = 10;
@@ -440,3 +475,89 @@ message HoldDetails {
   // The amount held in the account.
   HoldAmount amount = 2;
 }
+
+// Provides details of the issue raised by a user / remitter bank.
+message IssueDetails {
+  // The type of issue raised.
+  enum IssueType {
+    // Unspecified issue type.
+    ISSUE_TYPE_UNSPECIFIED = 0;
+    // Complaint.
+    COMPLAINT = 1;
+    // Dispute.
+    DISPUTE = 2;
+    // Refund.
+    REFUND = 3;
+    // Reversal.
+    REVERSAL = 4;
+  }
+
+  // Reason of the issue raised.
+  enum IssueReason {
+    // Issue reason unspecified.
+    ISSUE_REASON_UNSPECIFIED = 0;
+    // This indicates goods or services are not provided to payer for approved
+    // transaction.
+    GOODS_SERVICES_NOT_PROVIDED = 1;
+    // This indicates payer credit not processed for cancelled or returned
+    // goods & services.
+    PAYER_CREDIT_NOT_RECEIVED_FOR_CANCELLED_GOODS_AND_SERVICES = 2;
+    // This indicates payer account debited but transaction confirmation not
+    // received at merchant location.
+    MERCHANT_ACCOUNT_NOT_CREDITED = 3;
+    // This indicates payer account not credited back for declined merchant
+    // transaction.
+    PAYER_CREDIT_NOT_RECEIVED_FOR_DECLINED_MERCHANT_TRANSACTION = 4;
+    // This indicates payment was already made by alternate means.
+    DUPLICATE_PAYMENT = 5;
+    // This indicates payee account is not credited for successful pay
+    // transaction.
+    PAYEE_ACCOUNT_NOT_CREDITED = 6;
+    // This indicates payer account not credited back for declined P2P
+    // transaction.
+    PAYER_CREDIT_NOT_RECEIVED_FOR_DECLINED_P2P_TRANSACTION = 7;
+    // This indicates that the payee account could not be credited by the
+    // beneficiary bank.
+    BENEFICIARY_BANK_CANNOT_CREDIT = 8;
+    // This maps to reason code `114` defined in NPCI's `UDIR` specification.
+    CODE_RET_114 = 9;
+    // This maps to reason code `115` defined in NPCI's `UDIR` specification.
+    CODE_RET_115 = 10;
+    // This maps to reason code `116` defined in NPCI's `UDIR` specification.
+    CODE_RET_116 = 11;
+    // This maps to reason code `117` defined in NPCI's `UDIR` specification.
+    CODE_RET_117 = 12;
+    // This maps to reason code `118` defined in NPCI's `UDIR` specification.
+    CODE_RET_118 = 13;
+    // This maps to reason code `119` defined in NPCI's `UDIR` specification.
+    CODE_RET_119 = 14;
+    // This maps to reason code `120` defined in NPCI's `UDIR` specification.
+    CODE_RET_120 = 15;
+  }
+
+  // Specifies how the issue was raised.
+  enum InitiationMode {
+    // Initiation mode unspecified.
+    INITIATION_MODE_UNSPECIFIED = 0;
+    // This indicates that the complaint was auto-converted to dispute.
+    AUTO_CONVERSION = 1;
+    // Customer App.
+    CUSTOMER_APP = 2;
+    // Payments Service Provider.
+    PSP = 3;
+    // Bank.
+    BANK = 4;
+    // Customer relationship management system.
+    CRM = 5;
+  }
+
+  // Type of the issue raised.
+  IssueType type = 1;
+  // Reason of the issue raised.
+  IssueReason reason = 2;
+  // Specifies how the issue was raised,
+  InitiationMode initiation_mode = 3;
+  // Settlement code of the original unresolved transaction.
+  string original_settlement_code = 4;
+}
+
