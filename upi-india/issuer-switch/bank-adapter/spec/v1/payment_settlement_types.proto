@@ -22,7 +22,7 @@ import "google/protobuf/timestamp.proto";
 option java_outer_classname = "PaymentSettlementTypesProto";
 option java_multiple_files = true;
 option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
-option go_api_flag = "OPAQUE_V0";
+option go_api_flag = "OPAQUE_V0";  // see http://go/go-api-flag.
 
 // Individual payment settlement request.
 message SettlePaymentRequest {
@@ -53,6 +53,9 @@ message SettlePaymentRequest {
   // If this request's _settlement type_ is `REVERSAL`, then details of the
   // original transaction that is being reversed will be provided in this field.
   OriginalTransaction original_transaction = 12;
+  // If this request is being triggered as part of a complaint raised via UPI's
+  // UDIR system, then details of the complaint will be available in this field.
+  IssueDetails issue_details = 13;
 }
 
 // The response to be returned by the bank adapter once the settlement request
@@ -156,3 +159,4 @@ message OriginalTransaction {
   // Timestamp of the original transaction request.
   google.protobuf.Timestamp request_time = 9;
 }
+

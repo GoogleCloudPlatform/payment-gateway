@@ -21,7 +21,7 @@ import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1
 option java_outer_classname = "CustomerTypesProto";
 option java_multiple_files = true;
 option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
-option go_api_flag = "OPAQUE_V0;
+option go_api_flag = "OPAQUE_V0";  // see http://go/go-api-flag.
 
 // Information about a customer's debit card that will be validated by the bank
 // before sending an OTP to the customer's mobile phone or for validating an OTP
@@ -31,6 +31,28 @@ message DebitCardInfo {
   string card_number = 1;
   // The expiry date of the debit card in MMYY format.
   string expiry = 2;
+}
+
+// Details around customer's government issued ID that needs to validated.
+message CustomerValidationId {
+  // Supported ID types.
+  enum IdType {
+    // Unspecified ID type.
+    ID_TYPE_UNSPECIFIED = 0;
+    // Permanent Account Number,
+    // an alphanumeric ID issued by the Income Tax Department.
+    PAN = 1;
+    // A 12 digit ID number, issued by Unique Identification Authority of India.
+    AADHAAR = 2;
+    // An alphanumeric ID issued by Election Commission of India.
+    VOTER_ID = 3;
+    // An alphanumeric ID issued by Regional Transport Offices in India.
+    DRIVING_LICENSE = 4;
+  }
+  // The type of the ID that needs to be validated.
+  IdType id_type = 1;
+  // The value of the ID that needs to be validated.
+  string value = 2;
 }
 
 // Request body for MPIN updated notification.
@@ -97,3 +119,51 @@ message ValidateRegistrationRequest {
   // Participant validating the registration.
   Participant participant = 6;
 }
+
+// Request for validating customer against a government issued ID.
+message CustomerValidationRequest {
+  // Details of the ID that needs to be validated.
+  CustomerValidationId id = 1;
+  // Unique identification of an account according to India's UPI standards.
+  AccountReference ref = 2;
+}
+
+// Response for the customer validation against a government ID.
+message CustomerValidationResponse {
+  // Types of account nature.
+  enum AccountNature {
+    // Unspecified account nature.
+    ACCOUNT_NATURE_UNDEFINED = 0;
+    // Acount nature is of type SINGLE.
+    SINGLE = 1;
+    // Account nature is of type JOINT.
+    JOINT = 2;
+  }
+
+  // Types of account holder.
+  enum AccountHolder {
+    // Unspecified account holder.
+    ACCOUNT_HOLDER_UNDEFINED = 0;
+    // Customer is primary account holder.
+    PRIMARY = 1;
+    // Customer is secondary account holder.
+    SECONDARY = 2;
+  }
+
+  // TRUE if the ID provided in the request is valid, FALSE otherwise.
+  bool valid = 1;
+  // Nature of the account i.e. SINGLE/JOINT.
+  AccountNature account_nature = 2;
+  // Denotes whether the customer is a PRIMARY or SECONDARY account holder.
+  AccountHolder account_holder = 3;
+  // Denotes whether the account type is SAVINGS, CURRENT etc.
+  string account_type = 4;
+  // Mask Name of the customer with the bank.
+  string mask_name = 5;
+  // Denotes whether Customer is a PERSON or ENTITY.
+  Persona customer_type = 6;
+  // Merchant Category code as specified by UPI (A four-digit number listed in
+  // ISO 18245 for retail financial services).
+  string category_code = 7;
+}
+
