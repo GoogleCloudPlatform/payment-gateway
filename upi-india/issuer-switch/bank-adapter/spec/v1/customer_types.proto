@@ -21,7 +21,7 @@ import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1
 option java_outer_classname = "CustomerTypesProto";
 option java_multiple_files = true;
 option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
-option go_api_flag = "OPAQUE_V0";  // see http://go/go-api-flag.
+option go_api_flag = "OPAQUE_V0";
 
 // Information about a customer's debit card that will be validated by the bank
 // before sending an OTP to the customer's mobile phone or for validating an OTP
