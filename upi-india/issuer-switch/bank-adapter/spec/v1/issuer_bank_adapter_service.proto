@@ -18,8 +18,8 @@ package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
 
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/account_types.proto";
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/customer_types.proto";
-import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/issue_types.proto";
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/payment_settlement_types.proto";
+import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/resolution_types.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
@@ -116,7 +116,8 @@ service BankAdapterService {
   // * `TRANSACTION_NOT_PERMITTED` = Requested transaction is not permitted for
   // account.
   //
-  // _Note:_ This API will be invoked in the UPI `ReqMandate` API flow.
+  // _Note:_ This API will be invoked in the UPI `ReqMandate` and `ReqVoucher`
+  // API flows.
   rpc HoldFunds(HoldFundsRequest) returns (HoldFundsResponse) {
     option (google.api.http) = {
       post: "/v1/accounts/funds:hold"
@@ -148,7 +149,8 @@ service BankAdapterService {
   // * `TRANSACTION_NOT_PERMITTED` = Requested transaction is not permitted for
   // account.
   //
-  // _Note:_ This API will be invoked in the UPI `ReqMandate` API flow.
+  // _Note:_ This API will be invoked in the UPI `ReqMandate` and `ReqVoucher`
+  // API flows.
   rpc ReleaseFunds(ReleaseFundsRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/accounts/funds:release"
@@ -393,6 +395,8 @@ service BankAdapterService {
   //
   // * `INVALID_DEBIT_CARD` = Debit card details provided are invalid.
   //
+  // * `EXPIRED_DEBIT_CARD` = Debit card is expired.
+  //
   // * `MOBILE_NUMBER_MULTIPLE_CUSTOMERS` = Mobile number is linked with
   // multiple customers.
   //
@@ -409,19 +413,35 @@ service BankAdapterService {
     };
   }
 
-  // This is an API to notify the bank adapter about the successful updation of
-  // a user's MPIN in the Issuer Switch.
+  // This is an API to notify the bank's customer via SMS/email when certain
+  // actions are taken by the issuer switch, or when it receives certain
+  // notifications from the NPCI.
   //
-  // The validation of the current M-PIN of a user, and the updation to a new
-  // M-PIN is handled by the Issuer Switch. The bank adapter is invoked after
-  // the new M-PIN has been updated successfully by the issuer switch for any
-  // further processing by the bank's systems.
+  // There are two scenarios when this API will be invoked by the issuer switch.
   //
-  // The NPCI circular RMD-014 requires issuer banks to send an SMS notification
-  // to customers when the UPI M-PIN is successfully set for a user. This is to
-  // make the user aware of any fradulent attempts to modify the user's M-PIN.
-  // This SMS notification could be one of the possible actions taken when this
-  // API is invoked on the Bank Adapter.
+  // 1. The validation of the current M-PIN of a user, and the updating to a new
+  //    M-PIN is handled by the issuer switch. The bank adapter is invoked after
+  //    the new M-PIN has been updated successfully by the issuer switch for any
+  //    further processing by the bank's systems. The NPCI circular RMD-014
+  //    requires issuer banks to send an SMS notification to customers when the
+  //    UPI M-PIN is successfully set for a user. This is to make the user aware
+  //    of any fradulent attempts to modify the user's M-PIN. This SMS
+  //    notification could be one of the possible actions taken when this API is
+  //    invoked on the Bank Adapter.
+  //
+  // 1. 24 hours before a recurring mandate accepted by a customer is to be used
+  //    for a payment settlement, a notification is to be sent to the customer
+  //    with details about the mandate that will be executed. The issuer switch
+  //    will invoke the bank adapter with all the details about the mandate that
+  //    is to be executed in the next 24 hours for further processing by the
+  //    bank adapter. This could include the bank adapter invoking the
+  //    appropriate services in the bank's backend to notify the customer about
+  //    the upcoming mandate execution. The NPCI's `Recurring Mandate Technical
+  //    Specification` document describes this requirement. This notification is
+  //    to allow the customer to either pause / revoke the mandate, or ensure
+  //    that there are sufficient funds available in the account that will be
+  //    debited upon mandate execution.
+  //
   //
   // This API should return a `400` HTTP status code if it is unable to process
   // the request. The `reason` field in the
@@ -438,11 +458,11 @@ service BankAdapterService {
   //
   // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
   //
-  // _Note:_ This API will be invoked in the UPI `ReqSetCre` API flow.
-  rpc NotifyMPINUpdated(NotifyMPINUpdatedRequest)
-      returns (google.protobuf.Empty) {
+  // _Note:_ This API will be invoked in the UPI `ReqSetCre` API flow, or in the
+  // `ReqValCust` (mandate notification) API flow.
+  rpc NotifyCustomer(NotifyCustomerRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/v1/users:notifyMPINUpdated"
+      post: "/v1/users:notifyCustomer"
       body: "*"
     };
   }
@@ -485,4 +505,3 @@ service BankAdapterService {
     };
   }
 }
-

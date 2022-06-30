@@ -52,7 +52,7 @@ enum ErrorReason {
   // systems.
   ACCT_NOT_FOUND = 6;
   // The debit card has expired.
-  CARD_EXPIRED = 7;
+  EXPIRED_DEBIT_CARD = 7;
   // The bank card management system is down.
   CARD_MANAGEMENT_SYSTEM_FAILURE = 8;
   // The debit card is inactive.
@@ -102,33 +102,42 @@ enum ErrorReason {
   // defined in NPCI's `UDIR` specification.
   DUPLICATE_PROCESSING = 26;
   // The requested settle/resolve payment (credit) operation could not be
-  // performed because of other errors, and a reversal needs to be initiated.
-  // This error code maps to code `114` defined in NPCI's `UDIR` specification.
-  PAYMENT_UDIR_RET_114 = 27;
+  // performed because the payee account is closed, and a reversal needs to be
+  // initiated. This error code maps to code `114` defined in NPCI's
+  // `UDIR` specification.
+  PAYMENT_UDIR_RET_ACCOUNT_CLOSED = 27;
   // The requested settle/resolve payment (credit) operation could not be
-  // performed because of other errors, and a reversal needs to be initiated.
-  // This error code maps to code `115` defined in NPCI's `UDIR` specification.
-  PAYMENT_UDIR_RET_115 = 28;
+  // performed because the payee account does not exist, and a reversal needs to
+  // be initiated. This error code maps to code `115` defined in NPCI's
+  // `UDIR` specification.
+  PAYMENT_UDIR_RET_ACCOUNT_DOES_NOT_EXIST = 28;
   // The requested settle/resolve payment (credit) operation could not be
-  // performed because of other errors, and a reversal needs to be initiated.
-  // This error code maps to code `116` defined in NPCI's `UDIR` specification.
-  PAYMENT_UDIR_RET_116 = 29;
+  // performed because of party instructions, and a reversal needs to be
+  // initiated. This error code maps to code `116` defined in NPCI's `UDIR`
+  // specification.
+  PAYMENT_UDIR_RET_PARTY_INSTRUCTIONS = 29;
   // The requested settle/resolve payment (credit) operation could not be
-  // performed because of other errors, and a reversal needs to be initiated.
-  // This error code maps to code `117` defined in NPCI's `UDIR` specification.
-  PAYMENT_UDIR_RET_117 = 30;
+  // performed because the payee account is a NRI account, and a reversal needs
+  // to be initiated. This error code maps to code `117` defined in NPCI's
+  // `UDIR` specification.
+  PAYMENT_UDIR_RET_NRI_ACCOUNT = 30;
   // The requested settle/resolve payment (credit) operation could not be
-  // performed because of other errors, and a reversal needs to be initiated.
-  // This error code maps to code `118` defined in NPCI's `UDIR` specification.
-  PAYMENT_UDIR_RET_118 = 31;
+  // performed because the payee account has credit freezed, and a reversal
+  // needs to be initiated. This error code maps to code `118` defined in NPCI's
+  // `UDIR` specification.
+  PAYMENT_UDIR_RET_CREDIT_FREEZED = 31;
   // The requested settle/resolve payment (credit) operation could not be
-  // performed because of other errors, and a reversal needs to be initiated.
-  // This error code maps to code `119` defined in NPCI's `UDIR` specification.
-  PAYMENT_UDIR_RET_119 = 32;
+  // performed because of invalid payee details, and a reversal needs to be
+  // initiated. This error code maps to code `119` defined in NPCI's `UDIR`
+  // specification.
+  PAYMENT_UDIR_RET_INVALID_BENEFICIARY_DETAILS = 32;
   // The requested settle/resolve payment (credit) operation could not be
   // performed because of other errors, and a reversal needs to be initiated.
   // This error code maps to code `120` defined in NPCI's `UDIR` specification.
-  PAYMENT_UDIR_RET_120 = 33;
+  PAYMENT_UDIR_RET_OTHERS = 33;
+  // The requested operation could not be performed because the Bank Adapter
+  // service or one or more of the bank's services timed out.
+  SERVICE_TIMEOUT = 34;
 }
 
 // Unique identification of an account according to India's UPI standards.
@@ -476,12 +485,12 @@ message HoldDetails {
   HoldAmount amount = 2;
 }
 
-// Provides details of the issue raised by a user / remitter bank.
-message IssueDetails {
-  // The type of issue raised.
-  enum IssueType {
-    // Unspecified issue type.
-    ISSUE_TYPE_UNSPECIFIED = 0;
+// Provides details of the case raised by a user / remitter bank.
+message CaseDetails {
+  // The type of case raised.
+  enum CaseType {
+    // Unspecified case type.
+    CASE_TYPE_UNSPECIFIED = 0;
     // Complaint.
     COMPLAINT = 1;
     // Dispute.
@@ -492,10 +501,10 @@ message IssueDetails {
     REVERSAL = 4;
   }
 
-  // Reason of the issue raised.
-  enum IssueReason {
-    // Issue reason unspecified.
-    ISSUE_REASON_UNSPECIFIED = 0;
+  // Reason of the case raised.
+  enum CaseReason {
+    // Case reason unspecified.
+    CASE_REASON_UNSPECIFIED = 0;
     // This indicates goods or services are not provided to payer for approved
     // transaction.
     GOODS_SERVICES_NOT_PROVIDED = 1;
@@ -519,23 +528,32 @@ message IssueDetails {
     // This indicates that the payee account could not be credited by the
     // beneficiary bank.
     BENEFICIARY_BANK_CANNOT_CREDIT = 8;
+    // This indicates that a return is initiated as the payee account is closed.
     // This maps to reason code `114` defined in NPCI's `UDIR` specification.
-    CODE_RET_114 = 9;
-    // This maps to reason code `115` defined in NPCI's `UDIR` specification.
-    CODE_RET_115 = 10;
+    RET_ACCOUNT_CLOSED = 9;
+    // This indicates that a return is initiated as the payee account does not
+    // exist. This maps to reason code `115` defined in NPCI's `UDIR`
+    // specification.
+    RET_ACCOUNT_DOES_NOT_EXIST = 10;
+    // This indicates that a return is initiated due to party instructions.
     // This maps to reason code `116` defined in NPCI's `UDIR` specification.
-    CODE_RET_116 = 11;
-    // This maps to reason code `117` defined in NPCI's `UDIR` specification.
-    CODE_RET_117 = 12;
-    // This maps to reason code `118` defined in NPCI's `UDIR` specification.
-    CODE_RET_118 = 13;
+    RET_PARTY_INSTRUCTIONS = 11;
+    // This indicates that a return is initiated as payee account is NRI
+    // account. This maps to reason code `117` defined in NPCI's `UDIR`
+    // specification.
+    RET_NRI_ACCOUNT = 12;
+    // This indicates that a return is initiated as payee account has credit
+    // freezed. This maps to reason code `118` defined in NPCI's `UDIR`
+    // specification.
+    RET_CREDIT_FREEZED = 13;
+    // This indicates that a return in initiated due to invalid payee details.
     // This maps to reason code `119` defined in NPCI's `UDIR` specification.
-    CODE_RET_119 = 14;
+    RET_INVALID_BENEFICIARY_DETAILS = 14;
     // This maps to reason code `120` defined in NPCI's `UDIR` specification.
-    CODE_RET_120 = 15;
+    RET_OTHERS = 15;
   }
 
-  // Specifies how the issue was raised.
+  // Specifies how the case was raised.
   enum InitiationMode {
     // Initiation mode unspecified.
     INITIATION_MODE_UNSPECIFIED = 0;
@@ -551,13 +569,17 @@ message IssueDetails {
     CRM = 5;
   }
 
-  // Type of the issue raised.
-  IssueType type = 1;
-  // Reason of the issue raised.
-  IssueReason reason = 2;
-  // Specifies how the issue was raised,
+  // Type of the case raised.
+  CaseType type = 1;
+  // Reason of the case raised.
+  CaseReason reason = 2;
+  // Specifies how the case was raised,
   InitiationMode initiation_mode = 3;
+  // Specifies the amount to be adjusted.
+  Amount adjustment_amount = 4;
   // Settlement code of the original unresolved transaction.
-  string original_settlement_code = 4;
+  string original_settlement_code = 5;
+  // Specifies if the complaint/dispute belongs to current settlement cycle or
+  // not.
+  bool curr_cycle = 6;
 }
-

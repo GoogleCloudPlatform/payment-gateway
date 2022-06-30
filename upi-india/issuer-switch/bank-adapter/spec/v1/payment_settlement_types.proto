@@ -55,7 +55,7 @@ message SettlePaymentRequest {
   OriginalTransaction original_transaction = 12;
   // If this request is being triggered as part of a complaint raised via UPI's
   // UDIR system, then details of the complaint will be available in this field.
-  IssueDetails issue_details = 13;
+  CaseDetails case_details = 13;
 }
 
 // The response to be returned by the bank adapter once the settlement request
@@ -159,4 +159,3 @@ message OriginalTransaction {
   // Timestamp of the original transaction request.
   google.protobuf.Timestamp request_time = 9;
 }
-

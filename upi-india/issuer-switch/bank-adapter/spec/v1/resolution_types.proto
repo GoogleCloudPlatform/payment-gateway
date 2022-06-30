@@ -19,7 +19,7 @@ package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/payment_settlement_types.proto";
 
-option java_outer_classname = "IssueTypesProto";
+option java_outer_classname = "ResolutionTypesProto";
 option java_multiple_files = true;
 option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
 option go_api_flag = "OPAQUE_V0";
@@ -63,8 +63,8 @@ message ResolvePaymentRequest {
   // Type of resolution workflow which triggered this request.
   ResolutionWorkflow resolution_workflow = 3;
   // If this request's _resolution workflow_ is `COMPLAINT`, then details of the
-  // issue raised by the user/bank will be provided in this field.
-  IssueDetails issue_details = 4;
+  // complaint raised by the user/bank will be provided in this field.
+  CaseDetails case_details = 4;
 }
 
 // The response to be returned by the bank adapter once the resolve payment
@@ -152,4 +152,3 @@ message PaymentAdjustmentError {
   // Error reason.
   ErrorReason error_reason = 1;
 }
-

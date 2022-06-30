@@ -56,6 +56,15 @@ message ValidityPeriod {
 
 // Request to hold funds in an account.
 message HoldFundsRequest {
+  // Indicates whether the hold funds request is for a mandate or a voucher.
+  enum HoldReason {
+    // Unspecified hold reason.
+    REASON_UNSPECIFIED = 0;
+    // Hold funds for mandate.
+    MANDATE = 1;
+    // Hold funds for voucher.
+    VOUCHER = 2;
+  }
   // An identifier for this request. This is used to correlate a hold
   // funds request to a release funds request. In UPI, this field maps to the
   // Unified Mandate Number (UMN).
@@ -79,6 +88,8 @@ message HoldFundsRequest {
   // amount held originally. In other cases, this field will be omitted in the
   // request.
   HoldDetails original_hold_details = 9;
+  // Reason for this hold request.
+  HoldReason hold_reason = 10;
 }
 
 // Response for the HoldFunds method.
@@ -146,4 +157,3 @@ message RetrieveBalanceResponse {
   // The account whose balance was retrieved.
   AccountReference account_reference = 2;
 }
-

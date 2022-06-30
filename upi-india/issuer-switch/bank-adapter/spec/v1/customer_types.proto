@@ -55,12 +55,69 @@ message CustomerValidationId {
   string value = 2;
 }
 
-// Request body for MPIN updated notification.
-message NotifyMPINUpdatedRequest {
-  // Participant to be notified about the MPIN update.
+// Request body for customer notification.
+message NotifyCustomerRequest {
+  // Details of the MPIN update operation.
+  message MPINUpdated {
+    // Possible states of the MPIN update operation.
+    enum State {
+      // Unspecified state.
+      STATE_UNSPECIFIED = 0;
+      // MPIN update succeeded.
+      STATE_SUCCEEDED = 1;
+      // MPIN update failed.
+      STATE_FAILED = 2;
+    }
+    // State of the MPIN update operation.
+    State state = 1;
+  }
+  // Details of the recurring mandate execution.
+  message RecurringMandateExecution {
+    // Recurrence pattern of the mandate.
+    enum RecurrencePattern {
+      // Unspecified recurrence pattern.
+      RECURRENCE_PATTERN_UNSPECIFIED = 0;
+      // Mandate recurring daily.
+      RECURRENCE_PATTERN_DAILY = 1;
+      // Mandate recurring weekly.
+      RECURRENCE_PATTERN_WEEKLY = 2;
+      // Mandate recurring fortnightly.
+      RECURRENCE_PATTERN_FORTNIGHTLY = 3;
+      // Mandate recurring monthly.
+      RECURRENCE_PATTERN_MONTHLY = 4;
+      // Mandate recurring bi-monthly (once every 2 months).
+      RECURRENCE_PATTERN_BIMONTHLY = 5;
+      // Mandate recurring quarterly.
+      RECURRENCE_PATTERN_QUARTERLY = 6;
+      // Mandate recurring half yearly.
+      RECURRENCE_PATTERN_HALFYEARLY = 7;
+      // Mandate recurring yearly.
+      RECURRENCE_PATTERN_YEARLY = 8;
+    }
+    // Identifier of the mandate. This maps to the `Unique Mandate Number (UMN)
+    // in India's UPI standards.
+    string mandate_id = 1;
+    // Information about the merchant who will execute the mandate.
+    MerchantInfo merchant_info = 2;
+    // The mandate's recurrence pattern.
+    RecurrencePattern recurrence_pattern = 3;
+    // The amount that will be settled as part of the mandate execution.
+    Amount amount = 4;
+  }
+  // Participant to be notified.
   Participant participant = 1;
   // Unique identification of an account according to India's UPI standards.
+  // This is the details of the account of the customer who is to be notified.
   AccountReference account = 2;
+  // The details of the notification. Only one of two values will be specified.
+  // The type of notification to be sent can be inferred from which of the two
+  // possible values are set in the request.
+  oneof details {
+    // Details of the MPIN operation processed by the issuer switch.
+    MPINUpdated mpin_updated = 4;
+    // Details of the upcoming recurring mandate execution.
+    RecurringMandateExecution recurring_mandate_execution = 5;
+  }
 }
 
 // The response once a registration request has been processed and an OTP has
@@ -166,4 +223,3 @@ message CustomerValidationResponse {
   // ISO 18245 for retail financial services).
   string category_code = 7;
 }
-
