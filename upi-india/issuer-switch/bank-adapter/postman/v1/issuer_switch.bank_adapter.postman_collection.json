@@ -1774,7 +1774,7 @@
                   "                  \"type\": \"string\",",
                   "                  \"enum\": [",
                   "                    \"TRANSACTION_ALREADY_RESOLVED\",",
-                  "                    \"TRANSACTION_RESOLVED_NOW \",",
+                  "                    \"TRANSACTION_RESOLVED_NOW\",",
                   "                    \"ORIGINAL_TRANSACTION_NOT_FOUND\",",
                   "                    \"ORIGINAL_TRANSACTION_DID_NOT_OCCUR \",",
                   "                  ]                  ",
@@ -2036,7 +2036,7 @@
                   "                  \"type\": \"string\",",
                   "                  \"enum\": [",
                   "                    \"TRANSACTION_ALREADY_RESOLVED\",",
-                  "                    \"TRANSACTION_RESOLVED_NOW \",",
+                  "                    \"TRANSACTION_RESOLVED_NOW\",",
                   "                    \"ORIGINAL_TRANSACTION_NOT_FOUND\",",
                   "                    \"ORIGINAL_TRANSACTION_DID_NOT_OCCUR \",",
                   "                  ]                  ",
@@ -2868,4 +2868,3 @@
     }
   ]
 }
-
