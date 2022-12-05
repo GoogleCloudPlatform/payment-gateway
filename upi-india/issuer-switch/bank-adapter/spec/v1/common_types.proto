@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
 
+import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 
 option java_outer_classname = "CommonTypesProto";
@@ -138,22 +139,52 @@ enum ErrorReason {
   // The requested operation could not be performed because the Bank Adapter
   // service or one or more of the bank's services timed out.
   SERVICE_TIMEOUT = 34;
+  // Hold funds not allowed for certain types of accounts (like CC, PF, PPF
+  // accounts) as per bank's policy.
+  HOLD_FUNDS_NOT_ALLOWED = 35;
+  // Debit is not allowed on this type of account.
+  DEBIT_NOT_ALLOWED = 36;
+  // The blocked funds have already been released.
+  NO_FUNDS_ON_HOLD = 37;
+  // The requested transaction is suspected to be fraudulent due to high risk
+  // score.
+  FRAUDULENT_TRANSACTION = 38;
+  // The registered mobile number linked to the account has been changed or
+  // removed.
+  REGISTERED_MOBILE_NUMBER_CHANGED = 39;
+  // The requested settle payment operation could not be performed as it was
+  // stopped by a court order.
+  STOPPED_BY_COURT_ORDER = 40;
+  // The maximum number of OTP requests has been exceeded.
+  OTP_REQUESTS_EXCEEDED = 41;
 }
 
 // Unique identification of an account according to India's UPI standards.
 message AccountReference {
   // IFSC code of a bank's branch.
-  string ifsc_code = 1;
+  string ifsc_code = 1 [(google.api.field_behavior) = REQUIRED];
   // Type of account.
   string account_type = 2;
   // Unique number for the account in a bank and branch.
-  string account_number = 3;
+  string account_number = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 // The combination of a reference type and reference number that uniquely
 // identifies a bank customer. The customer can either be a physical person or a
 // business.
 message CustomerReference {
+  // Types of identification used to uniquely identify a bank's customer.
+  ReferenceType reference_type = 1 [(google.api.field_behavior) = REQUIRED];
+  // The value identifying the customer. The type of the value will be based on
+  // the referenceType field.
+  //
+  // When using `mobile_phone_number` as the reference type, this value will
+  // contain a mobile phone number including country code.
+  //
+  // When using `resident_id` as the reference type, this value will
+  // contain a given's country unique identification number, such as Aadhaar
+  // number in India.
+  string reference_value = 2 [(google.api.field_behavior) = REQUIRED];
   // Types of identification used to uniquely identify a bank's customer. The
   // admissible values will evolve over time.
   enum ReferenceType {
@@ -165,29 +196,17 @@ message CustomerReference {
     // in India or SSN in the USA.
     RESIDENT_ID = 2;
   }
-  // Types of identification used to uniquely identify a bank's customer.
-  ReferenceType reference_type = 1;
-  // The value identifying the customer. The type of the value will be based on
-  // the referenceType field.
-  //
-  // When using `mobile_phone_number` as the reference type, this value will
-  // contain a mobile phone number including country code.
-  //
-  // When using `resident_id` as the reference type, this value will
-  // contain a given's country unique identification number, such as Aadhaar
-  // number in India.
-  string reference_value = 2;
 }
 
 // Represents an monetary amount in a given currency.
 message Amount {
   // The 3-letter currency code as defined in ISO 4217.
-  string currency_code = 1;
+  string currency_code = 1 [(google.api.field_behavior) = REQUIRED];
   // The amount with fractional digits, where fractions can have between 2 and 4
   // digits. Negative amounts are represented with a prefix -ve sign. The
   // decimal separator is a dot. In India, only 2 digits will be used after the
   // decimal separator.
-  string amount = 2;
+  string amount = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Risk information specific to India's UPI Standards.
@@ -211,19 +230,61 @@ enum Persona {
   ENTITY = 2;
 }
 
+// Details about the device that a participant in an API transaction is using.
+message DeviceDetails {
+  // Enumeration of the possible device information types.
+  enum DeviceInfoType {
+    // Unspecified device info type.
+    DEVICE_INFO_TYPE_UNSPECIFIED = 0;
+    // The name of the application running on the device.
+    DEVICE_INFO_TYPE_APPLICATION_NAME = 1;
+    // The device's capability.
+    DEVICE_INFO_TYPE_CAPABILITY = 2;
+    // The device's geocode.
+    DEVICE_INFO_TYPE_GEOCODE = 3;
+    // The device's ID.
+    DEVICE_INFO_TYPE_ID = 4;
+    // The device's IP address.
+    DEVICE_INFO_TYPE_IP = 5;
+    // The device's location.
+    DEVICE_INFO_TYPE_LOCATION = 6;
+    // The device's operating system (OS).
+    DEVICE_INFO_TYPE_OS = 7;
+    // The device type.
+    DEVICE_INFO_TYPE_DEVICE_TYPE = 8;
+    // The device's telecom provider.
+    DEVICE_INFO_TYPE_TELECOM_PROVIDER = 9;
+  }
+
+  // Information about a device.
+  message DeviceInfo {
+    // The type of the information.
+    DeviceInfoType type = 1 [(google.api.field_behavior) = REQUIRED];
+    // The value of the information.
+    string value = 2 [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // Information about the device. One or more of the types from the
+  // [DeviceInfoType][] will be included.
+  repeated DeviceInfo info = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
 // Information about a person or entity participating in a transaction.
 message Participant {
   // The virtual payment address (VPA) of the settlement participant.
-  string virtual_payment_address = 1;
+  string virtual_payment_address = 1 [(google.api.field_behavior) = REQUIRED];
   // The type of the participant. Could either a person or an entity.
-  Persona persona = 2;
+  Persona persona = 2 [(google.api.field_behavior) = REQUIRED];
   // The name of the participant.
   string name = 3;
   // The combination of a reference type and reference number that uniquely
   // identifies a bank customer. The Issuer Switch populates this field with the
   // customer's unique resident identifier (like India's Aadhaar) or mobile
   // number.
-  CustomerReference customer_reference = 4;
+  CustomerReference customer_reference = 4
+      [(google.api.field_behavior) = REQUIRED];
+  // Optional details of the device used by a participant in an API transaction.
+  DeviceDetails device_details = 5;
 }
 
 // Provides additional informations about an entity.
@@ -295,7 +356,7 @@ message MerchantAdditionalInfo {
   }
   // Merchant Category code as specified by UPI (A four-digit number listed in
   // ISO 18245 for retail financial services).
-  string category_code = 1;
+  string category_code = 1 [(google.api.field_behavior) = REQUIRED];
   // A unique identifier for the merchant store where the payment occurs.
   string store_id = 2;
   // A unique identifier for the POS terminal in the store where the payment
@@ -328,9 +389,9 @@ message MerchantInfo {
 // the payer or the payee).
 message SettlementParticipant {
   // The participant information.
-  Participant participant = 1;
+  Participant participant = 1 [(google.api.field_behavior) = REQUIRED];
   // Unique identification of an account according to India's UPI standards.
-  AccountReference account = 2;
+  AccountReference account = 2 [(google.api.field_behavior) = REQUIRED];
   // Information about a merchant who is a participant in the payment. This
   // field will be specified only if the participant is a merchant.
   MerchantInfo merchant_info = 3;
@@ -442,14 +503,15 @@ message PaymentAdditionalInfo {
   string reference_link = 2;
   // Settlement origination date/time as specified by the message originator.
   // Formatted as specified in RFC 3339.
-  google.protobuf.Timestamp date_time = 3;
+  google.protobuf.Timestamp date_time = 3
+      [(google.api.field_behavior) = REQUIRED];
   // Indicates if the payment initiated by the payer (pay) or the payee
   // (collect).
-  SubType sub_type = 6;
+  SubType sub_type = 6 [(google.api.field_behavior) = REQUIRED];
   // Specifies how the payment was inititated.
-  InitiationMode initiation_mode = 7;
+  InitiationMode initiation_mode = 7 [(google.api.field_behavior) = REQUIRED];
   // The purpose field is specially used for SEBI txn.
-  Purpose purpose = 8;
+  Purpose purpose = 8 [(google.api.field_behavior) = REQUIRED];
   // If **referenceLink** is present, then this field is mandatory. The field is
   // used to identify the category of the transaction.
   ReferenceCategory reference_category = 10;
@@ -472,17 +534,17 @@ message HoldAmount {
     MAX = 2;
   }
   // The amount to be held in the account.
-  Amount instructed_amount = 1;
+  Amount instructed_amount = 1 [(google.api.field_behavior) = REQUIRED];
   // The holding rule.
-  HoldingRule holding_rule = 2;
+  HoldingRule holding_rule = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Specifies the amount held and the holding reference.
 message HoldDetails {
   // The bank's reference for the funds held in the account.
-  string reference = 1;
+  string reference = 1 [(google.api.field_behavior) = REQUIRED];
   // The amount held in the account.
-  HoldAmount amount = 2;
+  HoldAmount amount = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Provides details of the case raised by a user / remitter bank.
@@ -499,58 +561,111 @@ message CaseDetails {
     REFUND = 3;
     // Reversal.
     REVERSAL = 4;
+    // Check Status.
+    CHKSTATUS = 5;
   }
 
   // Reason of the case raised.
   enum CaseReason {
     // Case reason unspecified.
     CASE_REASON_UNSPECIFIED = 0;
-    // This indicates goods or services are not provided to payer for approved
-    // transaction.
-    GOODS_SERVICES_NOT_PROVIDED = 1;
-    // This indicates payer credit not processed for cancelled or returned
-    // goods & services.
-    PAYER_CREDIT_NOT_RECEIVED_FOR_CANCELLED_GOODS_AND_SERVICES = 2;
-    // This indicates payer account debited but transaction confirmation not
-    // received at merchant location.
-    MERCHANT_ACCOUNT_NOT_CREDITED = 3;
-    // This indicates payer account not credited back for declined merchant
-    // transaction.
-    PAYER_CREDIT_NOT_RECEIVED_FOR_DECLINED_MERCHANT_TRANSACTION = 4;
-    // This indicates payment was already made by alternate means.
-    DUPLICATE_PAYMENT = 5;
-    // This indicates payee account is not credited for successful pay
-    // transaction.
-    PAYEE_ACCOUNT_NOT_CREDITED = 6;
-    // This indicates payer account not credited back for declined P2P
-    // transaction.
-    PAYER_CREDIT_NOT_RECEIVED_FOR_DECLINED_P2P_TRANSACTION = 7;
-    // This indicates that the payee account could not be credited by the
-    // beneficiary bank.
-    BENEFICIARY_BANK_CANNOT_CREDIT = 8;
+    // This indicates that a complaint is raised as goods or services are not
+    // provided to payer for approved transaction. This maps to reason code
+    // `U008` defined in NPCI's `UDIR` specification.
+    COMPLAINT_RAISE_GOODS_SERVICES_NOT_PROVIDED = 1;
+    // This indicates that a complaint is raised as payer credit is not
+    // processed for cancelled or returned goods & services. This maps to reason
+    // code `U021` defined in NPCI's `UDIR` specification.
+    COMPLAINT_RAISE_PAYER_CREDIT_NOT_RECEIVED_FOR_CANCELLED_GOODS_AND_SERVICES =
+        2;
+    // This indicates that a complaint is raised as payer account is debited but
+    // transaction confirmation not received at merchant location. This maps to
+    // reason code `U022` defined in NPCI's `UDIR` specification.
+    COMPLAINT_RAISE_MERCHANT_ACCOUNT_NOT_CREDITED = 3;
+    // This indicates that a complaint is raised as payer account is not
+    // credited back for declined merchant transaction. This maps to reason code
+    // `U009` defined in NPCI's `UDIR` specification.
+    COMPLAINT_RAISE_PAYER_CREDIT_NOT_RECEIVED_FOR_DECLINED_MERCHANT_TRANSACTION =
+        4;
+    // This indicates that a complaint is raised as payment was already made
+    // by alternate means. This maps to reason code `U023` defined in NPCI's
+    // `UDIR` specification.
+    COMPLAINT_RAISE_DUPLICATE_PAYMENT = 5;
+    // This indicates that a complaint is raised as payee account is not
+    // credited for successful pay transaction. This maps to reason code `U010`
+    // defined in NPCI's `UDIR` specification.
+    COMPLAINT_RAISE_PAYEE_ACCOUNT_NOT_CREDITED = 6;
+    // This indicates that a complaint is raised as payer account is not
+    // credited back for declined P2P transaction. This maps to reason code
+    // `U005` defined in NPCI's `UDIR` specification.
+    COMPLAINT_RAISE_PAYER_CREDIT_NOT_RECEIVED_FOR_DECLINED_P2P_TRANSACTION = 7;
     // This indicates that a return is initiated as the payee account is closed.
     // This maps to reason code `114` defined in NPCI's `UDIR` specification.
-    RET_ACCOUNT_CLOSED = 9;
+    RET_ACCOUNT_CLOSED = 8;
     // This indicates that a return is initiated as the payee account does not
     // exist. This maps to reason code `115` defined in NPCI's `UDIR`
     // specification.
-    RET_ACCOUNT_DOES_NOT_EXIST = 10;
+    RET_ACCOUNT_DOES_NOT_EXIST = 9;
     // This indicates that a return is initiated due to party instructions.
     // This maps to reason code `116` defined in NPCI's `UDIR` specification.
-    RET_PARTY_INSTRUCTIONS = 11;
+    RET_PARTY_INSTRUCTIONS = 10;
     // This indicates that a return is initiated as payee account is NRI
     // account. This maps to reason code `117` defined in NPCI's `UDIR`
     // specification.
-    RET_NRI_ACCOUNT = 12;
+    RET_NRI_ACCOUNT = 11;
     // This indicates that a return is initiated as payee account has credit
     // freezed. This maps to reason code `118` defined in NPCI's `UDIR`
     // specification.
-    RET_CREDIT_FREEZED = 13;
+    RET_CREDIT_FREEZED = 12;
     // This indicates that a return in initiated due to invalid payee details.
     // This maps to reason code `119` defined in NPCI's `UDIR` specification.
-    RET_INVALID_BENEFICIARY_DETAILS = 14;
+    RET_INVALID_BENEFICIARY_DETAILS = 13;
     // This maps to reason code `120` defined in NPCI's `UDIR` specification.
-    RET_OTHERS = 15;
+    RET_OTHERS = 14;
+    // This indicates that a credit adjustment is initiated as credit was not
+    // provided for cancelled goods or services. This maps to reason code `1061`
+    // defined in NPCI's `UDIR` specification.
+    CREDIT_ADJUSTMENT_CREDIT_NOT_RECEIVED_FOR_CANCELLED_GOODS_SERVICES = 15;
+    // This indicates that a credit adjustment is initiated as goods or services
+    // were defective. This maps to reason code `1062` defined in NPCI's `UDIR`
+    // specification.
+    CREDIT_ADJUSTMENT_GOODS_SERVICES_DEFECTIVE = 16;
+    // This indicates that a credit adjustment is initiated as payment was made
+    // by alternate means. This maps to reason code `1063` defined in NPCI's
+    // `UDIR` specification.
+    CREDIT_ADJUSTMENT_PAID_ALTERNATE_MEANS = 17;
+    // This indicates that a credit adjustment is initiated as goods or services
+    // were not provided. This maps to reason code `1064` defined in NPCI's
+    // `UDIR` specification.
+    CREDIT_ADJUSTMENT_GOODS_SERVICES_NOT_PROVIDED = 18;
+    // This indicates that a credit adjustment is initiated as merchant account
+    // was not credited. This maps to reason code `1065` defined in NPCI's
+    // `UDIR` specification.
+    CREDIT_ADJUSTMENT_MERCHANT_ACCOUNT_NOT_CREDITED = 19;
+    // This indicates that a credit adjustment is initiated as there was a
+    // duplicate transaction. This maps to reason code `1084` defined in NPCI's
+    // `UDIR` specification.
+    CREDIT_ADJUSTMENT_DUPLICATE_TRANSACTION = 20;
+    // This indicates that a credit adjustment is initiated due to other
+    // reasons. This maps to reason code `1090` defined in NPCI's `UDIR`
+    // specification.
+    CREDIT_ADJUSTMENT_OTHERS = 21;
+    // This indicates that a credit adjustment is initiated as payment was made
+    // to a non matching account number. This maps to reason code `1091` defined
+    // in NPCI's `UDIR` specification.
+    CREDIT_ADJUSTMENT_NON_MATCHING_ACCOUNT_NUMBER = 22;
+    // This indicates that a credit adjustment is initiated as the card holder
+    // was charged more than the transaction amount. This maps to reason code
+    // `1092` defined in NPCI's `UDIR` specification.
+    CREDIT_ADJUSTMENT_CARD_HOLDER_CHARGED_MORE_THAN_AMOUNT = 23;
+    // This indicates that a credit adjustment is initiated as the credit was
+    // not processed. This maps to reason code `1093` defined in NPCI's `UDIR`
+    // specification.
+    CREDIT_ADJUSTMENT_CREDIT_NOT_PROCESSED = 24;
+    // This indicates that a credit adjustment is initiated as the beneficiary
+    // bank was unable to update the customer account. This maps to reason code
+    // `1094` defined in NPCI's `UDIR` specification.
+    CREDIT_ADJUSTMENT_BENEFICIARY_UNABLE_TO_UPDATE_CUSTOMER_ACCOUNT = 25;
   }
 
   // Specifies how the case was raised.
@@ -570,16 +685,30 @@ message CaseDetails {
   }
 
   // Type of the case raised.
-  CaseType type = 1;
+  CaseType type = 1 [(google.api.field_behavior) = REQUIRED];
   // Reason of the case raised.
-  CaseReason reason = 2;
+  CaseReason reason = 2 [(google.api.field_behavior) = REQUIRED];
   // Specifies how the case was raised,
-  InitiationMode initiation_mode = 3;
+  InitiationMode initiation_mode = 3 [(google.api.field_behavior) = REQUIRED];
   // Specifies the amount to be adjusted.
-  Amount adjustment_amount = 4;
+  Amount adjustment_amount = 4 [(google.api.field_behavior) = REQUIRED];
   // Settlement code of the original unresolved transaction.
-  string original_settlement_code = 5;
+  string original_settlement_code = 5 [(google.api.field_behavior) = REQUIRED];
   // Specifies if the complaint/dispute belongs to current settlement cycle or
   // not.
   bool curr_cycle = 6;
+}
+
+// Metadata about an API invocation received by the issuer switch. These are
+// passed in all the requests made by the issuer switch to the bank adapter.
+message InvocationMetadata {
+  // A unique ID of the API invocation received by the issuer switch. In UPI,
+  // this maps to the transaction ID.
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // The timestamp at which the current request was initiated/created. This is
+  // the value that is provided as the initiation/creation timestamp in the
+  // request received by the issuer switch.
+  google.protobuf.Timestamp initiation_time = 2
+      [(google.api.field_behavior) = REQUIRED];
 }
