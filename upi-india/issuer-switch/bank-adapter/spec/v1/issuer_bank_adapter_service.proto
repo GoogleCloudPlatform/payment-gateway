@@ -32,9 +32,22 @@ option go_api_flag = "OPAQUE_V0";
 service BankAdapterService {
   // Search and return a list of accounts associated with a given customer. The
   // customer may be identified in one of many ways (mobile number, email,
-  // unique national id, payment address, etc. For UPI, the supported customer
-  // identifiers are Mobile number and Aadhaar number. This API returns one or
-  // more accounts associated with the specified customer identifier.
+  // unique national id, payment address, etc).
+  //
+  // Accounts can be searched with one of two filters:
+  //
+  // 1. Customer reference - For UPI, the supported customer identifiers are
+  // Mobile number or Aadhaar number. All accounts associated with the specified
+  // customer identifier need to be returned. The response will be zero or more
+  // accounts.
+  // 2. Account reference - For UPI, this is the IFSC code and number
+  // of an account. The bank adapter should search for the specified account
+  // reference in the bank. The response will be either zero accounts or exactly
+  // one account.
+  //
+  // NOTE: If no matching accounts are found for the given reference in the
+  // request, the response is a success with zero accounts. This condition is
+  // not an error.
   //
   // This API should return a `400` HTTP status code if it is unable to process
   // the request. The `reason` field in the
@@ -116,6 +129,11 @@ service BankAdapterService {
   // * `TRANSACTION_NOT_PERMITTED` = Requested transaction is not permitted for
   // account.
   //
+  // * `HOLD_FUNDS_NOT_ALLOWED` = Hold funds is not allowed on certain account
+  // types.
+  //
+  // * `DEBIT_NOT_ALLOWED` = Debits are not allowed on this type of account.
+  //
   // _Note:_ This API will be invoked in the UPI `ReqMandate` and `ReqVoucher`
   // API flows.
   rpc HoldFunds(HoldFundsRequest) returns (HoldFundsResponse) {
@@ -148,6 +166,8 @@ service BankAdapterService {
   //
   // * `TRANSACTION_NOT_PERMITTED` = Requested transaction is not permitted for
   // account.
+  //
+  // * `NO_FUNDS_ON_HOLD` = Blocked funds have already been released.
   //
   // _Note:_ This API will be invoked in the UPI `ReqMandate` and `ReqVoucher`
   // API flows.
@@ -187,16 +207,33 @@ service BankAdapterService {
   // settlement request is for a _debit_ or that the payee account is not found,
   // if the settlement request is for a _credit_.
   //
+  // * `DEBIT_NOT_ALLOWED` = Returned if debits are not allowed on the
+  // account type (such as CC, PF or PPF account).
+  //
   // * `INSUFFICIENT_FUNDS` = Returned if the settlement type is _debit_ and the
   // payer's account does not have sufficient funds for the instructed amount.
   //
   // * `INVALID_TRANSACTION` = Requested settlement cannot be performed.
   //
-  // * `MAX_BALANCE_EXCEEDED` = Returned if the settlement type is `credit` and
+  // * `MAX_BALANCE_EXCEEDED` = Returned if the settlement type is _credit_ and
   // the payee's account's maximum balance allowed value will be breached with
   // the instructed amount.
   //
-  // _Note:_ This API will be invoked in the UPI `ReqPay` API flow.
+  // * `FRAUDULENT_TRANSACTION` = Returned if the settlement type is _debit_ or
+  // _credit_ and the requested transaction is suspected to be fraudulent due to
+  // high risk score.
+  //
+  // * `REGISTERED_MOBILE_NUMBER_CHANGED` = Returned if the settlement type is
+  // _debit_ or _credit_ and the registered mobile number linked to the account
+  // has been changed or removed.
+  //
+  // * `STOPPED_BY_COURT_ORDER` = Returned if the payment settlement was stopped
+  // because of a court order. This is typically used during *mandate execution*
+  // and is based on circular
+  // [OC-128](https://www.npci.org.in/PDF/npci/upi/circular/2021/UPI-OC-128-Extension-of-additional-response-codes-under-Deemed-Debit-for-mandate-execution.pdf)
+  //
+  // _Note:_ This API will be invoked in the UPI `ReqPay`,
+  // `ReqChkTxn-AUTOUPDATE` and `ReqComplaint` API flows.
   rpc SettlePayment(SettlePaymentRequest) returns (SettlePaymentResponse) {
     option (google.api.http) = {
       post: "/v1/payments:settleSingle"
@@ -209,10 +246,11 @@ service BankAdapterService {
   // all the values that could be used to search for the payment settlement.
   //
   // If no matching payments are found, then this API must return a HTTP status
-  // of 200 with an empty list of payments in the response.
+  // of 200 with an empty list of payments in the response. A non-200 HTTP
+  // status must be returned only when the bank adapter service itself fails.
   //
   // _Note:_ This API will be invoked in the UPI `ReqChkTxn` (transaction type
-  // `ChkTxn`) API flow.
+  // `ChkTxn` or `AUTOUPDATE`) and `ReqComplaint` API flows.
   rpc SearchPayments(SearchPaymentsRequest) returns (SearchPaymentsResponse) {
     option (google.api.http) = {
       post: "/v1/payments:search"
@@ -364,7 +402,7 @@ service BankAdapterService {
   // bank account reference must be provided.
   //
   // The following security details must be validated by the bank adapter
-  // service with the bank's backend systems:
+  // service with the bank's backend systems, if present in the request:
   //
   // 1. Debit card details
   // 2. ATM PIN
@@ -404,6 +442,8 @@ service BankAdapterService {
   //
   // * `RESTRICTED_DEBIT_CARD` = Debit card is restricted.
   //
+  // * `OTP_REQUESTS_EXCEEDED` = Number of OTP requests has been exceeded.
+  //
   // _Note:_ This API will be invoked in the UPI `ReqRegMob` API flow.
   rpc ValidateRegistration(ValidateRegistrationRequest)
       returns (google.protobuf.Empty) {
@@ -417,7 +457,8 @@ service BankAdapterService {
   // actions are taken by the issuer switch, or when it receives certain
   // notifications from the NPCI.
   //
-  // There are two scenarios when this API will be invoked by the issuer switch.
+  // There are a few scenarios when this API will be invoked by the issuer
+  // switch.
   //
   // 1. The validation of the current M-PIN of a user, and the updating to a new
   //    M-PIN is handled by the issuer switch. The bank adapter is invoked after
@@ -427,7 +468,25 @@ service BankAdapterService {
   //    UPI M-PIN is successfully set for a user. This is to make the user aware
   //    of any fradulent attempts to modify the user's M-PIN. This SMS
   //    notification could be one of the possible actions taken when this API is
-  //    invoked on the Bank Adapter.
+  //    invoked on the Bank Adapter. **Note** that a customer is to be notified
+  //    both in the case of a successful update of their M-PIN or when the M-PIN
+  //    update fails.
+  //
+  // 1. The issuer switch performs a number of operations with recurring
+  //    (auto-pay) mandates. These include the following operations:
+  //
+  //    * Creation
+  //    * Modification
+  //    * Revocation
+  //    * Pause
+  //    * Unpause
+  //
+  //    The NPCI circular OC-151 requires the issuer switch to notify the
+  //    customer of the success/failure of the operation with an SMS. The
+  //    issuer switch will invoke this Bank Adapter API with the details
+  //    about the specific operation performed with the recurring (auto-pay)
+  //    mandate. The Bank Adapter can then invoke other services to send out
+  //    the appropriate SMS notification to the customer.
   //
   // 1. 24 hours before a recurring mandate accepted by a customer is to be used
   //    for a payment settlement, a notification is to be sent to the customer

@@ -18,6 +18,7 @@ package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
 
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/payment_settlement_types.proto";
+import "google/api/field_behavior.proto";
 
 option java_outer_classname = "ResolutionTypesProto";
 option java_multiple_files = true;
@@ -26,6 +27,22 @@ option go_api_flag = "OPAQUE_V0";
 
 // Individual payment resolution request.
 message ResolvePaymentRequest {
+  // Type of resolution to execute.
+  ResolutionType resolution_type = 1 [(google.api.field_behavior) = REQUIRED];
+  // Details of the original payment debit / credit settlement which needs to be
+  // resolved.
+  SettlePaymentRequest original_settle_payment_info = 2
+      [(google.api.field_behavior) = REQUIRED];
+  // Type of resolution workflow which triggered this request.
+  ResolutionWorkflow resolution_workflow = 3
+      [(google.api.field_behavior) = REQUIRED];
+  // If this request's _resolution workflow_ is `COMPLAINT`, then details of the
+  // complaint raised by the user/bank will be provided in this field.
+  CaseDetails case_details = 4 [(google.api.field_behavior) = REQUIRED];
+  // Metadata about the API invocation received by the issuer switch which
+  // triggered this request to the bank adapter.
+  InvocationMetadata invocation_metadata = 5
+      [(google.api.field_behavior) = REQUIRED];
   // Type of resolution required to be done by bank in order resolve to an
   // unresolved payment settlement.
   enum ResolutionType {
@@ -54,22 +71,18 @@ message ResolvePaymentRequest {
     // UPI's complaint workflow.
     COMPLAINT_WORKFLOW = 2;
   }
-
-  // Type of resolution to execute.
-  ResolutionType resolution_type = 1;
-  // Details of the original payment debit / credit settlement which needs to be
-  // resolved.
-  SettlePaymentRequest original_settle_payment_info = 2;
-  // Type of resolution workflow which triggered this request.
-  ResolutionWorkflow resolution_workflow = 3;
-  // If this request's _resolution workflow_ is `COMPLAINT`, then details of the
-  // complaint raised by the user/bank will be provided in this field.
-  CaseDetails case_details = 4;
 }
 
 // The response to be returned by the bank adapter once the resolve payment
 // request is executed.
 message ResolvePaymentResponse {
+  // Resolve Payment result. Can indicate either a success or an error during
+  // resolution of an unresolved payment settlement.
+  ResolvePaymentResult resolve_payment_response = 1
+      [(google.api.field_behavior) = REQUIRED];
+  // The status of the resolution.
+  ResolutionStatus resolution_status = 2
+      [(google.api.field_behavior) = REQUIRED];
   // Describes the status of payment resolution.
   enum ResolutionStatus {
     // Unspecified resolution state.
@@ -79,11 +92,6 @@ message ResolvePaymentResponse {
     // Failed resolution.
     FAILED = 2;
   }
-  // Resolve Payment result. Can indicate either a success or an error during
-  // resolution of an unresolved payment settlement.
-  ResolvePaymentResult resolve_payment_response = 1;
-  // The status of the resolution.
-  ResolutionStatus resolution_status = 2;
 }
 
 // Result of resolution of an unresolved payment settlement. Can be one of

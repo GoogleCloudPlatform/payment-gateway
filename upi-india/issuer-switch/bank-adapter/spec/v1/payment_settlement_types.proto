@@ -17,6 +17,7 @@ syntax = "proto3";
 package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
 
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 
 option java_outer_classname = "PaymentSettlementTypesProto";
@@ -27,35 +28,42 @@ option go_api_flag = "OPAQUE_V0";
 // Individual payment settlement request.
 message SettlePaymentRequest {
   // Type of settlement to execute.
-  SettlementType settlement_type = 1;
+  SettlementType settlement_type = 1 [(google.api.field_behavior) = REQUIRED];
   // Payer in the payment settlement transaction.
-  SettlementParticipant payer = 2;
-  // Payee in the settlement payment transaction.
+  SettlementParticipant payer = 2 [(google.api.field_behavior) = REQUIRED];
+  // Payee in the settlement payment transaction. This field is not present in
+  // the request if the settlement type is `REVERSAL`.
   SettlementParticipant payee = 3;
   // Amount needed to complete payment settlement.
-  Amount instructed_amount = 4;
+  Amount instructed_amount = 4 [(google.api.field_behavior) = REQUIRED];
   // Uniquely identifies the payment this settlement is part of. This maps to
   // the transaction id in India's UPI system.
-  string payment_id = 6;
+  string payment_id = 5 [(google.api.field_behavior) = REQUIRED];
   // Retrieval Reference Number (RRN) for the transaction.
-  string retrieval_reference_number = 7;
+  string retrieval_reference_number = 6
+      [(google.api.field_behavior) = REQUIRED];
   // Free form string providing a description of the payment settlement.
-  string description = 8;
+  string description = 7 [(google.api.field_behavior) = REQUIRED];
   // Specifies the amount held and the holding reference i.e. the bank's
   // reference for the funds held in the account which are being debited in this
   // request. A value will be specified for this field only for `DEBIT`
   // settlements which are initiated against funds held in the account.
-  HoldDetails hold_details = 9;
+  HoldDetails hold_details = 8;
   // Timestamp of the current request.
-  google.protobuf.Timestamp request_time = 10;
+  google.protobuf.Timestamp request_time = 9
+      [(google.api.field_behavior) = REQUIRED];
   // Additional information about the payment settlement.
-  PaymentAdditionalInfo additional_info = 11;
+  PaymentAdditionalInfo additional_info = 10;
   // If this request's _settlement type_ is `REVERSAL`, then details of the
   // original transaction that is being reversed will be provided in this field.
-  OriginalTransaction original_transaction = 12;
+  OriginalTransaction original_transaction = 11;
   // If this request is being triggered as part of a complaint raised via UPI's
   // UDIR system, then details of the complaint will be available in this field.
-  CaseDetails case_details = 13;
+  CaseDetails case_details = 12;
+  // Metadata about the API invocation received by the issuer switch which
+  // triggered this request to the bank adapter.
+  InvocationMetadata invocation_metadata = 13
+      [(google.api.field_behavior) = REQUIRED];
 }
 
 // The response to be returned by the bank adapter once the settlement request
@@ -63,14 +71,9 @@ message SettlePaymentRequest {
 message SettlePaymentResponse {
   // An identifier used by the bank's systems for the settlement operation. In
   // India's UPI system, this translates to the `approval number`.
-  string backend_settlement_id = 2;
-  // Timestamp indicating when the settlement was executed. Formatted as
-  // specified in RFC 3339.
-  google.protobuf.Timestamp settlement_time = 3;
-  // The amount settled by the backend systems.
-  Amount settled_amount = 4;
+  string backend_settlement_id = 1 [(google.api.field_behavior) = REQUIRED];
   // Generic additional information.
-  repeated AdditionalInfo miscellaneous = 5;
+  repeated AdditionalInfo miscellaneous = 2;
 }
 
 // Result of a settlement payment. Can be one of either a success or an error
@@ -90,25 +93,37 @@ message SettlePaymentResult {
 // backend systems.
 message SettlePaymentError {
   // Error reason for the original payment settlement.
-  ErrorReason error_reason = 2;
+  ErrorReason error_reason = 1;
 }
 
 // Request to search for a payment settlement.
 message SearchPaymentsRequest {
   // Uniquely identifies the payment settlement transaction being searched for.
   // This maps to the `Txn.Id` value in India's UPI system.
-  string payment_id = 1;
+  string payment_id = 1 [(google.api.field_behavior) = REQUIRED];
   // Type of settlement.
-  SettlementType settlement_type = 2;
+  SettlementType settlement_type = 2 [(google.api.field_behavior) = REQUIRED];
   // Retrieval Reference Number (RRN) of the payment settlement being searched
   // for.
-  string retrieval_reference_number = 3;
+  string retrieval_reference_number = 3
+      [(google.api.field_behavior) = REQUIRED];
   // Timestamp of the payment settlement transaction request being searched for.
-  google.protobuf.Timestamp request_time = 4;
+  google.protobuf.Timestamp request_time = 4
+      [(google.api.field_behavior) = REQUIRED];
+  // Metadata about the API invocation received by the issuer switch which
+  // triggered this request to the bank adapter.
+  InvocationMetadata invocation_metadata = 5
+      [(google.api.field_behavior) = REQUIRED];
 }
 
 // Information about a payment previously requested.
 message SearchPaymentsResponse {
+  // Payment settlement result. Can indicate either a success or an error during
+  // the processing of the original payment settlement.
+  SettlePaymentResult settlement_payment_response = 1
+      [(google.api.field_behavior) = REQUIRED];
+  // The status of the overall settlement.
+  SettlementState settlement_state = 2 [(google.api.field_behavior) = REQUIRED];
   // The status of the overall settlement. It may have changed after it was
   // executed (for example, if a refund was processed).
   enum SettlementState {
@@ -125,11 +140,6 @@ message SearchPaymentsResponse {
     // Revoked settlement.
     REVOKED = 5;
   }
-  // Payment settlement result. Can indicate either a success or an error during
-  // the processing of the original payment settlement.
-  SettlePaymentResult settlement_payment_response = 1;
-  // The status of the overall settlement.
-  SettlementState settlement_state = 2;
 }
 
 // Type of settlement to execute.
@@ -157,5 +167,5 @@ message OriginalTransaction {
   // Type of settlement of the original transaction.
   SettlementType settlement_type = 4;
   // Timestamp of the original transaction request.
-  google.protobuf.Timestamp request_time = 9;
+  google.protobuf.Timestamp request_time = 5;
 }
