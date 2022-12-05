@@ -169,4 +169,3 @@ message OriginalTransaction {
   // Timestamp of the original transaction request.
   google.protobuf.Timestamp request_time = 5;
 }
-
