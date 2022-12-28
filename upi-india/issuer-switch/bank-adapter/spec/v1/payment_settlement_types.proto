@@ -29,10 +29,13 @@ option go_api_flag = "OPAQUE_V0";
 message SettlePaymentRequest {
   // Type of settlement to execute.
   SettlementType settlement_type = 1 [(google.api.field_behavior) = REQUIRED];
-  // Payer in the payment settlement transaction.
-  SettlementParticipant payer = 2 [(google.api.field_behavior) = REQUIRED];
-  // Payee in the settlement payment transaction. This field is not present in
-  // the request if the settlement type is `REVERSAL`.
+  // Payer in the payment settlement transaction. This field is present in all
+  // requests, except when the *settlement type* is
+  // [CREDIT_REVERSAL][google.cloud.paymentgateway.issuerswitch.bankadapter.v1.SettlementType.CREDIT_REVERSAL].
+  SettlementParticipant payer = 2;
+  // Payee in the settlement payment transaction. This field is present in all
+  // requests, except when the *settlement type* is
+  // [DEBIT_REVERSAL][google.cloud.paymentgateway.issuerswitch.bankadapter.v1.SettlementType.DEBIT_REVERSAL].
   SettlementParticipant payee = 3;
   // Amount needed to complete payment settlement.
   Amount instructed_amount = 4 [(google.api.field_behavior) = REQUIRED];
@@ -45,17 +48,20 @@ message SettlePaymentRequest {
   // Free form string providing a description of the payment settlement.
   string description = 7 [(google.api.field_behavior) = REQUIRED];
   // Specifies the amount held and the holding reference i.e. the bank's
-  // reference for the funds held in the account which are being debited in this
-  // request. A value will be specified for this field only for `DEBIT`
-  // settlements which are initiated against funds held in the account.
+  // reference for the funds held in the account which are being debited or
+  // reversed in this request. A value will be specified for this field only for
+  // `DEBIT` settlements which are initiated against funds held in the account
+  // or `DEBIT_REVERSAL` settlements which are initiated against deemed `DEBIT`
+  // settlements.
   HoldDetails hold_details = 8;
   // Timestamp of the current request.
   google.protobuf.Timestamp request_time = 9
       [(google.api.field_behavior) = REQUIRED];
   // Additional information about the payment settlement.
   PaymentAdditionalInfo additional_info = 10;
-  // If this request's _settlement type_ is `REVERSAL`, then details of the
-  // original transaction that is being reversed will be provided in this field.
+  // If this request's _settlement type_ is `DEBIT_REVERSAL` or
+  // `CREDIT_REVERSAL`, then details of the original transaction that is being
+  // reversed will be provided in this field.
   OriginalTransaction original_transaction = 11;
   // If this request is being triggered as part of a complaint raised via UPI's
   // UDIR system, then details of the complaint will be available in this field.
@@ -70,7 +76,8 @@ message SettlePaymentRequest {
 // is executed.
 message SettlePaymentResponse {
   // An identifier used by the bank's systems for the settlement operation. In
-  // India's UPI system, this translates to the `approval number`.
+  // India's UPI system, this translates to the `approval number`. This value is
+  // alpha-numeric and should be exactly 6 characters long.
   string backend_settlement_id = 1 [(google.api.field_behavior) = REQUIRED];
   // Generic additional information.
   repeated AdditionalInfo miscellaneous = 2;
@@ -150,12 +157,14 @@ enum SettlementType {
   DEBIT = 1;
   // Credit settlement.
   CREDIT = 2;
-  // Reversal of a previous settlement.
-  REVERSAL = 3;
+  // Reversal of a previous Debit settlement.
+  DEBIT_REVERSAL = 3;
+  // Reversal of a previous Credit settlement.
+  CREDIT_REVERSAL = 4;
 }
 
 // Details of original transaction. This type is passed to the Bank Adapter
-// service if the settlement type is `REVERSAL`.
+// service if the settlement type is `DEBIT_REVERSAL` or `CREDIT_REVERSAL`.
 message OriginalTransaction {
   // Uniquely identifies the original transaction. This maps to the `Txn.Id`
   // value of the original transaction in India's UPI system.
