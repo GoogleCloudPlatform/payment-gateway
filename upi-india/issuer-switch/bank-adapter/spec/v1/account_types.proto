@@ -56,9 +56,9 @@ message AccountInfo {
 // Balance information for a given account.
 message BalanceInfo {
   // The currency and value of the current balance.
-  Amount current_balance = 1 [(google.api.field_behavior) = REQUIRED];
+  Amount current_balance = 1;
   // The currency and value of the available balance.
-  Amount available_balance = 2;
+  Amount available_balance = 2 [(google.api.field_behavior) = REQUIRED];
   // The allowed credit limit on the account.
   Amount credit_limit = 3;
 }
@@ -115,7 +115,8 @@ message HoldFundsRequest {
 
 // Response for the HoldFunds method.
 message HoldFundsResponse {
-  // The bank's reference for the funds held in an account.
+  // The bank's reference for the funds held in an account. This value is
+  // alpha-numeric and should be exactly 6 characters long.
   string hold_reference = 1 [(google.api.field_behavior) = REQUIRED];
 }
 

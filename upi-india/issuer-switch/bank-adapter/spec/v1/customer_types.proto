@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 syntax = "proto3";
 
 package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
@@ -25,13 +24,12 @@ option java_multiple_files = true;
 option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
 option go_api_flag = "OPAQUE_V0";
 
-// Information about a customer's debit card that will be validated by the bank
-// before sending an OTP to the customer's mobile phone or for validating an OTP
-// received by the customer.
-message DebitCardInfo {
-  // The last 6 digits of the customer's debit card.
+// Information about a customer's debit/credit card that will be validated by
+// the bank as part of a user's registration of their account/credit card.
+message CardInfo {
+  // The last 6 digits of the customer's debit/credit card.
   string card_number = 1;
-  // The expiry date of the debit card in MMYY format.
+  // The expiry date of the debit/credit card in MMYY format.
   string expiry = 2;
 }
 
@@ -236,9 +234,9 @@ message InitiateRegistrationRequest {
     // India's UPI standards.
     AccountReference account_reference = 2;
   }
-  // Information about a customer's debit card that will be provided if the
-  // issuer bank supports the ATM_REDIRECT mode of registration.
-  DebitCardInfo debit_card_info = 3;
+  // Information about a customer's debit/credit card that will be provided if
+  // the issuer bank supports the ATM_REDIRECT mode of registration.
+  CardInfo card_info = 3;
   // Participant initiating the registration.
   Participant participant = 4 [(google.api.field_behavior) = REQUIRED];
   // The type of registration indicating if the specified reference is being
@@ -265,20 +263,20 @@ message ValidateRegistrationRequest {
     // India's UPI standards.
     AccountReference account_reference = 2;
   }
-  // Information about a customer's debit card that needs to be validated by the
+  // Information about a customer's debit/credit card that needs to be validated
+  // by the bank. This value will be specified only if the registration is being
+  // validated with a debit/credit card.
+  //
+  // If the registration is validated using an Aadhaar OTP, then this field will
+  // be omitted.
+  CardInfo card_info = 3;
+  // The PIN for the debit/credit card that needs to be validated by the
   // bank. This value will be specified only if the registration is being
-  // validated with a debit card.
+  // validated with a debit/credit card.
   //
   // If the registration is validated using an Aadhaar OTP, then this field will
   // be omitted.
-  DebitCardInfo debit_card_info = 3;
-  // The ATM pin for the debit card that needs to be validated by the bank. This
-  // value will be specified only if the registration is being validated with a
-  // debit card.
-  //
-  // If the registration is validated using an Aadhaar OTP, then this field will
-  // be omitted.
-  string atm_pin = 4;
+  string pin = 4;
   // The OTP received on the customer's mobile phone that needs to be validated
   // by the bank.
   string otp = 5 [(google.api.field_behavior) = REQUIRED];

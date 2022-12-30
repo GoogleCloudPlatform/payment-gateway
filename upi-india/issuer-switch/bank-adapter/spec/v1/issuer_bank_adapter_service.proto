@@ -167,7 +167,7 @@ service BankAdapterService {
   // * `TRANSACTION_NOT_PERMITTED` = Requested transaction is not permitted for
   // account.
   //
-  // * `NO_FUNDS_ON_HOLD` = Blocked funds have already been released.
+  // * `FUNDS_NOT_ON_HOLD` = Held funds have already been released.
   //
   // _Note:_ This API will be invoked in the UPI `ReqMandate` and `ReqVoucher`
   // API flows.
@@ -203,6 +203,10 @@ service BankAdapterService {
   // settlement request is for a _debit_ or that the payee account is inactive,
   // if the settlement request is for a _credit_.
   //
+  // * `ACCT_INVALID` = Indicates that the payer account is invalid, if the
+  // settlement request is for a _debit_ or that the payee account is invalid,
+  // if the settlement request is for a _credit_.
+  //
   // * `ACCT_NOT_FOUND` = Indicates that the payer account is not found, if the
   // settlement request is for a _debit_ or that the payee account is not found,
   // if the settlement request is for a _credit_.
@@ -231,6 +235,13 @@ service BankAdapterService {
   // because of a court order. This is typically used during *mandate execution*
   // and is based on circular
   // [OC-128](https://www.npci.org.in/PDF/npci/upi/circular/2021/UPI-OC-128-Extension-of-additional-response-codes-under-Deemed-Debit-for-mandate-execution.pdf)
+  //
+  // * `FUNDS_NOT_ON_HOLD` = Returned if the debit amount is not held for
+  // the customer. This should be returned only if the *settlement type* is
+  // `DEBIT` and is against funds held in the account.
+  //
+  // * `INSUFFICIENT_FUNDS_DUE_TO_HOLD` = Returned if adequate funds are not
+  // available in the account as they have been held.
   //
   // _Note:_ This API will be invoked in the UPI `ReqPay`,
   // `ReqChkTxn-AUTOUPDATE` and `ReqComplaint` API flows.
@@ -382,7 +393,7 @@ service BankAdapterService {
   //
   // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
   //
-  // * `INVALID_DEBIT_CARD` = Debit card details provided are invalid.
+  // * `INVALID_CARD` = Debit/Credit card details provided are invalid.
   //
   // * `MOBILE_NUMBER_MULTIPLE_CUSTOMERS` = Mobile number is linked with
   // multiple customers.
@@ -404,8 +415,8 @@ service BankAdapterService {
   // The following security details must be validated by the bank adapter
   // service with the bank's backend systems, if present in the request:
   //
-  // 1. Debit card details
-  // 2. ATM PIN
+  // 1. Debit/Credit card details
+  // 2. PIN
   // 3. SMS OTP
   //
   // This API should return a `400` HTTP status code if it is unable to process
@@ -425,22 +436,22 @@ service BankAdapterService {
   //
   // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Bank card management system is down.
   //
-  // * `INACTIVE_DEBIT_CARD` = Debit card is inactive.
+  // * `INACTIVE_CARD` = Debit/Credit card is inactive.
   //
-  // * `INCORRECT_ATM_PIN` = Incorrect ATM pin.
+  // * `INCORRECT_PIN` = Incorrect pin.
   //
   // * `INCORRECT_OTP` = OTP provided is incorrect.
   //
-  // * `INVALID_DEBIT_CARD` = Debit card details provided are invalid.
+  // * `INVALID_CARD` = Debit/Credit card details provided are invalid.
   //
-  // * `EXPIRED_DEBIT_CARD` = Debit card is expired.
+  // * `EXPIRED_CARD` = Debit/Credit card is expired.
   //
   // * `MOBILE_NUMBER_MULTIPLE_CUSTOMERS` = Mobile number is linked with
   // multiple customers.
   //
   // * `OTP_EXPIRED` = Specified OTP has expired.
   //
-  // * `RESTRICTED_DEBIT_CARD` = Debit card is restricted.
+  // * `RESTRICTED_CARD` = Debit/Credit card is restricted.
   //
   // * `OTP_REQUESTS_EXCEEDED` = Number of OTP requests has been exceeded.
   //
