@@ -1,10 +1,10 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
+package google.cloud.paymentgateway.issuerswitch.adapter.bank.v1;
 
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/payment_settlement_types.proto";
@@ -22,75 +22,107 @@ import "google/api/field_behavior.proto";
 
 option java_outer_classname = "ResolutionTypesProto";
 option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.bank.v1";
 option go_api_flag = "OPAQUE_V0";
 
 // Individual payment resolution request.
 message ResolvePaymentRequest {
-  // Type of resolution to execute.
-  ResolutionType resolution_type = 1 [(google.api.field_behavior) = REQUIRED];
-  // Details of the original payment debit / credit settlement which needs to be
-  // resolved.
-  SettlePaymentRequest original_settle_payment_info = 2
-      [(google.api.field_behavior) = REQUIRED];
-  // Type of resolution workflow which triggered this request.
-  ResolutionWorkflow resolution_workflow = 3
-      [(google.api.field_behavior) = REQUIRED];
-  // If this request's _resolution workflow_ is `COMPLAINT`, then details of the
-  // complaint raised by the user/bank will be provided in this field.
-  CaseDetails case_details = 4 [(google.api.field_behavior) = REQUIRED];
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 5
-      [(google.api.field_behavior) = REQUIRED];
-  // Type of resolution required to be done by bank in order resolve to an
-  // unresolved payment settlement.
-  enum ResolutionType {
-    // Unspecified resolution type.
-    RESOLUTION_TYPE_UNSPECIFIED = 0;
-    // Resolve an unresolved debit reversal transaction. The bank adapter
-    // service needs to check whether debit reversal was done for the debit
-    // specified in _original settle payment info_. If it was unsuccessful,
-    // then bank adapter or banks systems should resolve it by performing the
-    // debit reversal.
-    RESOLVE_DEBIT_REVERSAL = 1;
-    // Resolve an unresolved credit transaction. The bank adapter service needs
-    // to check whether the credit specified in _original settle payment info_
-    // was successful. If it was unsuccessful, then bank adapter or bank's
-    // systems should resolve the settlement by performing the credit.
-    RESOLVE_CREDIT = 2;
+  // Payload for resolve payment request.
+  message Payload {
+    // Type of resolution to execute.
+    ResolutionType resolution_type = 1 [(google.api.field_behavior) = REQUIRED];
+    // Details of the original payment debit / credit settlement which needs to
+    // be resolved.
+    SettlePaymentRequest original_settle_payment_info = 2
+        [(google.api.field_behavior) = REQUIRED];
+    // Type of resolution workflow which triggered this request.
+    ResolutionWorkflow resolution_workflow = 3
+        [(google.api.field_behavior) = REQUIRED];
+    // If this request's _resolution workflow_ is `COMPLAINT`, then details of
+    // the complaint raised by the user/bank will be provided in this field.
+    CaseDetails case_details = 4 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 5
+        [(google.api.field_behavior) = REQUIRED];
+    // Type of resolution required to be done by bank in order resolve to an
+    // unresolved payment settlement.
+    enum ResolutionType {
+      // Unspecified resolution type.
+      RESOLUTION_TYPE_UNSPECIFIED = 0;
+      // Resolve an unresolved debit reversal transaction. The bank adapter
+      // service needs to check whether debit reversal was done for the debit
+      // specified in _original settle payment info_. If it was unsuccessful,
+      // then bank adapter or banks systems should resolve it by performing the
+      // debit reversal.
+      RESOLVE_DEBIT_REVERSAL = 1;
+      // Resolve an unresolved credit transaction. The bank adapter service
+      // needs to check whether the credit specified in _original settle payment
+      // info_ was successful. If it was unsuccessful, then bank adapter or
+      // bank's systems should resolve the settlement by performing the credit.
+      RESOLVE_CREDIT = 2;
+    }
+
+    // Type of payment resolution workflow. This indicates the UPI workflow
+    // which triggered this request.
+    enum ResolutionWorkflow {
+      // Unspecified resolution workflow.
+      RESOLUTION_WORKFLOW_UNSPECIFIED = 0;
+      // UPI's auto-update workflow.
+      AUTOUPDATE_WORKFLOW = 1;
+      // UPI's complaint workflow.
+      COMPLAINT_WORKFLOW = 2;
+    }
   }
 
-  // Type of payment resolution workflow. This indicates the UPI workflow
-  // which triggered this request.
-  enum ResolutionWorkflow {
-    // Unspecified resolution workflow.
-    RESOLUTION_WORKFLOW_UNSPECIFIED = 0;
-    // UPI's auto-update workflow.
-    AUTOUPDATE_WORKFLOW = 1;
-    // UPI's complaint workflow.
-    COMPLAINT_WORKFLOW = 2;
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.ResolvePaymentRequest.Payload]
+    // message.
+    string encrypted = 2;
   }
 }
 
 // The response to be returned by the bank adapter once the resolve payment
 // request is executed.
 message ResolvePaymentResponse {
-  // Resolve Payment result. Can indicate either a success or an error during
-  // resolution of an unresolved payment settlement.
-  ResolvePaymentResult resolve_payment_response = 1
-      [(google.api.field_behavior) = REQUIRED];
-  // The status of the resolution.
-  ResolutionStatus resolution_status = 2
-      [(google.api.field_behavior) = REQUIRED];
-  // Describes the status of payment resolution.
-  enum ResolutionStatus {
-    // Unspecified resolution state.
-    STATE_UNSPECIFIED = 0;
-    // Successful resolution.
-    SUCCEEDED = 1;
-    // Failed resolution.
-    FAILED = 2;
+  // Payload for resolve payment response.
+  message Payload {
+    // Resolve Payment result. Can indicate either a success or an error during
+    // resolution of an unresolved payment settlement.
+    ResolvePaymentResult resolve_payment_response = 1
+        [(google.api.field_behavior) = REQUIRED];
+    // Describes the status of payment resolution.
+    enum ResolutionStatus {
+      // Unspecified resolution state.
+      STATE_UNSPECIFIED = 0;
+      // Successful resolution.
+      SUCCEEDED = 1;
+      // Failed resolution.
+      FAILED = 2;
+    }
+    // The status of the resolution.
+    ResolutionStatus resolution_status = 2
+        [(google.api.field_behavior) = REQUIRED];
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 3;
+  }
+
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.ResolvePaymentResponse.Payload]
+    // message.
+    string encrypted = 2;
   }
 }
 

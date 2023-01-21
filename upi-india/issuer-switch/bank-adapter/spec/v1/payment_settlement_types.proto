@@ -1,10 +1,10 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
+package google.cloud.paymentgateway.issuerswitch.adapter.bank.v1;
 
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
 import "google/api/field_behavior.proto";
@@ -22,65 +22,124 @@ import "google/protobuf/timestamp.proto";
 
 option java_outer_classname = "PaymentSettlementTypesProto";
 option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.bank.v1";
 option go_api_flag = "OPAQUE_V0";
 
 // Individual payment settlement request.
 message SettlePaymentRequest {
-  // Type of settlement to execute.
-  SettlementType settlement_type = 1 [(google.api.field_behavior) = REQUIRED];
-  // Payer in the payment settlement transaction. This field is present in all
-  // requests, except when the *settlement type* is
-  // [CREDIT_REVERSAL][google.cloud.paymentgateway.issuerswitch.bankadapter.v1.SettlementType.CREDIT_REVERSAL].
-  SettlementParticipant payer = 2;
-  // Payee in the settlement payment transaction. This field is present in all
-  // requests, except when the *settlement type* is
-  // [DEBIT_REVERSAL][google.cloud.paymentgateway.issuerswitch.bankadapter.v1.SettlementType.DEBIT_REVERSAL].
-  SettlementParticipant payee = 3;
-  // Amount needed to complete payment settlement.
-  Amount instructed_amount = 4 [(google.api.field_behavior) = REQUIRED];
-  // Uniquely identifies the payment this settlement is part of. This maps to
-  // the transaction id in India's UPI system.
-  string payment_id = 5 [(google.api.field_behavior) = REQUIRED];
-  // Retrieval Reference Number (RRN) for the transaction.
-  string retrieval_reference_number = 6
-      [(google.api.field_behavior) = REQUIRED];
-  // Free form string providing a description of the payment settlement.
-  string description = 7 [(google.api.field_behavior) = REQUIRED];
-  // Specifies the amount held and the holding reference i.e. the bank's
-  // reference for the funds held in the account which are being debited or
-  // reversed in this request. A value will be specified for this field only for
-  // `DEBIT` settlements which are initiated against funds held in the account
-  // or `DEBIT_REVERSAL` settlements which are initiated against deemed `DEBIT`
-  // settlements.
-  HoldDetails hold_details = 8;
-  // Timestamp of the current request.
-  google.protobuf.Timestamp request_time = 9
-      [(google.api.field_behavior) = REQUIRED];
-  // Additional information about the payment settlement.
-  PaymentAdditionalInfo additional_info = 10;
-  // If this request's _settlement type_ is `DEBIT_REVERSAL` or
-  // `CREDIT_REVERSAL`, then details of the original transaction that is being
-  // reversed will be provided in this field.
-  OriginalTransaction original_transaction = 11;
-  // If this request is being triggered as part of a complaint raised via UPI's
-  // UDIR system, then details of the complaint will be available in this field.
-  CaseDetails case_details = 12;
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 13
-      [(google.api.field_behavior) = REQUIRED];
+  // Payload for settle payment request.
+  message Payload {
+    // Type of settlement to execute.
+    SettlementType settlement_type = 1 [(google.api.field_behavior) = REQUIRED];
+    // Payer in the payment settlement transaction. This field is present in all
+    // requests, except when the *settlement type* is
+    // [CREDIT_REVERSAL][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SettlementType.CREDIT_REVERSAL].
+    SettlementParticipant payer = 2;
+    // Payee in the settlement payment transaction. This field is present in all
+    // requests, except when the *settlement type* is
+    // [DEBIT_REVERSAL][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SettlementType.DEBIT_REVERSAL].
+    SettlementParticipant payee = 3;
+    // Amount needed to complete payment settlement.
+    Amount instructed_amount = 4 [(google.api.field_behavior) = REQUIRED];
+    // Uniquely identifies the payment this settlement is part of. This maps to
+    // the transaction id in India's UPI system.
+    string payment_id = 5 [(google.api.field_behavior) = REQUIRED];
+    // Retrieval Reference Number (RRN) for the transaction.
+    string retrieval_reference_number = 6
+        [(google.api.field_behavior) = REQUIRED];
+    // Free form string providing a description of the payment settlement.
+    string description = 7 [(google.api.field_behavior) = REQUIRED];
+    // Specifies the amount held and the holding reference i.e. the bank's
+    // reference for the funds held in the account which are being debited or
+    // reversed in this request. A value will be specified for this field only
+    // for `DEBIT` settlements which are initiated against funds held in the
+    // account or `DEBIT_REVERSAL` settlements which are initiated against
+    // deemed `DEBIT` settlements.
+    HoldDetails hold_details = 8;
+    // Timestamp of the current request.
+    google.protobuf.Timestamp request_time = 9
+        [(google.api.field_behavior) = REQUIRED];
+    // Additional information about the payment settlement.
+    PaymentAdditionalInfo additional_info = 10;
+    // If this request's _settlement type_ is `DEBIT_REVERSAL` or
+    // `CREDIT_REVERSAL`, then details of the original transaction that is being
+    // reversed will be provided in this field.
+    OriginalTransaction original_transaction = 11;
+    // If this request is being triggered as part of a complaint raised via
+    // UPI's UDIR system, then details of the complaint will be available in
+    // this field.
+    CaseDetails case_details = 12;
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 13
+        [(google.api.field_behavior) = REQUIRED];
+
+    // A payment rule as provided by the payments orchestrator.
+    message Rule {
+      // An enum of the possible rule names.
+      enum RuleName {
+        // Rule name unspecified.
+        RULE_NAME_UNSPECIFIED = 0;
+        // The `expire after` rule.
+        EXPIRE_AFTER = 1;
+        // The `min amount` rule.
+        MIN_AMOUNT = 2;
+      }
+      // The rule's name.
+      RuleName name = 1;
+      // The rule's value.
+      string value = 2;
+    }
+    // A list of rules specified by the payments orchestrator for the payment
+    // settlement.
+    repeated Rule rules = 14;
+  }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SettlePaymentRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
+
+// Information about a successful payment settlement.
+message SettlePaymentInfo {
+  // An identifier used by the bank's systems for the settlement operation. In
+  // India's UPI system, this translates to the `approval number`. This value
+  // is alpha-numeric and should be exactly 6 characters long.
+  string backend_settlement_id = 1 [(google.api.field_behavior) = REQUIRED];
+  // Miscellaneous information about the payment settlement.
+  map<string, string> miscellaneous = 2;
 }
 
 // The response to be returned by the bank adapter once the settlement request
 // is executed.
 message SettlePaymentResponse {
-  // An identifier used by the bank's systems for the settlement operation. In
-  // India's UPI system, this translates to the `approval number`. This value is
-  // alpha-numeric and should be exactly 6 characters long.
-  string backend_settlement_id = 1 [(google.api.field_behavior) = REQUIRED];
-  // Generic additional information.
-  repeated AdditionalInfo miscellaneous = 2;
+  // Payload for settle payment response.
+  message Payload {
+    // Information about a successful payment settlement.
+    SettlePaymentInfo settle_payment_info = 1;
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 2;
+  }
+
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SettlePaymentResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Result of a settlement payment. Can be one of either a success or an error
@@ -89,7 +148,7 @@ message SettlePaymentResult {
   // Settlement payment can be either success or error.
   oneof settle_payment_result {
     // Successful settlement response.
-    SettlePaymentResponse success = 1;
+    SettlePaymentInfo success = 1;
     // Settlement Error Response.
     SettlePaymentError error = 2;
   }
@@ -105,47 +164,81 @@ message SettlePaymentError {
 
 // Request to search for a payment settlement.
 message SearchPaymentsRequest {
-  // Uniquely identifies the payment settlement transaction being searched for.
-  // This maps to the `Txn.Id` value in India's UPI system.
-  string payment_id = 1 [(google.api.field_behavior) = REQUIRED];
-  // Type of settlement.
-  SettlementType settlement_type = 2 [(google.api.field_behavior) = REQUIRED];
-  // Retrieval Reference Number (RRN) of the payment settlement being searched
-  // for.
-  string retrieval_reference_number = 3
-      [(google.api.field_behavior) = REQUIRED];
-  // Timestamp of the payment settlement transaction request being searched for.
-  google.protobuf.Timestamp request_time = 4
-      [(google.api.field_behavior) = REQUIRED];
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 5
-      [(google.api.field_behavior) = REQUIRED];
+  // Payload for search payment request.
+  message Payload {
+    // Uniquely identifies the payment settlement transaction being searched
+    // for. This maps to the `Txn.Id` value in India's UPI system.
+    string payment_id = 1 [(google.api.field_behavior) = REQUIRED];
+    // Type of settlement.
+    SettlementType settlement_type = 2 [(google.api.field_behavior) = REQUIRED];
+    // Retrieval Reference Number (RRN) of the payment settlement being searched
+    // for.
+    string retrieval_reference_number = 3
+        [(google.api.field_behavior) = REQUIRED];
+    // Timestamp of the payment settlement transaction request being searched
+    // for.
+    google.protobuf.Timestamp request_time = 4
+        [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 5
+        [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SearchPaymentsRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Information about a payment previously requested.
 message SearchPaymentsResponse {
-  // Payment settlement result. Can indicate either a success or an error during
-  // the processing of the original payment settlement.
-  SettlePaymentResult settlement_payment_response = 1
-      [(google.api.field_behavior) = REQUIRED];
-  // The status of the overall settlement.
-  SettlementState settlement_state = 2 [(google.api.field_behavior) = REQUIRED];
-  // The status of the overall settlement. It may have changed after it was
-  // executed (for example, if a refund was processed).
-  enum SettlementState {
-    // Unspecified settlement state.
-    STATE_UNSPECIFIED = 0;
-    // Successful settlement.
-    SUCCEEDED = 1;
-    // Failed settlement.
-    FAILED = 2;
-    // Partially completed settlement.
-    PARTIAL = 3;
-    // Deemed settlement.
-    DEEMED = 4;
-    // Revoked settlement.
-    REVOKED = 5;
+  // Payload for search payments response.
+  message Payload {
+    // Payment settlement result. Can indicate either a success or an error
+    // during the processing of the original payment settlement.
+    SettlePaymentResult settle_payment_result = 1
+        [(google.api.field_behavior) = REQUIRED];
+    // The status of the overall settlement. It may have changed after it was
+    // executed (for example, if a refund was processed).
+    enum SettlementState {
+      // Unspecified settlement state.
+      STATE_UNSPECIFIED = 0;
+      // Successful settlement.
+      SUCCEEDED = 1;
+      // Failed settlement.
+      FAILED = 2;
+      // Partially completed settlement.
+      PARTIAL = 3;
+      // Deemed settlement.
+      DEEMED = 4;
+      // Revoked settlement.
+      REVOKED = 5;
+    }
+    // The status of the overall settlement.
+    SettlementState settlement_state = 2
+        [(google.api.field_behavior) = REQUIRED];
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 3;
+  }
+
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SearchPaymentsResponse.Payload]
+    // message.
+    string encrypted = 2;
   }
 }
 

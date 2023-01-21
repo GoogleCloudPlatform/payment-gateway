@@ -1,19 +1,20 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 syntax = "proto3";
 
-package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
+package google.cloud.paymentgateway.issuerswitch.adapter.bank.v1;
 
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
 import "google/api/field_behavior.proto";
@@ -21,7 +22,7 @@ import "google/type/date.proto";
 
 option java_outer_classname = "CustomerTypesProto";
 option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.bank.v1";
 option go_api_flag = "OPAQUE_V0";
 
 // Information about a customer's debit/credit card that will be validated by
@@ -57,289 +58,429 @@ message CustomerValidationId {
 
 // Request body for customer notification.
 message NotifyCustomerRequest {
-  // Details of the MPIN update operation.
-  message MPINUpdated {
-    // Possible states of the MPIN update operation.
-    enum State {
-      // Unspecified state.
-      STATE_UNSPECIFIED = 0;
-      // MPIN update succeeded.
-      SUCCEEDED = 1;
-      // MPIN update failed.
-      FAILED = 2;
+  // Payload for notify customer request.
+  message Payload {
+    // Details of the MPIN update operation.
+    message MPINUpdated {
+      // Possible states of the MPIN update operation.
+      enum State {
+        // Unspecified state.
+        STATE_UNSPECIFIED = 0;
+        // MPIN update succeeded.
+        SUCCEEDED = 1;
+        // MPIN update failed.
+        FAILED = 2;
+      }
+      // State of the MPIN update operation.
+      State state = 1 [(google.api.field_behavior) = REQUIRED];
     }
-    // State of the MPIN update operation.
-    State state = 1 [(google.api.field_behavior) = REQUIRED];
+    // Details of the notification needed for recurring mandate (auto-pay)
+    // operations.
+    message RecurringMandate {
+      // Possible states of the recurrming mandate operation.
+      enum State {
+        // Unspecified state.
+        STATE_UNSPECIFIED = 0;
+        // Recurring mandate operation succeeded.
+        SUCCEEDED = 1;
+        // Recurring mandate operation failed.
+        FAILED = 2;
+      }
+      // Recurrence pattern of the mandate.
+      enum Pattern {
+        // Unspecified recurrence pattern.
+        PATTERN_UNSPECIFIED = 0;
+        // Mandate recurring daily.
+        PATTERN_DAILY = 1;
+        // Mandate recurring weekly.
+        PATTERN_WEEKLY = 2;
+        // Mandate recurring fortnightly.
+        PATTERN_FORTNIGHTLY = 3;
+        // Mandate recurring monthly.
+        PATTERN_MONTHLY = 4;
+        // Mandate recurring bi-monthly (once every 2 months).
+        PATTERN_BIMONTHLY = 5;
+        // Mandate recurring quarterly.
+        PATTERN_QUARTERLY = 6;
+        // Mandate recurring half yearly.
+        PATTERN_HALFYEARLY = 7;
+        // Mandate recurring yearly.
+        PATTERN_YEARLY = 8;
+      }
+      // Identifier of the mandate. This maps to the `Unique Mandate Number
+      // (UMN)` in India's UPI standards.
+      string id = 1 [(google.api.field_behavior) = REQUIRED];
+      // Information about the payee who will be executing the mandate debit
+      // request. This will include the payee's VPA, name and all merchant
+      // details of the payee. Note that the account reference of the payee will
+      // not be populated in the request.
+      SettlementParticipant payee = 2 [(google.api.field_behavior) = REQUIRED];
+      // The mandate's recurrence pattern.
+      Pattern pattern = 3 [(google.api.field_behavior) = REQUIRED];
+      // The amount that will be settled as part of the mandate execution.
+      Amount amount = 4 [(google.api.field_behavior) = REQUIRED];
+      // State of the recurring mandate operation.
+      State state = 5 [(google.api.field_behavior) = REQUIRED];
+      // Type of operation performed on the recurring mandate.
+      OperationType operation_type = 6 [(google.api.field_behavior) = REQUIRED];
+      // Details of a newly created recurring mandate.
+      message Creation {
+        // Start date of the recurring mandate.
+        google.type.Date start_date = 1
+            [(google.api.field_behavior) = REQUIRED];
+        // End date of the recurring mandate.
+        google.type.Date end_date = 2 [(google.api.field_behavior) = REQUIRED];
+      }
+      // Details of a recurring mandate that is to be executed in the next 24
+      // hours with a SettlePayment-DEBIT.
+      message Execution {
+        // Date when the mandate will be executed next.
+        google.type.Date execution_date = 1
+            [(google.api.field_behavior) = REQUIRED];
+      }
+      // Details of a recurring mandate that has been modified.
+      message Modification {
+        // Modified start date of the recurring mandate.
+        google.type.Date start_date = 1
+            [(google.api.field_behavior) = REQUIRED];
+        // Modified end date of the recurring mandate.
+        google.type.Date end_date = 2 [(google.api.field_behavior) = REQUIRED];
+      }
+      // Detailf of a recurring mandate that has been paused.
+      message Pause {
+        // Date when the recurring mandate's pause starts.
+        google.type.Date start_date = 1
+            [(google.api.field_behavior) = REQUIRED];
+        // Date when the recurring mandate's pause ends.
+        google.type.Date end_date = 2 [(google.api.field_behavior) = REQUIRED];
+      }
+      enum OperationType {
+        // Unspecified operation type.
+        OPERATION_TYPE_UNSPECIFIED = 0;
+        // Operation type creation. This type indicates that a new recurring
+        // mandate creation operation has been processed by the issuer switch.
+        // The `operation` field will contain details about the newly created
+        // mandate.
+        OPERATION_TYPE_CREATION = 1;
+        // Operation type execution. This type indicates that there will be an
+        // upcoming execution of a recurring mandate. The `operation` field will
+        // contain details about the upcoming execution of the recurring
+        // mandate.
+        OPERATION_TYPE_EXECUTION = 2;
+        // Operation type modification. This type indicates that the issuer
+        // switch has processed a modification to a recurring mandate. The
+        // `operation` field will contain details about the modified recurring
+        // mandate.
+        OPERATION_TYPE_MODIFICATION = 3;
+        // Operation type revocation. This type indicates that the issuer switch
+        // has processed a revocation of a recurring mandate. No additional
+        // information is included for this operation type.
+        OPERATION_TYPE_REVOCATION = 4;
+        // Operation type pause. This type indicates that the issuer switch has
+        // processed a pause on a recurring mandate. The `operation` field will
+        // contain details about pause operation.
+        OPERATION_TYPE_PAUSE = 5;
+        // Operation type unpause. This type indicates that the issuer switch
+        // has processed an unpause on a recurring mandate. No additional
+        // information is included for this operation type.
+        OPERATION_TYPE_UNPAUSE = 6;
+      }
+      // Additional information about the operation processed on a recurring
+      // mandate will be provided in this field. One of these values will be
+      // specified.
+      oneof Operation {
+        // Contains details about the recurring mandate creation operation.
+        Creation creation = 7;
+        // Contains details about the recurring mandate execution operation.
+        Execution execution = 8;
+        // Contains details about the recurring mandate modification operation.
+        Modification modification = 9;
+        // Contains details about the recurring mandate pause operation.
+        Pause pause = 10;
+      }
+    }
+    // Participant to be notified.
+    Participant participant = 1 [(google.api.field_behavior) = REQUIRED];
+    // Unique identification of an account according to India's UPI standards.
+    // This is the details of the account of the customer who is to be notified.
+    AccountReference account = 2 [(google.api.field_behavior) = REQUIRED];
+    // The details of the notification. Exactly one of two values will be
+    // specified. The type of notification to be sent can be inferred from which
+    // of the two possible values are set in the request.
+    oneof details {
+      // Details of the MPIN operation processed by the issuer switch.
+      MPINUpdated mpin_updated = 3;
+      // Details of the recurring mandate operation processed by the issuer
+      // switch.
+      RecurringMandate recurring_mandate = 4;
+    }
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 5
+        [(google.api.field_behavior) = REQUIRED];
   }
-  // Details of the notification needed for recurring mandate (auto-pay)
-  // operations.
-  message RecurringMandate {
-    // Possible states of the recurrming mandate operation.
-    enum State {
-      // Unspecified state.
-      STATE_UNSPECIFIED = 0;
-      // Recurring mandate operation succeeded.
-      SUCCEEDED = 1;
-      // Recurring mandate operation failed.
-      FAILED = 2;
-    }
-    // Recurrence pattern of the mandate.
-    enum Pattern {
-      // Unspecified recurrence pattern.
-      PATTERN_UNSPECIFIED = 0;
-      // Mandate recurring daily.
-      PATTERN_DAILY = 1;
-      // Mandate recurring weekly.
-      PATTERN_WEEKLY = 2;
-      // Mandate recurring fortnightly.
-      PATTERN_FORTNIGHTLY = 3;
-      // Mandate recurring monthly.
-      PATTERN_MONTHLY = 4;
-      // Mandate recurring bi-monthly (once every 2 months).
-      PATTERN_BIMONTHLY = 5;
-      // Mandate recurring quarterly.
-      PATTERN_QUARTERLY = 6;
-      // Mandate recurring half yearly.
-      PATTERN_HALFYEARLY = 7;
-      // Mandate recurring yearly.
-      PATTERN_YEARLY = 8;
-    }
-    // Identifier of the mandate. This maps to the `Unique Mandate Number (UMN)`
-    // in India's UPI standards.
-    string id = 1 [(google.api.field_behavior) = REQUIRED];
-    // Information about the payee who will be executing the mandate debit
-    // request. This will include the payee's VPA, name and all merchant details
-    // of the payee. Note that the account reference of the payee will not be
-    // populated in the request.
-    SettlementParticipant payee = 2 [(google.api.field_behavior) = REQUIRED];
-    // The mandate's recurrence pattern.
-    Pattern pattern = 3 [(google.api.field_behavior) = REQUIRED];
-    // The amount that will be settled as part of the mandate execution.
-    Amount amount = 4 [(google.api.field_behavior) = REQUIRED];
-    // State of the recurring mandate operation.
-    State state = 5 [(google.api.field_behavior) = REQUIRED];
-    // Type of operation performed on the recurring mandate.
-    OperationType operation_type = 6 [(google.api.field_behavior) = REQUIRED];
-    // Details of a newly created recurring mandate.
-    message Creation {
-      // Start date of the recurring mandate.
-      google.type.Date start_date = 1 [(google.api.field_behavior) = REQUIRED];
-      // End date of the recurring mandate.
-      google.type.Date end_date = 2 [(google.api.field_behavior) = REQUIRED];
-    }
-    // Details of a recurring mandate that is to be executed in the next 24
-    // hours with a SettlePayment-DEBIT.
-    message Execution {
-      // Date when the mandate will be executed next.
-      google.type.Date execution_date = 1
-          [(google.api.field_behavior) = REQUIRED];
-    }
-    // Details of a recurring mandate that has been modified.
-    message Modification {
-      // Modified start date of the recurring mandate.
-      google.type.Date start_date = 1 [(google.api.field_behavior) = REQUIRED];
-      // Modified end date of the recurring mandate.
-      google.type.Date end_date = 2 [(google.api.field_behavior) = REQUIRED];
-    }
-    // Detailf of a recurring mandate that has been paused.
-    message Pause {
-      // Date when the recurring mandate's pause starts.
-      google.type.Date start_date = 1 [(google.api.field_behavior) = REQUIRED];
-      // Date when the recurring mandate's pause ends.
-      google.type.Date end_date = 2 [(google.api.field_behavior) = REQUIRED];
-    }
-    enum OperationType {
-      // Unspecified operation type.
-      OPERATION_TYPE_UNSPECIFIED = 0;
-      // Operation type creation. This type indicates that a new recurring
-      // mandate creation operation has been processed by the issuer switch. The
-      // `operation` field will contain details about the newly created mandate.
-      OPERATION_TYPE_CREATION = 1;
-      // Operation type execution. This type indicates that there will be an
-      // upcoming execution of a recurring mandate. The `operation` field will
-      // contain details about the upcoming execution of the recurring mandate.
-      OPERATION_TYPE_EXECUTION = 2;
-      // Operation type modification. This type indicates that the issuer switch
-      // has processed a modification to a recurring mandate. The `operation`
-      // field will contain details about the modified recurring mandate.
-      OPERATION_TYPE_MODIFICATION = 3;
-      // Operation type revocation. This type indicates that the issuer switch
-      // has processed a revocation of a recurring mandate. No additional
-      // information is included for this operation type.
-      OPERATION_TYPE_REVOCATION = 4;
-      // Operation type pause. This type indicates that the issuer switch has
-      // processed a pause on a recurring mandate. The `operation` field will
-      // contain details about pause operation.
-      OPERATION_TYPE_PAUSE = 5;
-      // Operation type unpause. This type indicates that the issuer switch has
-      // processed an unpause on a recurring mandate. No additional information
-      // is included for this operation type.
-      OPERATION_TYPE_UNPAUSE = 6;
-    }
-    // Additional information about the operation processed on a recurring
-    // mandate will be provided in this field. One of these values will be
-    // specified.
-    oneof Operation {
-      // Contains details about the recurring mandate creation operation.
-      Creation creation = 7;
-      // Contains details about the recurring mandate execution operation.
-      Execution execution = 8;
-      // Contains details about the recurring mandate modification operation.
-      Modification modification = 9;
-      // Contains details about the recurring mandate pause operation.
-      Pause pause = 10;
-    }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.NotifyCustomerRequest.Payload]
+    // message.
+    string encrypted = 2;
   }
-  // Participant to be notified.
-  Participant participant = 1 [(google.api.field_behavior) = REQUIRED];
-  // Unique identification of an account according to India's UPI standards.
-  // This is the details of the account of the customer who is to be notified.
-  AccountReference account = 2 [(google.api.field_behavior) = REQUIRED];
-  // The details of the notification. Exactly one of two values will be
-  // specified. The type of notification to be sent can be inferred from which
-  // of the two possible values are set in the request.
-  oneof details {
-    // Details of the MPIN operation processed by the issuer switch.
-    MPINUpdated mpin_updated = 3;
-    // Details of the recurring mandate operation processed by the issuer
-    // switch.
-    RecurringMandate recurring_mandate = 4;
+}
+
+// Response for a customer notification.
+message NotifyCustomerResponse {
+  // Payload for the customer notification response.
+  message Payload {
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 1;
   }
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 5
-      [(google.api.field_behavior) = REQUIRED];
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.ReleaseFundsResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // The response once a registration request has been processed and an OTP has
 // been generated and sent to a customer's mobile phone.
 message InitiateRegistrationResponse {
-  // URL the customer should use to enter the OTP received on their mobile.
-  string validation_page_link = 1;
+  // Payload for initiate registration response.
+  message Payload {
+    // URL the customer should use to enter the OTP received on their mobile.
+    string validation_page_link = 1;
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 2;
+  }
+
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.InitiateRegistrationResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Request for initiating registration of a customer's bank account for UPI.
 message InitiateRegistrationRequest {
-  // Identifies the customer or bank account registering for UPI. An OTP is sent
-  // to the mobile number associated with the customer/bank account. Either a
-  // customer reference or a bank account reference will be provided. Only one
-  // of the two will be specified.
-  oneof reference {
-    // The combination of a reference type and reference number that uniquely
-    // identifies a bank customer. This field will be used if the customer is
-    // identified based on a unique resident identifier (like Aadhaar) or based
-    // on the customer's mobile number.
-    CustomerReference customer_reference = 1;
-    // A reference to uniquely identify a customer's bank account based on
-    // India's UPI standards.
-    AccountReference account_reference = 2;
+  // Payload for initiate registration request.
+  message Payload {
+    // Identifies the customer or bank account registering for UPI. An OTP is
+    // sent to the mobile number associated with the customer/bank account.
+    // Either a customer reference or a bank account reference will be provided.
+    // Only one of the two will be specified.
+    oneof reference {
+      // The combination of a reference type and reference number that uniquely
+      // identifies a bank customer. This field will be used if the customer is
+      // identified based on a unique resident identifier (like Aadhaar) or
+      // based on the customer's mobile number.
+      CustomerReference customer_reference = 1;
+      // A reference to uniquely identify a customer's bank account based on
+      // India's UPI standards.
+      AccountReference account_reference = 2;
+    }
+    // Information about a customer's debit/credit card that will be provided if
+    // the issuer bank supports the ATM_REDIRECT mode of registration.
+    CardInfo card_info = 3;
+    // Participant initiating the registration.
+    Participant participant = 4 [(google.api.field_behavior) = REQUIRED];
+    // The type of registration indicating if the specified reference is being
+    // registered newly or being reset.
+    RegistrationType type = 5 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 6
+        [(google.api.field_behavior) = REQUIRED];
   }
-  // Information about a customer's debit/credit card that will be provided if
-  // the issuer bank supports the ATM_REDIRECT mode of registration.
-  CardInfo card_info = 3;
-  // Participant initiating the registration.
-  Participant participant = 4 [(google.api.field_behavior) = REQUIRED];
-  // The type of registration indicating if the specified reference is being
-  // registered newly or being reset.
-  RegistrationType type = 5 [(google.api.field_behavior) = REQUIRED];
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 6
-      [(google.api.field_behavior) = REQUIRED];
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.InitiateRegistrationRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Request for a previously initiated registration to be validated.
 message ValidateRegistrationRequest {
-  // Identifies the customer or bank account whose registration for UPI is to be
-  // validated. Either a customer reference or a bank account reference will be
-  // provided. Only one of the two will be specified.
-  oneof reference {
-    // The combination of a reference type and reference number that uniquely
-    // identifies a bank customer. This field will be used if the customer is
-    // identified based on a unique resident identifier (like Aadhaar) or based
-    // on the customer's mobile number.
-    CustomerReference customer_reference = 1;
-    // A reference to uniquely identify a customer's bank account based on
-    // India's UPI standards.
-    AccountReference account_reference = 2;
+  // Payload for validate registration request.
+  message Payload {
+    // Identifies the customer or bank account whose registration for UPI is to
+    // be validated. Either a customer reference or a bank account reference
+    // will be provided. Only one of the two will be specified.
+    oneof reference {
+      // The combination of a reference type and reference number that uniquely
+      // identifies a bank customer. This field will be used if the customer is
+      // identified based on a unique resident identifier (like Aadhaar) or
+      // based on the customer's mobile number.
+      CustomerReference customer_reference = 1;
+      // A reference to uniquely identify a customer's bank account based on
+      // India's UPI standards.
+      AccountReference account_reference = 2;
+    }
+    // Information about a customer's debit/credit card that needs to be
+    // validated by the bank. This value will be specified only if the
+    // registration is being validated with a debit/credit card.
+    //
+    // If the registration is validated using an Aadhaar OTP, then this field
+    // will be omitted.
+    CardInfo card_info = 3;
+    // The PIN for the debit/credit card that needs to be validated by the
+    // bank. This value will be specified only if the registration is being
+    // validated with a debit/credit card.
+    //
+    // If the registration is validated using an Aadhaar OTP, then this field
+    // will be omitted.
+    string pin = 4;
+    // The OTP received on the customer's mobile phone that needs to be
+    // validated by the bank.
+    string otp = 5 [(google.api.field_behavior) = REQUIRED];
+    // Participant validating the registration.
+    Participant participant = 6 [(google.api.field_behavior) = REQUIRED];
+    // The type of registration indicating if the specified reference is being
+    // registered newly or being reset.
+    RegistrationType type = 7 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 8
+        [(google.api.field_behavior) = REQUIRED];
   }
-  // Information about a customer's debit/credit card that needs to be validated
-  // by the bank. This value will be specified only if the registration is being
-  // validated with a debit/credit card.
-  //
-  // If the registration is validated using an Aadhaar OTP, then this field will
-  // be omitted.
-  CardInfo card_info = 3;
-  // The PIN for the debit/credit card that needs to be validated by the
-  // bank. This value will be specified only if the registration is being
-  // validated with a debit/credit card.
-  //
-  // If the registration is validated using an Aadhaar OTP, then this field will
-  // be omitted.
-  string pin = 4;
-  // The OTP received on the customer's mobile phone that needs to be validated
-  // by the bank.
-  string otp = 5 [(google.api.field_behavior) = REQUIRED];
-  // Participant validating the registration.
-  Participant participant = 6 [(google.api.field_behavior) = REQUIRED];
-  // The type of registration indicating if the specified reference is being
-  // registered newly or being reset.
-  RegistrationType type = 7 [(google.api.field_behavior) = REQUIRED];
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 8
-      [(google.api.field_behavior) = REQUIRED];
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.ValidateRegistrationRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
+
+// Response for a request to validate a previously initiated registration.
+message ValidateRegistrationResponse {
+  // Payload for the validate registration response.
+  message Payload {
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 1;
+  }
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.ReleaseFundsResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Request for validating customer against a government issued ID.
 message CustomerValidationRequest {
-  // Details of the ID that needs to be validated.
-  CustomerValidationId id = 1 [(google.api.field_behavior) = REQUIRED];
-  // Unique identification of an account according to India's UPI standards.
-  AccountReference ref = 2 [(google.api.field_behavior) = REQUIRED];
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 3
-      [(google.api.field_behavior) = REQUIRED];
+  // Payload for customer validation request.
+  message Payload {
+    // Details of the ID that needs to be validated.
+    CustomerValidationId id = 1 [(google.api.field_behavior) = REQUIRED];
+    // Unique identification of an account according to India's UPI standards.
+    AccountReference ref = 2 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 3
+        [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.CustomerValidationRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Response for the customer validation against a government ID.
 message CustomerValidationResponse {
-  // Types of account nature.
-  enum AccountNature {
-    // Unspecified account nature.
-    ACCOUNT_NATURE_UNDEFINED = 0;
-    // Acount nature is of type SINGLE.
-    SINGLE = 1;
-    // Account nature is of type JOINT.
-    JOINT = 2;
+  // Payload for customer validation response.
+  message Payload {
+    // Types of account nature.
+    enum AccountNature {
+      // Unspecified account nature.
+      ACCOUNT_NATURE_UNDEFINED = 0;
+      // Acount nature is of type SINGLE.
+      SINGLE = 1;
+      // Account nature is of type JOINT.
+      JOINT = 2;
+    }
+
+    // Types of account holder.
+    enum AccountHolder {
+      // Unspecified account holder.
+      ACCOUNT_HOLDER_UNDEFINED = 0;
+      // Customer is primary account holder.
+      PRIMARY = 1;
+      // Customer is secondary account holder.
+      SECONDARY = 2;
+    }
+
+    // TRUE if the ID provided in the request is valid, FALSE otherwise.
+    bool valid = 1 [(google.api.field_behavior) = REQUIRED];
+    // Nature of the account i.e. SINGLE/JOINT.
+    AccountNature account_nature = 2 [(google.api.field_behavior) = REQUIRED];
+    // Denotes whether the customer is a PRIMARY or SECONDARY account holder.
+    AccountHolder account_holder = 3 [(google.api.field_behavior) = REQUIRED];
+    // Denotes whether the account type is SAVINGS, CURRENT etc.
+    string account_type = 4 [(google.api.field_behavior) = REQUIRED];
+    // Mask Name of the customer with the bank.
+    string mask_name = 5;
+    // Denotes whether Customer is a PERSON or ENTITY.
+    Persona customer_type = 6 [(google.api.field_behavior) = REQUIRED];
+    // Merchant Category code as specified by UPI (A four-digit number listed in
+    // ISO 18245 for retail financial services).
+    string category_code = 7;
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 8;
   }
 
-  // Types of account holder.
-  enum AccountHolder {
-    // Unspecified account holder.
-    ACCOUNT_HOLDER_UNDEFINED = 0;
-    // Customer is primary account holder.
-    PRIMARY = 1;
-    // Customer is secondary account holder.
-    SECONDARY = 2;
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.CustomerValidationResponse.Payload]
+    // message.
+    string encrypted = 2;
   }
-
-  // TRUE if the ID provided in the request is valid, FALSE otherwise.
-  bool valid = 1 [(google.api.field_behavior) = REQUIRED];
-  // Nature of the account i.e. SINGLE/JOINT.
-  AccountNature account_nature = 2 [(google.api.field_behavior) = REQUIRED];
-  // Denotes whether the customer is a PRIMARY or SECONDARY account holder.
-  AccountHolder account_holder = 3 [(google.api.field_behavior) = REQUIRED];
-  // Denotes whether the account type is SAVINGS, CURRENT etc.
-  string account_type = 4 [(google.api.field_behavior) = REQUIRED];
-  // Mask Name of the customer with the bank.
-  string mask_name = 5;
-  // Denotes whether Customer is a PERSON or ENTITY.
-  Persona customer_type = 6 [(google.api.field_behavior) = REQUIRED];
-  // Merchant Category code as specified by UPI (A four-digit number listed in
-  // ISO 18245 for retail financial services).
-  string category_code = 7;
 }
 
 // Enumeration of the types of registration.

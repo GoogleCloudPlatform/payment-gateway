@@ -1,10 +1,10 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,18 +14,17 @@
 
 syntax = "proto3";
 
-package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
+package google.cloud.paymentgateway.issuerswitch.adapter.bank.v1;
 
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/account_types.proto";
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/customer_types.proto";
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/payment_settlement_types.proto";
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/resolution_types.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
 
 option java_outer_classname = "IssuerBankAdapterServiceProto";
 option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.bank.v1";
 option go_api_flag = "OPAQUE_V0";
 
 // A service interface for the Issuer Switch Bank Adapter.
@@ -171,7 +170,7 @@ service BankAdapterService {
   //
   // _Note:_ This API will be invoked in the UPI `ReqMandate` and `ReqVoucher`
   // API flows.
-  rpc ReleaseFunds(ReleaseFundsRequest) returns (google.protobuf.Empty) {
+  rpc ReleaseFunds(ReleaseFundsRequest) returns (ReleaseFundsResponse) {
     option (google.api.http) = {
       post: "/v1/accounts/funds:release"
       body: "*"
@@ -457,7 +456,7 @@ service BankAdapterService {
   //
   // _Note:_ This API will be invoked in the UPI `ReqRegMob` API flow.
   rpc ValidateRegistration(ValidateRegistrationRequest)
-      returns (google.protobuf.Empty) {
+      returns (ValidateRegistrationResponse) {
     option (google.api.http) = {
       post: "/v1/users:validateRegistration"
       body: "*"
@@ -530,7 +529,7 @@ service BankAdapterService {
   //
   // _Note:_ This API will be invoked in the UPI `ReqSetCre` API flow, or in the
   // `ReqValCust` (mandate notification) API flow.
-  rpc NotifyCustomer(NotifyCustomerRequest) returns (google.protobuf.Empty) {
+  rpc NotifyCustomer(NotifyCustomerRequest) returns (NotifyCustomerResponse) {
     option (google.api.http) = {
       post: "/v1/users:notifyCustomer"
       body: "*"
