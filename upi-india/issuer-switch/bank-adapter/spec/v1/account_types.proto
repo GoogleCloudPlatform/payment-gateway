@@ -1,20 +1,20 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License
+// limitations under the License.
 
 syntax = "proto3";
 
-package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
+package google.cloud.paymentgateway.issuerswitch.adapter.bank.v1;
 
 import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
 import "google/api/field_behavior.proto";
@@ -22,7 +22,7 @@ import "google/protobuf/timestamp.proto";
 
 option java_outer_classname = "AccountTypesProto";
 option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.bank.v1";
 option go_api_flag = "OPAQUE_V0";
 
 // Provides information about an account.
@@ -73,51 +73,83 @@ message ValidityPeriod {
 
 // Request to hold funds in an account.
 message HoldFundsRequest {
-  // An identifier for this request. This is used to correlate a hold
-  // funds request to a release funds request. In UPI, this field maps to the
-  // Unified Mandate Number (UMN).
-  string request_id = 1 [(google.api.field_behavior) = REQUIRED];
-  // Payer in the transaction.
-  SettlementParticipant payer = 2 [(google.api.field_behavior) = REQUIRED];
-  // Payee in the transaction.
-  SettlementParticipant payee = 3 [(google.api.field_behavior) = REQUIRED];
-  // Specifies the amount to be held and the holding type rule.
-  HoldAmount hold_amount = 4 [(google.api.field_behavior) = REQUIRED];
-  // Identifier for the mandate creation transaction.
-  string transaction_id = 5 [(google.api.field_behavior) = REQUIRED];
-  // Specifies the validity period for the funds to be held.
-  ValidityPeriod validity_period = 6 [(google.api.field_behavior) = REQUIRED];
-  // Free form string describing the hold request.
-  string description = 7;
-  // Additional payment information specific to India's UPI requirements.
-  PaymentAdditionalInfo payment_additional_info = 8;
-  // If the hold funds call is triggered to update an existing hold on funds,
-  // then this field will contain the original hold funds reference and the
-  // amount held originally. In other cases, this field will be omitted in the
-  // request.
-  HoldDetails original_hold_details = 9;
-  // Reason for this hold request.
-  HoldReason hold_reason = 10 [(google.api.field_behavior) = REQUIRED];
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 11
-      [(google.api.field_behavior) = REQUIRED];
-  // Indicates whether the hold funds request is for a mandate or a voucher.
-  enum HoldReason {
-    // Unspecified hold reason.
-    REASON_UNSPECIFIED = 0;
-    // Hold funds for mandate.
-    MANDATE = 1;
-    // Hold funds for voucher.
-    VOUCHER = 2;
+  // Payload for hold funds request.
+  message Payload {
+    // An identifier for this request. This is used to correlate a hold
+    // funds request to a release funds request. In UPI, this field maps to the
+    // Unified Mandate Number (UMN).
+    string request_id = 1 [(google.api.field_behavior) = REQUIRED];
+    // Payer in the transaction.
+    SettlementParticipant payer = 2 [(google.api.field_behavior) = REQUIRED];
+    // Payee in the transaction.
+    SettlementParticipant payee = 3 [(google.api.field_behavior) = REQUIRED];
+    // Specifies the amount to be held and the holding type rule.
+    HoldAmount hold_amount = 4 [(google.api.field_behavior) = REQUIRED];
+    // Identifier for the mandate creation transaction.
+    string transaction_id = 5 [(google.api.field_behavior) = REQUIRED];
+    // Specifies the validity period for the funds to be held.
+    ValidityPeriod validity_period = 6 [(google.api.field_behavior) = REQUIRED];
+    // Free form string describing the hold request.
+    string description = 7;
+    // Additional payment information specific to India's UPI requirements.
+    PaymentAdditionalInfo payment_additional_info = 8;
+    // If the hold funds call is triggered to update an existing hold on funds,
+    // then this field will contain the original hold funds reference and the
+    // amount held originally. In other cases, this field will be omitted in the
+    // request.
+    HoldDetails original_hold_details = 9;
+    // Reason for this hold request.
+    HoldReason hold_reason = 10 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 11
+        [(google.api.field_behavior) = REQUIRED];
+    // Indicates whether the hold funds request is for a mandate or a voucher.
+    enum HoldReason {
+      // Unspecified hold reason.
+      REASON_UNSPECIFIED = 0;
+      // Hold funds for mandate.
+      MANDATE = 1;
+      // Hold funds for voucher.
+      VOUCHER = 2;
+    }
+  }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.HoldFundsRequest.Payload]
+    // message.
+    string encrypted = 2;
   }
 }
 
 // Response for the HoldFunds method.
 message HoldFundsResponse {
-  // The bank's reference for the funds held in an account. This value is
-  // alpha-numeric and should be exactly 6 characters long.
-  string hold_reference = 1 [(google.api.field_behavior) = REQUIRED];
+  // Payload for hold funds response.
+  message Payload {
+    // The bank's reference for the funds held in an account. This value is
+    // alpha-numeric and should be exactly 6 characters long.
+    string hold_reference = 1 [(google.api.field_behavior) = REQUIRED];
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 2;
+  }
+
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.HoldFundsResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Details of the funds to be released.
@@ -128,94 +160,198 @@ message ReleaseDetails {
 
 // Request to release previously held funds in an account.
 message ReleaseFundsRequest {
-  // An identifier for this request which must be the same as the identifier for
-  // a previous hold funds request. This is used to correlate a hold
-  // funds request to a release funds request. In UPI, this field maps to the
-  // Unified Mandate Number (UMN).
-  string request_id = 1 [(google.api.field_behavior) = REQUIRED];
-  // Payer in the transaction.
-  SettlementParticipant payer = 2 [(google.api.field_behavior) = REQUIRED];
-  // Payee in the transaction.
-  SettlementParticipant payee = 3 [(google.api.field_behavior) = REQUIRED];
-  // Identifier of the original hold funds transaction.
-  string original_transaction_id = 4 [(google.api.field_behavior) = REQUIRED];
-  // The bank's reference for the funds held in the account which are being
-  // released. It specifies the amount held and the hold reference returned when
-  // the funds were initially held in the account.
-  HoldDetails hold_details = 5 [(google.api.field_behavior) = REQUIRED];
-  // Details of the funds to be released. *Note* that the amount to be released
-  // will be less than or equal to the amount that was originally held.
-  ReleaseDetails release_details = 6 [(google.api.field_behavior) = REQUIRED];
-  // Additional information for executing the request.
-  PaymentAdditionalInfo additional_info = 7;
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 8
-      [(google.api.field_behavior) = REQUIRED];
+  // Payload for release funds request.
+  message Payload {
+    // An identifier for this request which must be the same as the identifier
+    // for a previous hold funds request. This is used to correlate a hold funds
+    // request to a release funds request. In UPI, this field maps to the
+    // Unified Mandate Number (UMN).
+    string request_id = 1 [(google.api.field_behavior) = REQUIRED];
+    // Payer in the transaction.
+    SettlementParticipant payer = 2 [(google.api.field_behavior) = REQUIRED];
+    // Payee in the transaction.
+    SettlementParticipant payee = 3 [(google.api.field_behavior) = REQUIRED];
+    // Identifier of the original hold funds transaction.
+    string original_transaction_id = 4 [(google.api.field_behavior) = REQUIRED];
+    // The bank's reference for the funds held in the account which are being
+    // released. It specifies the amount held and the hold reference returned
+    // when the funds were initially held in the account.
+    HoldDetails hold_details = 5 [(google.api.field_behavior) = REQUIRED];
+    // Details of the funds to be released. *Note* that the amount to be
+    // released will be less than or equal to the amount that was originally
+    // held.
+    ReleaseDetails release_details = 6 [(google.api.field_behavior) = REQUIRED];
+    // Additional information for executing the request.
+    PaymentAdditionalInfo additional_info = 7;
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter. *Note* that in case of
+    // release
+    // of funds for expired or partially executed mandates, invocation metadata
+    // will not be included in the request as this API will be invoked directly
+    // by the issuer switch and not as part of any UPI API flows.
+    InvocationMetadata invocation_metadata = 8
+        [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.ReleaseFundsRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
+
+// Response to release request of previously held funds in an account.
+message ReleaseFundsResponse {
+  // Payload for the release funds response.
+  message Payload {
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 1;
+  }
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.ReleaseFundsResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Request to search for accounts, given a customer reference or an account
 // reference.
 message SearchAccountsRequest {
-  // Either a customer reference or a bank account reference will be
-  // provided. Only one of the two will be specified.
-  oneof reference {
-    // Reference of customer used to search for accounts.
-    CustomerReference customer_reference = 1;
-    // A reference to uniquely identify a customer's bank account based on
-    // India's UPI standards.
-    AccountReference account_reference = 2;
+  // Payload for search accounts request.
+  message Payload {
+    // Either a customer reference or a bank account reference will be
+    // provided. Only one of the two will be specified.
+    oneof reference {
+      // Reference of customer used to search for accounts.
+      CustomerReference customer_reference = 1;
+      // A reference to uniquely identify a customer's bank account based on
+      // India's UPI standards.
+      AccountReference account_reference = 2;
+    }
+    // Additional information that should be returned about the accounts that
+    // match the request. If no additional information of the relevant type is
+    // associated with an account that matches the request, then that type can
+    // be omitted for that account in this API's response.
+    //
+    // For example, if this field contains the enum RESIDENT_ID, then, in the
+    // [additional_info][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.AccountInfo.additional_info]
+    // field for each account, the bank adapter should return the Aadhaar number
+    // associated with that account, if any.
+    repeated AccountInfo.AdditionalInfo.Type additional_info_types = 3;
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 4
+        [(google.api.field_behavior) = REQUIRED];
   }
-  // Additional information that should be returned about the accounts that
-  // match the request. If no additional information of the relevant type is
-  // associated with an account that matches the request, then that type can be
-  // omitted for that account in this API's response.
-  //
-  // For example, if this field contains the enum RESIDENT_ID, then, in the
-  // [additional_info][google.cloud.paymentgateway.issuerswitch.bankadapter.v1.AccountInfo.additional_info]
-  // field for each account, the bank adapter should return the Aadhaar number
-  // associated with that account, if any.
-  repeated AccountInfo.AdditionalInfo.Type additional_info_types = 3;
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 4
-      [(google.api.field_behavior) = REQUIRED];
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SearchAccountsRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Response for the SearchAccount method.
 message SearchAccountsResponse {
-  // List of accounts matching the search criteria.
-  repeated AccountInfo accounts = 1 [(google.api.field_behavior) = REQUIRED];
+  // Payload for search accounts response.
+  message Payload {
+    // List of accounts matching the search criteria.
+    repeated AccountInfo accounts = 1 [(google.api.field_behavior) = REQUIRED];
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 2;
+  }
+
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SearchAccountsResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Request to retrieve an account balance.
 message RetrieveBalanceRequest {
-  // Identifies the customer or bank account whose account balance is to be
-  // retrieved. Either a customer reference or a bank account reference will be
-  // provided. Only one of the two will be specified.
-  oneof reference {
-    // The combination of a reference type and reference number that uniquely
-    // identifies a bank customer. This field will be used if the customer is
-    // identified based on a unique resident identifier (like Aadhaar) or based
-    // on the customer's mobile number.
-    CustomerReference customer_reference = 1;
-    // A reference to uniquely identify a customer's bank account based on
-    // India's UPI standards.
-    AccountReference account_reference = 2;
+  // Payload for retrieve balance request.
+  message Payload {
+    // Identifies the customer or bank account whose account balance is to be
+    // retrieved. Either a customer reference or a bank account reference will
+    // be provided. Only one of the two will be specified.
+    oneof reference {
+      // The combination of a reference type and reference number that uniquely
+      // identifies a bank customer. This field will be used if the customer is
+      // identified based on a unique resident identifier (like Aadhaar) or
+      // based on the customer's mobile number.
+      CustomerReference customer_reference = 1;
+      // A reference to uniquely identify a customer's bank account based on
+      // India's UPI standards.
+      AccountReference account_reference = 2;
+    }
+    // Participant requesting the balance retrieval.
+    Participant participant = 3 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 4
+        [(google.api.field_behavior) = REQUIRED];
   }
-  // Participant requesting the balance retrieval.
-  Participant participant = 3 [(google.api.field_behavior) = REQUIRED];
-  // Metadata about the API invocation received by the issuer switch which
-  // triggered this request to the bank adapter.
-  InvocationMetadata invocation_metadata = 4
-      [(google.api.field_behavior) = REQUIRED];
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.RetrieveBalanceRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }
 
 // Response for the RetrieveBalance method.
 message RetrieveBalanceResponse {
-  // Details of account balance.
-  BalanceInfo balance_info = 1 [(google.api.field_behavior) = REQUIRED];
-  // The account whose balance was retrieved.
-  AccountReference account_reference = 2
-      [(google.api.field_behavior) = REQUIRED];
+  // Payload for retrieve balance response.
+  message Payload {
+    // Details of account balance.
+    BalanceInfo balance_info = 1 [(google.api.field_behavior) = REQUIRED];
+    // The account whose balance was retrieved.
+    AccountReference account_reference = 2
+        [(google.api.field_behavior) = REQUIRED];
+    // Any additional metadata about the response from the bank adapter.
+    ResponseMetadata response_metadata = 3;
+  }
+
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.RetrieveBalanceResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
 }

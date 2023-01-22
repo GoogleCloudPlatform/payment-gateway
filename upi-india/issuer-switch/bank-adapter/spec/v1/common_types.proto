@@ -1,10 +1,10 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,14 +14,14 @@
 
 syntax = "proto3";
 
-package google.cloud.paymentgateway.issuerswitch.bankadapter.v1;
+package google.cloud.paymentgateway.issuerswitch.adapter.bank.v1;
 
 import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 
 option java_outer_classname = "CommonTypesProto";
 option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.issuerswitch.bankadapter.v1";
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.bank.v1";
 option go_api_flag = "OPAQUE_V0";
 
 // Provides additional reason about a particular error response returned by the
@@ -89,7 +89,7 @@ enum ErrorReason {
   SERVICE_ERROR = 22;
   // The requested operation could not be performed because the Bank Adapter
   // service or one or more of the bank's services are unavailable.
-  SERVICE_UNAVAILAIBLE = 23;
+  SERVICE_UNAVAILABLE = 23;
   // The requested transaction is not permitted.
   TRANSACTION_NOT_PERMITTED = 24;
   // The requested settle/resolve payment could not be performed because the
@@ -167,8 +167,8 @@ enum ErrorReason {
 
 // Unique identification of an account according to India's UPI standards.
 message AccountReference {
-  // IFSC code of a bank's branch.
-  string ifsc_code = 1 [(google.api.field_behavior) = REQUIRED];
+  // IFSC of an account's bank branch.
+  string ifsc = 1 [(google.api.field_behavior) = REQUIRED];
   // Type of account.
   string account_type = 2;
   // Unique number for the account in a bank and branch.
@@ -217,12 +217,13 @@ message Amount {
 
 // Risk information specific to India's UPI Standards.
 message RiskInfo {
-  // Entity providing the risk score.
+  // Entity providing the risk score. This could either be the payment service
+  // provider or the payment orchestrator.
   string risk_score_provider = 1;
   // Numeric value of risk evaluation ranging from 0 (No Risk) to 100 (Maximum
   // Risk).
   string risk_score_value = 2;
-  // Type of risk.
+  // Type of risk. Examples include `TXNRISK`.
   string risk_type = 3;
 }
 
@@ -238,41 +239,33 @@ enum Persona {
 
 // Details about the device that a participant in an API transaction is using.
 message DeviceDetails {
-  // Enumeration of the possible device information types.
-  enum DeviceInfoType {
-    // Unspecified device info type.
-    DEVICE_INFO_TYPE_UNSPECIFIED = 0;
-    // The name of the application running on the device.
-    DEVICE_INFO_TYPE_APPLICATION_NAME = 1;
-    // The device's capability.
-    DEVICE_INFO_TYPE_CAPABILITY = 2;
-    // The device's geocode.
-    DEVICE_INFO_TYPE_GEOCODE = 3;
-    // The device's ID.
-    DEVICE_INFO_TYPE_ID = 4;
-    // The device's IP address.
-    DEVICE_INFO_TYPE_IP = 5;
-    // The device's location.
-    DEVICE_INFO_TYPE_LOCATION = 6;
-    // The device's operating system (OS).
-    DEVICE_INFO_TYPE_OS = 7;
-    // The device type.
-    DEVICE_INFO_TYPE_DEVICE_TYPE = 8;
-    // The device's telecom provider.
-    DEVICE_INFO_TYPE_TELECOM_PROVIDER = 9;
-  }
+  // The payment application on the device.
+  string payment_app = 1;
 
-  // Information about a device.
-  message DeviceInfo {
-    // The type of the information.
-    DeviceInfoType type = 1 [(google.api.field_behavior) = REQUIRED];
-    // The value of the information.
-    string value = 2 [(google.api.field_behavior) = REQUIRED];
-  }
+  // The capability of the device.
+  string capability = 2;
 
-  // Information about the device. One or more of the types from the
-  // [DeviceInfoType][] will be included.
-  repeated DeviceInfo info = 1 [(google.api.field_behavior) = REQUIRED];
+  // The geo-code of the device. This will be a comma-separated value of the
+  // latitude and longitude of the device.
+  string geo_code = 3;
+
+  // The device's ID.
+  string id = 4;
+
+  // The device's IP address.
+  string ip_address = 5;
+
+  // The coarse location of the device.
+  string location = 6;
+
+  // The operating system on the device.
+  string operating_system = 7;
+
+  // The device's telecom provider.
+  string telecom_provider = 8;
+
+  // The type of device.
+  string type = 9;
 }
 
 // Information about a person or entity participating in a transaction.
@@ -291,14 +284,6 @@ message Participant {
       [(google.api.field_behavior) = REQUIRED];
   // Optional details of the device used by a participant in an API transaction.
   DeviceDetails device_details = 5;
-}
-
-// Provides additional informations about an entity.
-message AdditionalInfo {
-  // Field name.
-  string name = 1;
-  // Field value.
-  string value = 2;
 }
 
 // The name of a merchant who is a party in a payment settlement. Includes
@@ -377,7 +362,7 @@ message MerchantAdditionalInfo {
   // Indicates the type of ownership for the merchant.
   OwnershipType ownership_type = 7;
   // Additional information about the merchant.
-  repeated AdditionalInfo additional_info = 8;
+  map<string, string> additional_info = 8;
 }
 
 // Information about a merchant entity participating in a payment settlement.
@@ -539,9 +524,8 @@ message PaymentAdditionalInfo {
   ReferenceCategory reference_category = 10;
   // Risk information specific to India's UPI Standards.
   repeated RiskInfo risk_info = 11;
-  // Each additional info can be used to present more detailed information about
-  // the entity is attached to.
-  repeated AdditionalInfo miscellaneous = 12;
+  // More information about the payment.
+  map<string, string> miscellaneous = 12;
 }
 
 // Specifies the amount to be held and the holding rule.
@@ -733,4 +717,19 @@ message InvocationMetadata {
   // request received by the issuer switch.
   google.protobuf.Timestamp initiation_time = 2
       [(google.api.field_behavior) = REQUIRED];
+
+  // A reference id for the API invocation.
+  string reference_id = 3;
+
+  // A URL as a reference to the current API invocation.
+  string reference_url = 4;
+
+  // A descriptive note about the API transaction.
+  string description = 5;
+}
+
+// Metadata that the bank adapter wants to include in the response sent to the
+// issuer switch.
+message ResponseMetadata {
+  map<string, string> values = 1;
 }
