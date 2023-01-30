@@ -22,7 +22,6 @@ import "google/protobuf/timestamp.proto";
 option java_outer_classname = "CommonTypesProto";
 option java_multiple_files = true;
 option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.bank.v1";
-option go_api_flag = "OPAQUE_V0";
 
 // Provides additional reason about a particular error response returned by the
 // Bank Adapter. Not all reasons can be returned by all APIs. The list of
@@ -522,10 +521,8 @@ message PaymentAdditionalInfo {
   // If **referenceLink** is present, then this field is mandatory. The field is
   // used to identify the category of the transaction.
   ReferenceCategory reference_category = 10;
-  // Risk information specific to India's UPI Standards.
-  repeated RiskInfo risk_info = 11;
   // More information about the payment.
-  map<string, string> miscellaneous = 12;
+  map<string, string> miscellaneous = 11;
 }
 
 // Specifies the amount to be held and the holding rule.
@@ -726,10 +723,14 @@ message InvocationMetadata {
 
   // A descriptive note about the API transaction.
   string description = 5;
+
+  // Risk information specific to India's UPI Standards.
+  repeated RiskInfo risk_info = 6;
 }
 
 // Metadata that the bank adapter wants to include in the response sent to the
 // issuer switch.
 message ResponseMetadata {
+  // A map of name-value pairs.
   map<string, string> values = 1;
 }

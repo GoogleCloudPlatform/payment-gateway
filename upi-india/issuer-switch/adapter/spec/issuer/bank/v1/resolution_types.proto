@@ -16,14 +16,13 @@ syntax = "proto3";
 
 package google.cloud.paymentgateway.issuerswitch.adapter.bank.v1;
 
-import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
-import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/payment_settlement_types.proto";
+import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/bank/v1/common_types.proto";
+import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/bank/v1/payment_settlement_types.proto";
 import "google/api/field_behavior.proto";
 
 option java_outer_classname = "ResolutionTypesProto";
 option java_multiple_files = true;
 option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.bank.v1";
-option go_api_flag = "OPAQUE_V0";
 
 // Individual payment resolution request.
 message ResolvePaymentRequest {
@@ -33,7 +32,7 @@ message ResolvePaymentRequest {
     ResolutionType resolution_type = 1 [(google.api.field_behavior) = REQUIRED];
     // Details of the original payment debit / credit settlement which needs to
     // be resolved.
-    SettlePaymentRequest original_settle_payment_info = 2
+    SettlePaymentRequest.Payload original_settle_payment_info = 2
         [(google.api.field_behavior) = REQUIRED];
     // Type of resolution workflow which triggered this request.
     ResolutionWorkflow resolution_workflow = 3
@@ -184,7 +183,7 @@ message PaymentAdjustmentResponse {
   AdjustmentMetadata metadata = 2;
   // Settlement related information if a settlement was done to resolve an
   // unresolved transaction.
-  SettlePaymentResponse settlement_response = 3;
+  SettlePaymentInfo settle_payment_info = 3;
 }
 
 // Error found during execution of an individual payment resolution.
