@@ -16,14 +16,13 @@ syntax = "proto3";
 
 package google.cloud.paymentgateway.issuerswitch.adapter.bank.v1;
 
-import "cloud/api_products/payment_gateway/upi_india/bank_adapter/spec/issuer/v1/common_types.proto";
+import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/bank/v1/common_types.proto";
 import "google/api/field_behavior.proto";
 import "google/type/date.proto";
 
 option java_outer_classname = "CustomerTypesProto";
 option java_multiple_files = true;
 option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.bank.v1";
-option go_api_flag = "OPAQUE_V0";
 
 // Information about a customer's debit/credit card that will be validated by
 // the bank as part of a user's registration of their account/credit card.
