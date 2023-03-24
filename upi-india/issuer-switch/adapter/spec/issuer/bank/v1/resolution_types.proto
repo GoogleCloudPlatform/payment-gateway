@@ -75,7 +75,7 @@ message ResolvePaymentRequest {
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -113,7 +113,7 @@ message ResolvePaymentResponse {
   }
 
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;

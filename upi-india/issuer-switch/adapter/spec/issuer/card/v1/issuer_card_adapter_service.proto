@@ -1,0 +1,262 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.issuerswitch.adapter.card.v1;
+
+import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/card/v1/account_types.proto";
+import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/card/v1/customer_types.proto";
+import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/card/v1/payment_settlement_types.proto";
+import "google/api/annotations.proto";
+
+option java_outer_classname = "IssuerCardAdapterServiceProto";
+option java_multiple_files = true;
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.card.v1";
+
+// A service interface for the Issuer Switch Card Adapter.
+service CardAdapterService {
+  // Search and return a list of card accounts associated with a given customer.
+  // The customer may be identified in one of many ways (mobile number, email,
+  // unique national id, payment address, etc).
+  //
+  // Accounts can only be searched with a customer reference. For UPI, the
+  // only supported customer identifier is the Mobile number. All card accounts
+  // associated with the specified customer identifier need to be returned. The
+  // response will be zero or more accounts.
+  //
+  // NOTE: If no matching accounts are found for the given reference in the
+  // request, the response is a success with zero accounts. This condition is
+  // not an error.
+  //
+  // This API should return a `400` HTTP status code if it is unable to process
+  // the request. The `reason` field in the
+  // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
+  // response should contain one of the following values:
+  //
+  // * `ACCT_MULTIPLE_CUSTOMERS` = Indicates that the account is associated
+  // with multiple customers.
+  //
+  // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Card management system is down.
+  //
+  // * `MOBILE_NUMBER_MULTIPLE_CUSTOMERS` = Indicates that the same mobile
+  // number is associated with multiple customers in the bank's card management
+  // systems.
+  //
+  // _Note:_ This API will be invoked in the UPI `ReqListAccount` API flow.
+  rpc SearchAccounts(SearchAccountsRequest) returns (SearchAccountsResponse) {
+    option (google.api.http) = {
+      post: "/v1/accounts:search"
+      body: "*"
+    };
+  }
+
+  // Initiates the registration of a customer's card account with UPI on the
+  // issuer bank. A card account reference will be provided.
+  //
+  // It is expected that the card adapter service will trigger an SMS OTP to be
+  // sent to the customer's mobile phone.
+  //
+  // This API should return a `400` HTTP status code if it is unable to process
+  // the request. The `reason` field in the
+  // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
+  // response should contain one of the following values:
+  //
+  // * `CARD_BLOCKED` = Card is blocked.
+  //
+  // * `CARD_FROZEN` = Card is frozen.
+  //
+  // * `CARD_EXPIRED` = Card has expired.
+  //
+  // * `CARD_INACTIVE` = Card is inactive.
+  //
+  // * `CARD_INVALID` = Card details provided are invalid, or not found in the
+  // bank's card management systems.
+  //
+  // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Card management system is down.
+  //
+  // * `CARD_RESTRICTED` = Card is restricted from performing payments.
+  //
+  // _Note:_ This API will be invoked in the UPI `ReqOtp` API flow.
+  rpc InitiateRegistration(InitiateRegistrationRequest)
+      returns (InitiateRegistrationResponse) {
+    option (google.api.http) = {
+      post: "/v1/users:initiateRegistration"
+      body: "*"
+    };
+  }
+
+  // Validates a previously initiated registration request for a customer's card
+  // account with UPI on the issuer bank. A card account reference will be
+  // provided.
+  //
+  // The following security details must be validated by the card adapter
+  // service with the bank's backend systems, if present in the request:
+  //
+  // 1. Credit card details
+  // 2. PIN
+  // 3. SMS OTP
+  //
+  // This API should return a `400` HTTP status code if it is unable to process
+  // the request. The `reason` field in the
+  // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
+  // response should contain one of the following values:
+  //
+  // * `CARD_BLOCKED` = Card is blocked.
+  //
+  // * `CARD_EXPIRED` = Card has expired.
+  //
+  // * `CARD_FROZEN` = Card is frozen.
+  //
+  // * `CARD_INACTIVE` = Card is inactive.
+  //
+  // * `CARD_INVALID` = Card details provided are invalid, or not found in the
+  // bank's card management systems.
+  //
+  // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Card management system is down.
+  //
+  // * `CARD_RESTRICTED` = Card is restricted from performing payments.
+  //
+  // * `INCORRECT_PIN` = Incorrect PIN.
+  //
+  // * `INCORRECT_OTP` = OTP provided is incorrect.
+  //
+  // * `OTP_EXPIRED` = Specified OTP has expired.
+  //
+  // * `OTP_REQUESTS_EXCEEDED` = Number of OTP requests has been exceeded.
+  //
+  // _Note:_ This API will be invoked in the UPI `ReqRegMob` API flow.
+  rpc ValidateRegistration(ValidateRegistrationRequest)
+      returns (ValidateRegistrationResponse) {
+    option (google.api.http) = {
+      post: "/v1/users:validateRegistration"
+      body: "*"
+    };
+  }
+
+  // Retrieves the balance information for the specified card account.
+  //
+  // This API should return a `400` HTTP status code if it is unable to process
+  // the request. The `reason` field in the
+  // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
+  // response should contain one of the following values:
+  //
+  // * `CARD_BLOCKED` = Card is blocked.
+  //
+  // * `CARD_EXPIRED` = Card has expired.
+  //
+  // * `CARD_FROZEN` = Card is frozen.
+  //
+  // * `CARD_INACTIVE` = Card is inactive.
+  //
+  // * `CARD_INVALID` = Card details provided are invalid, or not found in the
+  // bank's card management systems.
+  //
+  // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Card management system is down.
+  //
+  // * `CARD_RESTRICTED` = Card is restricted from performing payments.
+  //
+  // _Note:_ This API will be invoked in the UPI `ReqBalEnq` API flow.
+  rpc RetrieveBalance(RetrieveBalanceRequest)
+      returns (RetrieveBalanceResponse) {
+    option (google.api.http) = {
+      post: "/v1/accounts/balance:retrieve"
+      body: "*"
+    };
+  }
+
+  // Request issued by the Issuer Switch for the bank to execute a single
+  // payment settlement operation. The operation is either to debit a payer's
+  // card account or to credit a payee's card account.
+  //
+  // This API should return a `400` HTTP status code if it is unable to process
+  // the request. The `reason` field in the
+  // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
+  // response should contain one of the following values:
+  //
+  // * `CARD_BLOCKED` = Card is blocked.
+  //
+  // * `CARD_EXPIRED` = Card has expired.
+  //
+  // * `CARD_FROZEN` = Card is frozen.
+  //
+  // * `CARD_INACTIVE` = Card is inactive.
+  //
+  // * `CARD_INVALID` = Card details provided are invalid, or not found in the
+  // bank's card management systems.
+  //
+  // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Card management system is down.
+  //
+  // * `CARD_RESTRICTED` = Card is restricted from performing payments.
+  //
+  // * `INSUFFICIENT_CREDIT` = Returned if the settlement type is _debit_ and
+  // the payer's card account does not have sufficient credit for the instructed
+  // amount.
+  //
+  // * `INVALID_TRANSACTION` = Requested settlement cannot be performed.
+  //
+  // * `FRAUDULENT_TRANSACTION` = Returned if the settlement type is _debit_ or
+  // _credit_ and the requested transaction is suspected to be fraudulent due to
+  // high risk score.
+  //
+  // * `REGISTERED_MOBILE_NUMBER_CHANGED` = Returned if the settlement type is
+  // _debit_ or _credit_ and the registered mobile number linked to the card
+  // account has been changed or removed.
+  //
+  // _Note:_ This API will be invoked in the UPI `ReqPay`,
+  // `ReqChkTxn-AUTOUPDATE` and `ReqComplaint` API flows.
+  rpc SettlePayment(SettlePaymentRequest) returns (SettlePaymentResponse) {
+    option (google.api.http) = {
+      post: "/v1/payments:settleSingle"
+      body: "*"
+    };
+  }
+
+  // Returns information about a specific payment. The payment to search
+  // can be specified using various filter criteria. The request will contain
+  // all the values that could be used to search for the payment settlement.
+  //
+  // If no matching payments are found, then this API must return a HTTP status
+  // of 200 with an empty list of payments in the response. A non-200 HTTP
+  // status must be returned only when the card adapter service itself fails.
+  //
+  // This API expects the card adapter to return the correct status of manually
+  // entered transactions as well for UDIR. In case the bank has not developed
+  // the capability to check for manually entered transactions, the card adapter
+  // should process any manual transaction based on reconciliation only after
+  // T+1 day's first settlement (T = Txn date) and after checking the adjustment
+  // reports. Also, the card adapter should respond with the following status
+  // for:
+  //
+  // 1. SearchPayments API received on T+0: Return the current status of
+  // original online transaction including any updates done via UDIR.
+  // 1. SearchPayments API received after T+0: Return 200 HTTP status in case
+  // transaction was resolved via UDIR on T+0. Else, return a non-200 HTTP
+  // status with settlement_state as _FAILED_ and error_reason as
+  // _UNABLE_TO_UPDATE_CARD_SERVICES_.
+  //
+  // Refer to the _UDIR UPI TSD V2.1 spec_ and
+  // _[UPI circular
+  // OC-98](https://www.npci.org.in/PDF/npci/upi/circular/2020/Circular-98-UDIR-Enhancing-Complaint-handling-and-resolution.pdf)_
+  // for further details.
+  //
+  // _Note:_ This API will be invoked in the UPI `ReqChkTxn` (transaction type
+  // `ChkTxn` or `AUTOUPDATE`) and `ReqComplaint` API flows.
+  rpc SearchPayments(SearchPaymentsRequest) returns (SearchPaymentsResponse) {
+    option (google.api.http) = {
+      post: "/v1/payments:search"
+      body: "*"
+    };
+  }
+}

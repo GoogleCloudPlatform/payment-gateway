@@ -69,6 +69,12 @@ service BankAdapterService {
   // * `MOBILE_NUMBER_MULTIPLE_CUSTOMERS` = Indicates that the same mobile
   // number is associated with multiple customers in the bank's systems.
   //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
+  //
   // _Note:_ This API will be invoked in the UPI `ReqListAccount` API flow.
   rpc SearchAccounts(SearchAccountsRequest) returns (SearchAccountsResponse) {
     option (google.api.http) = {
@@ -93,6 +99,12 @@ service BankAdapterService {
   // * `ACCT_INACTIVE` = Account is inactive.
   //
   // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
+  //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
   //
   // _Note:_ This API will be invoked in the UPI `ReqBalEnq` API flow.
   rpc RetrieveBalance(RetrieveBalanceRequest)
@@ -132,6 +144,12 @@ service BankAdapterService {
   //
   // * `DEBIT_NOT_ALLOWED` = Debits are not allowed on this type of account.
   //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
+  //
   // _Note:_ This API will be invoked in the UPI `ReqMandate` and `ReqVoucher`
   // API flows.
   rpc HoldFunds(HoldFundsRequest) returns (HoldFundsResponse) {
@@ -166,6 +184,12 @@ service BankAdapterService {
   // account.
   //
   // * `FUNDS_NOT_ON_HOLD` = Held funds have already been released.
+  //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
   //
   // _Note:_ This API will be invoked in the UPI `ReqMandate` and `ReqVoucher`
   // API flows.
@@ -241,6 +265,12 @@ service BankAdapterService {
   // * `INSUFFICIENT_FUNDS_DUE_TO_HOLD` = Returned if adequate funds are not
   // available in the account as they have been held.
   //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
+  //
   // _Note:_ This API will be invoked in the UPI `ReqPay`,
   // `ReqChkTxn-AUTOUPDATE` and `ReqComplaint` API flows.
   rpc SettlePayment(SettlePaymentRequest) returns (SettlePaymentResponse) {
@@ -258,6 +288,26 @@ service BankAdapterService {
   // of 200 with an empty list of payments in the response. A non-200 HTTP
   // status must be returned only when the bank adapter service itself fails.
   //
+  // This API expects the bank adapter to return the correct status of manually
+  // entered transactions as well for UDIR. In case the bank has not developed
+  // the capability to check for manually entered transactions, the bank adapter
+  // should process any manual transaction based on reconciliation only after
+  // T+1 day’s first settlement (T = Txn date) and after checking the adjustment
+  // reports. Also, the bank adapter should respond with the following status
+  // for:
+  //
+  // 1. SearchPayments API received on T+0: Return the current status of
+  // original online transaction including any updates done via UDIR.
+  // 1. SearchPayments API received after T+0: Return 200 HTTP status in case
+  // transaction was resolved via UDIR on T+0. Else, return a non-200 HTTP
+  // status with settlement_state as _FAILED_ and error_reason as
+  // _UNABLE_TO_UPDATE_BANK_SERVICES_.
+  //
+  // Refer to the _UDIR UPI TSD V2.1 spec_ and
+  // _[UPI circular
+  // OC-98](https://www.npci.org.in/PDF/npci/upi/circular/2020/Circular-98-UDIR-Enhancing-Complaint-handling-and-resolution.pdf)_
+  // for further details.
+
   // _Note:_ This API will be invoked in the UPI `ReqChkTxn` (transaction type
   // `ChkTxn` or `AUTOUPDATE`) and `ReqComplaint` API flows.
   rpc SearchPayments(SearchPaymentsRequest) returns (SearchPaymentsResponse) {
@@ -329,6 +379,12 @@ service BankAdapterService {
   // * `DUPLICATE_PROCESSING` = Indicates that the resolution request is a
   // duplicate.
   //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
+  //
   // * `PAYMENT_UDIR_RET_114` = Indicates that the resolution failed due to
   // error `114` as part of beneficiary bank attempting to resolve a `TCC`
   // case.
@@ -393,6 +449,12 @@ service BankAdapterService {
   //
   // * `INVALID_CARD` = Debit/Credit card details provided are invalid.
   //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
+  //
   // * `MOBILE_NUMBER_MULTIPLE_CUSTOMERS` = Mobile number is linked with
   // multiple customers.
   //
@@ -452,6 +514,12 @@ service BankAdapterService {
   // * `RESTRICTED_CARD` = Debit/Credit card is restricted.
   //
   // * `OTP_REQUESTS_EXCEEDED` = Number of OTP requests has been exceeded.
+  //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
   //
   // _Note:_ This API will be invoked in the UPI `ReqRegMob` API flow.
   rpc ValidateRegistration(ValidateRegistrationRequest)
@@ -526,6 +594,12 @@ service BankAdapterService {
   //
   // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
   //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
+  //
   // _Note:_ This API will be invoked in the UPI `ReqSetCre` API flow, or in the
   // `ReqValCust` (mandate notification) API flow.
   rpc NotifyCustomer(NotifyCustomerRequest) returns (NotifyCustomerResponse) {
@@ -563,6 +637,12 @@ service BankAdapterService {
   // * `ACCT_INACTIVE` = Account is inactive.
   //
   // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
+  //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
   //
   // _Note:_ This API will be invoked in the UPI `ReqValCust` API flow.
   rpc ValidateCustomer(CustomerValidationRequest)

@@ -1,0 +1,183 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.issuerswitch.adapter.card.v1;
+
+import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/card/v1/common_types.proto";
+import "google/api/field_behavior.proto";
+
+option java_outer_classname = "CustomerTypesProto";
+option java_multiple_files = true;
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.card.v1";
+
+// Information about a customer's debit/credit card that will be validated by
+// the bank as part of a user's registration of their account/credit card.
+message CardInfo {
+  // The last 6 digits of the customer's debit/credit card.
+  string card_number = 1 [(google.api.field_behavior) = REQUIRED];
+  // The expiry date of the debit/credit card in MMYY format.
+  string expiry = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Request for initiating registration of a customer's card account for UPI.
+message InitiateRegistrationRequest {
+  // Payload for initiate registration request.
+  message Payload {
+    // Identifies the customer's card account registering for UPI. An OTP is
+    // sent to the mobile number associated with the card account.
+    // Either a customer reference or a card account reference will be provided.
+    // Only one of the two will be specified.
+    oneof reference {
+      // The combination of a reference type and reference number that uniquely
+      // identifies a bank customer. This field will be used if the customer is
+      // identified based on a unique resident identifier (like Aadhaar) or
+      // based on the customer's mobile number.
+      CustomerReference customer_reference = 1;
+      // A reference to uniquely identify a customer's card account based on
+      // India's UPI standards.
+      AccountReference account_reference = 2;
+    }
+    // Information about a customer's credit card that will be provided if the
+    // issuer bank supports the ATM_REDIRECT mode of registration.
+    CardInfo card_info = 3;
+    // Participant initiating the registration.
+    Participant participant = 4 [(google.api.field_behavior) = REQUIRED];
+    // The type of registration indicating if the specified reference is being
+    // registered newly or being reset.
+    RegistrationType type = 5 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the card adapter.
+    InvocationMetadata invocation_metadata = 6
+        [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.InitiateRegistrationRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
+
+// The response once a registration request has been processed and an OTP has
+// been generated and sent to a customer's mobile phone.
+message InitiateRegistrationResponse {
+  // Payload for initiate registration response.
+  message Payload {
+    // URL the customer should use to enter the OTP received on their mobile.
+    string validation_page_link = 1;
+    // Any additional metadata about the response from the card adapter.
+    ResponseMetadata response_metadata = 2;
+  }
+
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.InitiateRegistrationResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
+
+// Enumeration of the types of registration.
+enum RegistrationType {
+  // Registration type unspecified.
+  REGISTRATION_TYPE_UNSPECIFIED = 0;
+  // A new registration for a particular customer or account reference.
+  REGISTRATION_TYPE_NEW = 1;
+  // An existing registration for a particular customer or account reference is
+  // being reset with a new MPIN.
+  REGISTRATION_TYPE_RESET = 2;
+}
+
+// Request for a previously initiated registration to be validated.
+message ValidateRegistrationRequest {
+  // Payload for validate registration request.
+  message Payload {
+    // Identifies the customer's card account whose registration for UPI is to
+    // be validated. Either a customer reference or a card account reference
+    // will be provided. Only one of the two will be specified.
+    oneof reference {
+      // The combination of a reference type and reference number that uniquely
+      // identifies a bank customer. This field will be used if the customer is
+      // identified based on a unique resident identifier (like Aadhaar) or
+      // based on the customer's mobile number.
+      CustomerReference customer_reference = 1;
+      // A reference to uniquely identify a customer's card account based on
+      // India's UPI standards.
+      AccountReference account_reference = 2;
+    }
+    // Information about a customer's credit card that needs to be validated by
+    // the bank. This value will be specified only if the registration is being
+    // validated with a debit/credit card.
+    CardInfo card_info = 3;
+    // The PIN for the credit card that needs to be validated by the bank.
+    string pin = 4;
+    // The OTP received on the customer's mobile phone that needs to be
+    // validated by the bank.
+    string otp = 5 [(google.api.field_behavior) = REQUIRED];
+    // Participant validating the registration.
+    Participant participant = 6 [(google.api.field_behavior) = REQUIRED];
+    // The type of registration indicating if the specified reference is being
+    // registered newly or being reset.
+    RegistrationType type = 7 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the card adapter.
+    InvocationMetadata invocation_metadata = 8
+        [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.ValidateRegistrationRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
+
+// Response for a request to validate a previously initiated registration.
+message ValidateRegistrationResponse {
+  // Payload for the validate registration response.
+  message Payload {
+    // Any additional metadata about the response from the card adapter.
+    ResponseMetadata response_metadata = 1;
+  }
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.ReleaseFundsResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
