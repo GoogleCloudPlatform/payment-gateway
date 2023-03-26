@@ -115,7 +115,7 @@ message HoldFundsRequest {
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -139,7 +139,7 @@ message HoldFundsResponse {
   }
 
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;
@@ -193,7 +193,7 @@ message ReleaseFundsRequest {
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -213,7 +213,7 @@ message ReleaseFundsResponse {
     ResponseMetadata response_metadata = 1;
   }
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;
@@ -256,7 +256,7 @@ message SearchAccountsRequest {
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -279,7 +279,7 @@ message SearchAccountsResponse {
   }
 
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;
@@ -317,7 +317,7 @@ message RetrieveBalanceRequest {
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -343,7 +343,7 @@ message RetrieveBalanceResponse {
   }
 
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;

@@ -220,7 +220,7 @@ message NotifyCustomerRequest {
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -240,7 +240,7 @@ message NotifyCustomerResponse {
     ResponseMetadata response_metadata = 1;
   }
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;
@@ -264,7 +264,7 @@ message InitiateRegistrationResponse {
   }
 
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;
@@ -309,7 +309,7 @@ message InitiateRegistrationRequest {
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -367,7 +367,7 @@ message ValidateRegistrationRequest {
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -387,7 +387,7 @@ message ValidateRegistrationResponse {
     ResponseMetadata response_metadata = 1;
   }
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;
@@ -414,7 +414,7 @@ message CustomerValidationRequest {
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -470,7 +470,7 @@ message CustomerValidationResponse {
   }
 
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;

@@ -1,0 +1,489 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.issuerswitch.adapter.card.v1;
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_outer_classname = "CommonTypesProto";
+option java_multiple_files = true;
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.card.v1";
+
+// Provides additional reason about a particular error response returned by the
+// Card Adapter. Not all reasons can be returned by all APIs. The list of
+// reasons that can be returned by a particular API are documented along with
+// the API.
+//
+// For any API, if the card adapter returns an error reason that is not
+// acceptable for that particular API, then the issuer switch will default to
+// INVALID_TRANSACTION.
+enum ErrorReason {
+  // Unspecified error reason.
+  ERROR_REASON_UNSPECIFIED = 0;
+  // The account is associated with multiple customers.
+  ACCT_MULTIPLE_CUSTOMERS = 1;
+  // Card is blocked.
+  CARD_BLOCKED = 2;
+  // Card has expired.
+  CARD_EXPIRED = 3;
+  // Card is frozen.
+  CARD_FROZEN = 4;
+  // Card is inactive.
+  CARD_INACTIVE = 5;
+  // Card is invalid.
+  CARD_INVALID = 6;
+  // Failure in the bank's card management system.
+  CARD_MANAGEMENT_SYSTEM_FAILURE = 7;
+  // Card is restricted for payments.
+  CARD_RESTRICTED = 8;
+  // Transaction is fraudulent.
+  FRAUDULENT_TRANSACTION = 9;
+  // The specified PIN is incorrect.
+  INCORRECT_PIN = 10;
+  // The specified OTP is incorrect.
+  INCORRECT_OTP = 11;
+  // Insufficient credit in the card to process the debit payment settlement.
+  INSUFFICIENT_CREDIT = 12;
+  // Transaction is invalid.
+  INVALID_TRANSACTION = 13;
+  // More than one customer is associated with the same mobile number.
+  MOBILE_NUMBER_MULTIPLE_CUSTOMERS = 14;
+  // Specified OTP has expired.
+  OTP_EXPIRED = 15;
+  // Maximu number of requests allowed for an OTP has been exceeded.
+  OTP_REQUESTS_EXCEEDED = 16;
+  // The registered mobile number associated with the card has changed in the
+  // bank's card management systems.
+  REGISTERED_MOBILE_NUMBER_CHANGED = 17;
+  // Unable to update card management system services.
+  UNABLE_TO_UPDATE_CARD_SERVICES = 18;
+}
+
+// The combination of a reference type and reference number that uniquely
+// identifies a card customer.
+message CustomerReference {
+  // Types of identification used to uniquely identify a bank's card customer.
+  ReferenceType reference_type = 1 [(google.api.field_behavior) = REQUIRED];
+  // The value identifying the customer. The type of the value will be based on
+  // the referenceType field.
+  //
+  // When using `mobile_phone_number` as the reference type, this value will
+  // contain a mobile phone number including country code.
+  string reference_value = 2 [(google.api.field_behavior) = REQUIRED];
+  // Types of identification used to uniquely identify a bank's card customer.
+  // The admissible values will evolve over time.
+  enum ReferenceType {
+    // Unspecified reference type.
+    REFERENCE_TYPE_UNSPECIFIED = 0;
+    // Mobile phone number as reference.
+    MOBILE_PHONE_NUMBER = 1;
+  }
+}
+
+// Provides information about a card account.
+message CardAccountInfo {
+  // The name on the card account.
+  string display_name = 1;
+
+  // The bank identifier number (BIN) of the card account. This number should be
+  // at least 6 digits long. Card adapter developers could choose to return
+  // more digits based on their interfaces with backend systems.
+  string bank_identifier_number = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // The card's account reference number. Card adapter developers need to ensure
+  // that a unique card account reference number is returned. This could map to
+  // the card's AAN or similar number.
+  string account_reference_number = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // The card number's suffix digits. At least the last 2 digits of the card
+  // number should be present. Card adapter developers could choose to return
+  // more digits based on their interfaces with backend systems.
+  string card_number_suffix = 4 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Unique identification of an account according to India's UPI standards.
+message AccountReference {
+  // IFSC of a card account.
+  string ifsc = 1 [(google.api.field_behavior) = REQUIRED];
+  // Type of account.
+  string account_type = 2;
+  // Unique number for the card account.
+  string account_number = 3 [(google.api.field_behavior) = REQUIRED];
+  // Details of the card account. This will be present only if the account_type
+  // is `CREDIT`. This information is returned by the card adapter to the
+  // issuer switch in a prior call to the
+  // [SearchAccounts][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.CardAdapterService.SearchAccounts]
+  // method. The issuer switch will store this data and pass it back to the card
+  // adapter service in all methods that include an account reference.
+  CardAccountInfo card_account_info = 4
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Risk information specific to India's UPI Standards.
+message RiskInfo {
+  // Entity providing the risk score. This could either be the payment service
+  // provider or the payment orchestrator.
+  string risk_score_provider = 1;
+  // Numeric value of risk evaluation ranging from 0 (No Risk) to 100 (Maximum
+  // Risk).
+  string risk_score_value = 2;
+  // Type of risk. Examples include `TXNRISK`.
+  string risk_type = 3;
+}
+
+// Metadata about an API invocation received by the issuer switch. These are
+// passed in all the requests made by the issuer switch to the card adapter.
+message InvocationMetadata {
+  // A unique ID of the API invocation received by the issuer switch. In UPI,
+  // this maps to the transaction ID.
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // The timestamp at which the current request was initiated/created. This is
+  // the value that is provided as the initiation/creation timestamp in the
+  // request received by the issuer switch.
+  google.protobuf.Timestamp initiation_time = 2
+      [(google.api.field_behavior) = REQUIRED];
+
+  // A reference id for the API invocation.
+  string reference_id = 3;
+
+  // A URL as a reference to the current API invocation.
+  string reference_url = 4;
+
+  // A descriptive note about the API transaction.
+  string description = 5;
+
+  // Risk information specific to India's UPI Standards.
+  repeated RiskInfo risk_info = 6;
+}
+
+// Metadata that the card adapter wants to include in the response sent to the
+// issuer switch.
+message ResponseMetadata {
+  // A map of name-value pairs.
+  map<string, string> values = 1;
+}
+
+// The type of the customer.
+enum Persona {
+  // Unspecified persona.
+  PERSONA_UNSPECIFIED = 0;
+  // Customer is a person.
+  PERSON = 1;
+  // Customer is an entity.
+  ENTITY = 2;
+}
+
+// Details about the device that a participant in an API transaction is using.
+message DeviceDetails {
+  // The payment application on the device.
+  string payment_app = 1;
+
+  // The capability of the device.
+  string capability = 2;
+
+  // The geo-code of the device. This will be a comma-separated value of the
+  // latitude and longitude of the device.
+  string geo_code = 3;
+
+  // The device's ID.
+  string id = 4;
+
+  // The device's IP address.
+  string ip_address = 5;
+
+  // The coarse location of the device.
+  string location = 6;
+
+  // The operating system on the device.
+  string operating_system = 7;
+
+  // The device's telecom provider.
+  string telecom_provider = 8;
+
+  // The type of device.
+  string type = 9;
+}
+
+// Information about a person or entity participating in a transaction.
+message Participant {
+  // The virtual payment address (VPA) of the settlement participant.
+  string virtual_payment_address = 1 [(google.api.field_behavior) = REQUIRED];
+  // The type of the participant. Could either a person or an entity.
+  Persona persona = 2 [(google.api.field_behavior) = REQUIRED];
+  // The name of the participant.
+  string name = 3;
+  // The combination of a reference type and reference number that uniquely
+  // identifies a bank's card customer. The Issuer Switch populates this field
+  // with the customer's unique resident identifier (like India's Aadhaar) or
+  // mobile number.
+  CustomerReference customer_reference = 4
+      [(google.api.field_behavior) = REQUIRED];
+  // Optional details of the device used by a participant in an API transaction.
+  DeviceDetails device_details = 5;
+}
+
+// Represents a monetary amount in a given currency.
+message Amount {
+  // The 3-letter currency code as defined in ISO 4217.
+  string currency_code = 1 [(google.api.field_behavior) = REQUIRED];
+  // The amount with fractional digits, where fractions can have between 2 and 4
+  // digits. Negative amounts are represented with a prefix -ve sign. The
+  // decimal separator is a dot. In India, only 2 digits will be used after the
+  // decimal separator.
+  string amount = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The name of a merchant who is a party in a payment settlement. Includes
+// multiple possible names for the merchant.
+message MerchantName {
+  // The name the merchant is commonly known as.
+  string brand = 1;
+  // The merchant's Legal Name.
+  string legal = 2;
+  // The franchise name under which the merchant operates.
+  string franchise = 3;
+}
+
+// Additional merchant information specific to India's UPI requirements.
+message MerchantAdditionalInfo {
+  // Indicates whether it is a small or large merchant.
+  enum Type {
+    // Unspecified merchant type.
+    TYPE_UNSPECIFIED = 0;
+    // Small merchant.
+    SMALL = 1;
+    // Large merchant.
+    LARGE = 2;
+  }
+
+  // Indicates whether it is an online or offline merchant.
+  enum Genre {
+    // Unspecified merchant genre.
+    GENRE_UNSPECIFIED = 0;
+    // Online merchant.
+    ONLINE = 1;
+    // Offline merchant
+    OFFLINE = 2;
+  }
+
+  // Indicates whether the merchant has been onboarded by a bank or an
+  // aggregator.
+  enum OnboardingType {
+    // Unspecified merchant onboarding type.
+    ONBOARDING_TYPE_UNSPECIFIED = 0;
+    // Onboarded by bank.
+    BANK = 1;
+    // Onboarded by aggreagator.
+    AGGREGATOR = 2;
+  }
+
+  // Indicates the type of ownership for the merchant.
+  enum OwnershipType {
+    // Unspecified merchant ownership type.
+    OWNERSHIP_TYPE_UNSPECIFIED = 0;
+    // Properiety ownership.
+    PROPRIETARY = 1;
+    // Partnership ownership.
+    PARTNERSHIP = 2;
+    // Public ownership.
+    PUBLIC = 3;
+    // Private ownership.
+    PRIVATE = 4;
+    // Other ownership model.
+    OTHERS = 5;
+  }
+  // Merchant Category code as specified by UPI (A four-digit number listed in
+  // ISO 18245 for retail financial services).
+  string category_code = 1 [(google.api.field_behavior) = REQUIRED];
+  // A unique identifier for the merchant store where the payment occurs.
+  string store_id = 2;
+  // A unique identifier for the POS terminal in the store where the payment
+  // occurs.
+  string terminal_id = 3;
+  // Indicates the type of merchant.
+  Type type = 4;
+  // Indicates the genre of the merchant.
+  Genre genre = 5;
+  // Indicates by whom the merchant has been onboarded.
+  OnboardingType onboarding_type = 6;
+  // Indicates the type of ownership for the merchant.
+  OwnershipType ownership_type = 7;
+  // Additional information about the merchant.
+  map<string, string> additional_info = 8;
+}
+
+// Information about a merchant entity participating in a payment settlement.
+message MerchantInfo {
+  // A unique identifier for the merchant.
+  string id = 1;
+  // The name of the merchant who is a party in the payment. Includes multiple
+  // possible names for the merchant.
+  MerchantName name = 2;
+  // India specific merchant additional information.
+  MerchantAdditionalInfo additional_info = 3;
+}
+
+// Contains all information about a participant in a payment settlement (either
+// the payer or the payee).
+message SettlementParticipant {
+  // The participant information.
+  Participant participant = 1 [(google.api.field_behavior) = REQUIRED];
+  // Unique identification of an account according to India's UPI standards.
+  AccountReference account = 2 [(google.api.field_behavior) = REQUIRED];
+  // Information about a merchant who is a participant in the payment. This
+  // field will be specified only if the participant is a merchant.
+  MerchantInfo merchant_info = 3;
+}
+
+// Additional payment information specific to India's UPI requirements.
+message PaymentAdditionalInfo {
+  // Indicates who initiated the payment.
+  enum SubType {
+    // Unspecified sub-type.
+    SUB_TYPE_UNSPECIFIED = 0;
+    // Pay subtype - initiated by payer.
+    PAY = 1;
+    // Collect subtype - initiated by payee.
+    COLLECT = 2;
+    // Refund subtype - initiated by payee.
+    REFUND = 3;
+  }
+
+  // Specifies how the payment was inititated.
+  enum InitiationMode {
+    // Unspecified payment initation mode.
+    INITIATION_MODE_UNSPECIFIED = 0;
+    // Default.
+    DEFAULT_INITIATION_MODE = 1;
+    // QR Code.
+    QR_CODE = 2;
+    // Secure QR Code.
+    SECURE_QR_CODE = 3;
+    // Bharat QR Code.
+    BHARAT_QR_CODE = 4;
+    // Intent.
+    INTENT = 5;
+    // Secure Intent.
+    SECURE_INTENT = 6;
+    // NFC(Near Field Communication).
+    NFC = 7;
+    // BLE (Bluetooth).
+    BLUETOOTH = 8;
+    // UHF(Ultra High Frequency).
+    ULTRA_HIGH_FREQUENCY = 9;
+    // Aadhaar.
+    AADHAAR = 10;
+    // SDK (Software Development Kit).
+    SDK = 11;
+    // UPI-Mandate.
+    UPI_MANDATE = 12;
+    // FIR (Foreign Inward Remittance).
+    FOREIGN_INWARD_REMITTANCE = 13;
+    // QR Mandate.
+    QR_MANDATE = 14;
+    // BBPS.
+    BBPS = 15;
+    // Future purpose.
+    FUTURE_PURPOSE = 16;
+  }
+
+  // The purpose field is specially used for SEBI transactions.
+  enum Purpose {
+    // Unspecified purpose.
+    PURPOSE_UNSPECIFIED = 0;
+    // Default.
+    DEFAULT_PURPOSE = 1;
+    // SEBI.
+    SEBI = 2;
+    // AMC.
+    AMC = 3;
+    // Travel.
+    TRAVEL = 4;
+    // Hospitality.
+    HOSPITALITY = 5;
+    // Hospital.
+    HOSPITAL = 6;
+    // Telecom.
+    TELECOM = 7;
+    // Insurance.
+    INSURANCE = 8;
+    // Education.
+    EDUCATION = 9;
+    // Gifting.
+    GIFTING = 10;
+    // Others.
+    OTHER_PURPOSES = 11;
+    // Purpose type 11.
+    PURPOSE_TYPE_11 = 12;
+    // Purpose type 12.
+    PURPOSE_TYPE_12 = 13;
+    // Purpose type 13.
+    PURPOSE_TYPE_13 = 14;
+    // Purpose type 14.
+    PURPOSE_TYPE_14 = 15;
+    // Preapproved disbursement.
+    PREAPPROVED_DISBURSEMENT = 16;
+    // Enablement for UPI Lite with top up.
+    UPI_LITE_ENABLE_WITH_TOP_UP = 17;
+    // Top-up UPI Lite account.
+    UPI_LITE_TOP_UP_ACCOUNT = 18;
+    // Disablement from UPI Lite.
+    UPI_LITE_DISABLE = 19;
+    // Online Payment using UPI Lite.
+    UPI_LITE_ONLINE_PAYMENT = 20;
+    // Offline Payment using UPI Lite.
+    UPI_LITE_OFFLINE_PAYMENT = 21;
+    // Disable zero balance UPI Lite Reference Number (LRN).
+    UPI_LITE_DISABLE_LRN = 22;
+  }
+
+  // The category of the transaction.
+  enum ReferenceCategory {
+    // Unspecified reference category.
+    REFERENCE_CATEGORY_UNSPECIFIED = 0;
+    // Null.
+    NULL = 1;
+    // Advertisement.
+    ADVERTISEMENT = 2;
+    // Invoice.
+    INVOICE = 3;
+    // Others, for future use.
+    OTHER_REFERENCE_CATEGORIES = 4;
+  }
+
+  // Consumer reference number to identify (like Loan number, etc).
+  string consumer_reference_number = 1;
+  // A reference URL for the settlement.
+  string reference_link = 2;
+  // Settlement origination date/time as specified by the message originator.
+  // Formatted as specified in RFC 3339.
+  google.protobuf.Timestamp date_time = 3
+      [(google.api.field_behavior) = REQUIRED];
+  // Indicates if the payment initiated by the payer (pay) or the payee
+  // (collect).
+  SubType sub_type = 6 [(google.api.field_behavior) = REQUIRED];
+  // Specifies how the payment was inititated.
+  InitiationMode initiation_mode = 7 [(google.api.field_behavior) = REQUIRED];
+  // The purpose field is specially used for SEBI txn.
+  Purpose purpose = 8 [(google.api.field_behavior) = REQUIRED];
+  // If **referenceLink** is present, then this field is mandatory. The field is
+  // used to identify the category of the transaction.
+  ReferenceCategory reference_category = 10;
+  // More information about the payment.
+  map<string, string> miscellaneous = 11;
+}

@@ -92,10 +92,19 @@ message SettlePaymentRequest {
     // A list of rules specified by the payments orchestrator for the payment
     // settlement.
     repeated Rule rules = 14;
+
+    // Details of a foreign inward remittance. This will have a value only if
+    // the current payment is a foreign inward remittance payment. The
+    // [initiation_mode][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.PaymentAdditionalInfo.initiation_mode]
+    // field in the
+    // [additional_info][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SettlePaymentRequest.Payload.additional_info]
+    // will be set to
+    // [FOREIGN_INWARD_REMITTANCE][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.PaymentAdditionalInfo.InitiationMode.FOREIGN_INWARD_REMITTANCE].
+    ForeignInwardRemittance foreign_inward_remittance = 15;
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -129,7 +138,7 @@ message SettlePaymentResponse {
   }
 
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;
@@ -185,7 +194,7 @@ message SearchPaymentsRequest {
   }
 
   // The request sent can be either a plain text request or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof request {
     // The plain text payload.
     Payload plain = 1;
@@ -229,7 +238,7 @@ message SearchPaymentsResponse {
   }
 
   // The response sent can be either a plain text response or encrypted in a
-  // Base64 encoded JSON string
+  // Base64 encoded JSON string.
   oneof response {
     // The plain text payload.
     Payload plain = 1;
@@ -255,7 +264,7 @@ enum SettlementType {
   CREDIT_REVERSAL = 4;
 }
 
-// Details of original transaction. This type is passed to the Bank Adapter
+// Details of original transaction. This type is passed to the bank adapter
 // service if the settlement type is `DEBIT_REVERSAL` or `CREDIT_REVERSAL`.
 message OriginalTransaction {
   // Uniquely identifies the original transaction. This maps to the `Txn.Id`
@@ -269,4 +278,119 @@ message OriginalTransaction {
   SettlementType settlement_type = 4;
   // Timestamp of the original transaction request.
   google.protobuf.Timestamp request_time = 5;
+}
+
+// Details of the foreign inward remittance being processed in the payment
+// transaction.
+message ForeignInwardRemittance {
+  // Details of a payer specific to a foreign inward remittance.
+  message Payer {
+    // The intermediary institution details.
+    message Institution {
+      // The institution type.
+      enum Type {
+        // Type unspecified.
+        TYPE_UNSPECIFIED = 0;
+        // Institution type is a Money Transfer Operator (MTO).
+        MONEY_TRANSFER_OPERATOR = 1;
+        // Institution type is a bank.
+        BANK = 2;
+      }
+      // The intermediary institution's type.
+      Type type = 1 [(google.api.field_behavior) = REQUIRED];
+      // The route through which the foreign exchange is being transferred.
+      enum Route {
+        // Route unspecified.
+        ROUTE_UNSPECIFIED = 0;
+        // Routing is via RBI's Money Transfer Service Scheme (MTSS).
+        MONEY_TRANSFER_SERVICE_SCHEME = 1;
+        // Routing is via Rupee Drawing Agreement (RDA).
+        RUPEE_DRAWING_AGREEMENT = 2;
+        // Routing is via CBA.
+        CBA = 3;
+      }
+      // The route used for the foreign inward remittance.
+      Route route = 2 [(google.api.field_behavior) = REQUIRED];
+      // The institution's name. The minimum length will be 1 and the maximum
+      // length will be 100.
+      string name = 3 [(google.api.field_behavior) = REQUIRED];
+      // The institution's account number. The minimum length will be 1 and the
+      // maximum length will be 30.
+      string account_number = 4 [(google.api.field_behavior) = REQUIRED];
+      // The purpose of the foreign inward remittance.
+      message Purpose {
+        // The code as per the pre-defined list published by RBI. The minimum
+        // length will be 1 and the maximum length will be 50.
+        string code = 1 [(google.api.field_behavior) = REQUIRED];
+        // A descriptive note for the purpose of the remittance. The minimum
+        // length will be 1 and the maximum length will be 50.
+        string note = 2;
+      }
+      // The foreign inward remittance's purpose.
+      Purpose purpose = 5 [(google.api.field_behavior) = REQUIRED];
+      // The originator of the foreign inward remittance payment transaction.
+      message Originator {
+        // The originator's name. The minimum length will be 1 and the maximum
+        // length will be 50.
+        string name = 1 [(google.api.field_behavior) = REQUIRED];
+        // Originator type.
+        enum Type {
+          // Type unspecified.
+          TYPE_UNSPECIFIED = 0;
+          // Originator is a company.
+          COMPANY = 1;
+          // Originator is an individual.
+          INDIVIDUAL = 2;
+        }
+        // The origingator's type
+        Type type = 2 [(google.api.field_behavior) = REQUIRED];
+        // The originator's reference number. The minimum length will be 1 and
+        // the maximum length will be 30.
+        string reference_number = 3 [(google.api.field_behavior) = REQUIRED];
+        // An adddress.
+        message Address {
+          // The location. The minimum length will be 1 and the maximum length
+          // will be 40.
+          string location = 1 [(google.api.field_behavior) = REQUIRED];
+          // The city. The minimum length will be 1 and the maximum length will
+          // be 100.
+          string city = 2 [(google.api.field_behavior) = REQUIRED];
+          // The country. The minimum length will be 1 and the maximum length
+          // will be 100.
+          string country = 3 [(google.api.field_behavior) = REQUIRED];
+          // The geo-code. This will be a comma-separated value of the latitude
+          // and longitude of the address.
+          string geo_code = 4 [(google.api.field_behavior) = REQUIRED];
+        }
+        // The originator's address.
+        Address address = 4 [(google.api.field_behavior) = REQUIRED];
+      }
+      // The foreign inward remittance's originator.
+      Originator originator = 6 [(google.api.field_behavior) = REQUIRED];
+      // A beneficiary.
+      message Beneficiary {
+        // The beneficiary's name in the foreign inward remittance transaction.
+        string name = 1 [(google.api.field_behavior) = REQUIRED];
+      }
+      // The foreign inward remittance's beneficiary.
+      Beneficiary beneficiary = 7 [(google.api.field_behavior) = REQUIRED];
+    }
+    // The intermediary institution that has initiated the foreign inward
+    // remittance payment transaction as the payer.
+    Institution institution = 1 [(google.api.field_behavior) = REQUIRED];
+  }
+  // The payer details specific to a foreign inward remittance.
+  Payer payer = 1 [(google.api.field_behavior) = REQUIRED];
+  // Details of a payee specific to a foreign inward remittance.
+  message Payee {
+    // The intermediary institution details.
+    message Institution {
+      // The Interest Rate Parity (IRP) id.
+      string irp_id = 1 [(google.api.field_behavior) = REQUIRED];
+      // The foreign exchange currency code.
+      string currency_code = 2 [(google.api.field_behavior) = REQUIRED];
+    }
+  }
+  // The payee details specific to a foreign inward remittance.
+  Payee payee = 2 [(google.api.field_behavior) = REQUIRED];
 }

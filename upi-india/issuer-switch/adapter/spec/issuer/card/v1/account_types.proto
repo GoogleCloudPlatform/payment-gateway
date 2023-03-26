@@ -1,0 +1,148 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.issuerswitch.adapter.card.v1;
+
+import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/card/v1/common_types.proto";
+import "google/api/field_behavior.proto";
+
+option java_outer_classname = "AccountTypesProto";
+option java_multiple_files = true;
+option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.card.v1";
+
+// Request to search for card accounts, given a customer reference.
+message SearchAccountsRequest {
+  // Payload for search accounts request.
+  message Payload {
+    // The customer reference whose card accounts are to be searched and
+    // returned.
+    CustomerReference customer_reference = 1;
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the card adapter.
+    InvocationMetadata invocation_metadata = 2
+        [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string.
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.SearchAccountsRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
+
+// Response for the SearchAccounts method.
+message SearchAccountsResponse {
+  // Payload for search accounts response.
+  message Payload {
+    // List of card accounts matching the search criteria.
+    repeated CardAccountInfo accounts = 1
+        [(google.api.field_behavior) = REQUIRED];
+    // Any additional metadata about the response from the card adapter.
+    ResponseMetadata response_metadata = 2;
+  }
+
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string.
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.SearchAccountsResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
+
+// Request to retrieve a card account's balance.
+message RetrieveBalanceRequest {
+  // Payload for retrieve balance request.
+  message Payload {
+    // Identifies the customer or card account whose balance is to be retrieved.
+    // Either a customer reference or a card account reference will be provided.
+    // Only one of the two will be specified.
+    oneof reference {
+      // The combination of a reference type and reference number that uniquely
+      // identifies a bank customer. This field will be used if the customer is
+      // identified based on a unique resident identifier (like Aadhaar) or
+      // based on the customer's mobile number.
+      CustomerReference customer_reference = 1;
+      // A reference to uniquely identify a customer's card account based on
+      // India's UPI standards.
+      AccountReference account_reference = 2;
+    }
+    // Participant requesting the balance retrieval.
+    Participant participant = 3 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the card adapter.
+    InvocationMetadata invocation_metadata = 4
+        [(google.api.field_behavior) = REQUIRED];
+  }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.RetrieveBalanceRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
+
+// Balance information for a given account.
+message BalanceInfo {
+  // The currency and value of the current balance.
+  Amount current_balance = 1;
+  // The currency and value of the available balance.
+  Amount available_balance = 2 [(google.api.field_behavior) = REQUIRED];
+  // The allowed credit limit on the account.
+  Amount credit_limit = 3;
+}
+
+// Response for the RetrieveBalance method.
+message RetrieveBalanceResponse {
+  // Payload for retrieve balance response.
+  message Payload {
+    // Details of account balance.
+    BalanceInfo balance_info = 1 [(google.api.field_behavior) = REQUIRED];
+    // The account whose balance was retrieved.
+    AccountReference account_reference = 2
+        [(google.api.field_behavior) = REQUIRED];
+    // Any additional metadata about the response from the card adapter.
+    ResponseMetadata response_metadata = 3;
+  }
+
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.RetrieveBalanceResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}

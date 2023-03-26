@@ -162,6 +162,12 @@ enum ErrorReason {
   // The funds in the bank account are insufficient to perform the requested
   // operation as funds are on hold in the account.
   INSUFFICIENT_FUNDS_DUE_TO_HOLD = 43;
+  // The requested operation could not be performed because the Bank Adapter
+  // service could not encrypt the payload.
+  ENCRYPTION_FAILED = 44;
+  // The requested operation could not be performed because the Bank Adapter
+  // service could not decrypt the payload.
+  DECRYPTION_FAILED = 45;
 }
 
 // Unique identification of an account according to India's UPI standards.
@@ -203,7 +209,7 @@ message CustomerReference {
   }
 }
 
-// Represents an monetary amount in a given currency.
+// Represents a monetary amount in a given currency.
 message Amount {
   // The 3-letter currency code as defined in ISO 4217.
   string currency_code = 1 [(google.api.field_behavior) = REQUIRED];
@@ -424,7 +430,7 @@ message PaymentAdditionalInfo {
     // UHF(Ultra High Frequency).
     ULTRA_HIGH_FREQUENCY = 9;
     // Aadhaar.
-    AADHAR = 10;
+    AADHAAR = 10;
     // SDK (Software Development Kit).
     SDK = 11;
     // UPI-Mandate.
