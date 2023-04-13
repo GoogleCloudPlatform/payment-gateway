@@ -198,25 +198,46 @@ message NotifyCustomerRequest {
         Pause pause = 10;
       }
     }
+    // Details of the notification needed for
+    // international activation transactions
+    message InternationalOutwardActivation {
+      // activation start date
+      string start_date = 1 [(google.api.field_behavior) = REQUIRED];
+      // activation end date
+      string end_date = 2 [(google.api.field_behavior) = REQUIRED];
+      // Possible actions.
+      enum Action {
+        // Unspecified state.
+        ACTION_UNSPECIFIED = 0;
+        // Deactivated action.
+        DEACTIVATED = 1;
+        // Activated action.
+        ACTIVATED = 2;
+      }
+      Action action = 3 [(google.api.field_behavior) = REQUIRED];
+    }
     // Participant to be notified.
     Participant participant = 1 [(google.api.field_behavior) = REQUIRED];
     // Unique identification of an account according to India's UPI standards.
     // This is the details of the account of the customer who is to be notified.
     AccountReference account = 2 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the bank adapter.
+    InvocationMetadata invocation_metadata = 3
+        [(google.api.field_behavior) = REQUIRED];
     // The details of the notification. Exactly one of two values will be
     // specified. The type of notification to be sent can be inferred from which
     // of the two possible values are set in the request.
     oneof details {
       // Details of the MPIN operation processed by the issuer switch.
-      MPINUpdated mpin_updated = 3;
+      MPINUpdated mpin_updated = 4;
       // Details of the recurring mandate operation processed by the issuer
       // switch.
-      RecurringMandate recurring_mandate = 4;
+      RecurringMandate recurring_mandate = 5;
+      // Details of the international outward activation processed by the
+      // issuer switch
+      InternationalOutwardActivation international_outward_activation = 6;
     }
-    // Metadata about the API invocation received by the issuer switch which
-    // triggered this request to the bank adapter.
-    InvocationMetadata invocation_metadata = 5
-        [(google.api.field_behavior) = REQUIRED];
   }
 
   // The request sent can be either a plain text request or encrypted in a
@@ -434,7 +455,7 @@ message CustomerValidationResponse {
     enum AccountNature {
       // Unspecified account nature.
       ACCOUNT_NATURE_UNDEFINED = 0;
-      // Acount nature is of type SINGLE.
+      // Account nature is of type SINGLE.
       SINGLE = 1;
       // Account nature is of type JOINT.
       JOINT = 2;

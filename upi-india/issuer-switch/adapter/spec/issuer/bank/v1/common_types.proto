@@ -178,6 +178,34 @@ message AccountReference {
   string account_type = 2;
   // Unique number for the account in a bank and branch.
   string account_number = 3 [(google.api.field_behavior) = REQUIRED];
+  // Metadata of an account reference.
+  message Metadata {
+    // Additional metadata about a particular account as key-value pairs.
+    // The following restrictions apply on the values in this map:
+    //
+    // 1. There is a limit on the number of key-value pairs that can be present
+    // in this map. This value is configurable on the issuer switch instance and
+    // defaults to 5 pairs.
+    // 1. There is a limit on the length of each key in the map. This value is
+    // configurable on the issuer switch instance and defaults to 100
+    // characters.
+    // 1. There is a limit on the length of each value in the map. This value is
+    // configurable on the issuer switch instance and defaults to 500
+    // characters.
+    map<string, string> values = 1 [(google.api.field_behavior) = REQUIRED];
+  }
+  // Additional metadata about the account.
+  //
+  // Bank adapters return the value for this metadata in the response to the
+  // [SearchAccounts][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.BankAdapterService.SearchAccounts]
+  // method. The issuer switch will persist this information and include it in
+  // all subsequent calls where operations are triggered on behalf of the user
+  // owning the account.
+  //
+  // *Note* that this field will not be included in the account reference
+  // of the payee when the issuer switch is processing the
+  // `SettlePayment-CREDIT` into an account.
+  Metadata metadata = 4;
 }
 
 // The combination of a reference type and reference number that uniquely

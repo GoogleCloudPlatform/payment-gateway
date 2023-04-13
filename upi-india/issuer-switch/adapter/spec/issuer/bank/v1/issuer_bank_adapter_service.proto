@@ -292,7 +292,7 @@ service BankAdapterService {
   // entered transactions as well for UDIR. In case the bank has not developed
   // the capability to check for manually entered transactions, the bank adapter
   // should process any manual transaction based on reconciliation only after
-  // T+1 day’s first settlement (T = Txn date) and after checking the adjustment
+  // T+1 day's first settlement (T = Txn date) and after checking the adjustment
   // reports. Also, the bank adapter should respond with the following status
   // for:
   //
@@ -307,7 +307,7 @@ service BankAdapterService {
   // _[UPI circular
   // OC-98](https://www.npci.org.in/PDF/npci/upi/circular/2020/Circular-98-UDIR-Enhancing-Complaint-handling-and-resolution.pdf)_
   // for further details.
-
+  //
   // _Note:_ This API will be invoked in the UPI `ReqChkTxn` (transaction type
   // `ChkTxn` or `AUTOUPDATE`) and `ReqComplaint` API flows.
   rpc SearchPayments(SearchPaymentsRequest) returns (SearchPaymentsResponse) {

@@ -390,6 +390,8 @@ message ForeignInwardRemittance {
       // The foreign exchange currency code.
       string currency_code = 2 [(google.api.field_behavior) = REQUIRED];
     }
+    // The payee institution.
+    Institution institution = 1;
   }
   // The payee details specific to a foreign inward remittance.
   Payee payee = 2 [(google.api.field_behavior) = REQUIRED];
