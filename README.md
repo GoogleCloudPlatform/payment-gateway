@@ -1,6 +1,6 @@
 # Google Cloud - Payment Gateway Protos
 
-This repository contains proto definitions of different APIS implemented in payment switches.
+This repository contains proto definitions of different APIs implemented in payment switches.
 
 ## License
 
