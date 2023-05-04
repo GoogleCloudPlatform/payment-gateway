@@ -1,0 +1,420 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.acquirerswitch.v1;
+
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/cloud/paymentgateway/acquirerswitch/v1/common_fields.proto";
+import "google/cloud/paymentgateway/acquirerswitch/v1/payments.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/field_mask.proto";
+
+option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "PaymentAddressesProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
+option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
+option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
+
+// This service provides methods for the management of payment addresses.
+service PersonSwitchPaymentAddresses {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
+  // Create a new payment address associated with a profile. Once a profile is
+  // created and active, this method can be invoked any number fo times create a
+  // new payment address associated with the profile.
+  //
+  // The
+  // [address][google.cloud.paymentgateway.acquirerswitch.v1.PaymentAddress.address]
+  // and
+  // [address_type][google.cloud.paymentgateway.acquirerswitch.v1.PaymentAddress.address_type]
+  // fields are optional in the request. The following use-cases are handled as
+  // described.
+  //
+  // * If specified and unique in the context of an app, then the payment
+  // address is created with the specified `address`.
+  // * If specified but not unique in the context of an app, then this API
+  // invocation fails.
+  // * If not specified, then a default address (based on the phone number
+  // associated with the profile) is used as the `address`.
+  rpc CreatePaymentAddress(CreatePaymentAddressRequest)
+      returns (PaymentAddress) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/paymentAddresses"
+      body: "payment_address"
+    };
+    option (google.api.method_signature) = "parent,payment_address";
+  }
+
+  // List all active payment addresses registered with the specified profiles.
+  // This API does not support pagination of the result as the list of
+  // payment addresses will be a small list consisting of an average of 2
+  // payment addresses.
+  //
+  // A
+  // [ProfileIdSet][google.cloud.paymentgateway.acquirerswitch.v1.ProfileIdSet]
+  // is provided in the request and all active payment addresses associated with
+  // the identified profile are listed.
+  //
+  // Note: Although this is a *list resources* method, it is modelled as a *HTTP
+  // POST* in REST because the *device's* information is included in the
+  // request.
+  rpc ListPaymentAddresses(ListPaymentAddressesRequest)
+      returns (ListPaymentAddressesResponse) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/paymentAddresses:list"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent,profile_id_set";
+  }
+
+  // Get all the details of a specific payment address.
+  rpc GetPaymentAddress(GetPaymentAddressRequest) returns (PaymentAddress) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/clients/*/apps/*/paymentAddresses/*}"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Update a payment address. The following fields of a `PaymentAddress` can be
+  // updated:
+  //
+  // * [state][google.cloud.paymentgateway.acquirerswitch.v1.PaymentAddress.state]
+  // * [primary_registered_account][google.cloud.paymentgateway.acquirerswitch.v1.PaymentAddress.primary_registered_account]
+  //
+  // The
+  // [update_mask][google.cloud.paymentgateway.acquirerswitch.v1.UpdatePaymentAddressRequest.update_mask]
+  // should indicate which of the two udpatable fields are being updated by the
+  // request. Note that this API allows only one field to be updated at a time.
+  // Specifying more than one value in the `update_mask` field, or if the mask
+  // contains the path to a field other than the ones defined as updatable
+  // above, then this method will raise an error.
+  rpc UpdatePaymentAddress(UpdatePaymentAddressRequest)
+      returns (PaymentAddress) {
+    option (google.api.http) = {
+      patch: "/v1/{payment_address.name=projects/*/clients/*/apps/*/paymentAddresses/*}"
+      body: "payment_address"
+    };
+    option (google.api.method_signature) = "payment_address,update_mask";
+  }
+
+  // Search, based on certain filter criteria, and return all participants who
+  // can participate in a payment transaction as a payer or a payee.
+  //
+  // The following filter criteria are supported:
+  //
+  // * `payment_address` - The address of the participant to be searched. In
+  // UPI, this will be Virtual Payment Address (VPA) of a participant.
+  // * `account_id` - The account details of the participant to be searched. In
+  // UPI, this will be the participant's IFSC and account number.
+  //
+  // Exactly one of the two filter criteria fields need to be specified in the
+  // request.
+  //
+  // The returned list of participants will either be empty (if no participant
+  // matches the filter criteria) or contain exactly one participant matching
+  // the specified filter criteria.
+  //
+  // **Note** - Use this method to search for participants with payment
+  // addresses on handles **not owned** by the app invoking the API. To search
+  // for payment addresses in handles owned by the app invoking the API, use the
+  // [SearchPaymentAddresses][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.SearchPaymentAddresses]
+  // method.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [SearchParticipantsResponse][google.cloud.paymentgateway.acquirerswitch.v1.SearchParticipantsResponse]
+  // in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  rpc SearchParticipants(SearchParticipantsRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/paymentAddresses:searchParticipants"
+      body: "*"
+    };
+    option (google.api.method_signature) =
+        "parent,initiator_payment_address,device";
+    option (google.longrunning.operation_info) = {
+      response_type: "SearchParticipantsResponse"
+      metadata_type: "SearchParticipantsMetadata"
+    };
+  }
+
+  // Search, based on certain filter criteria, and return all payment address
+  // resources which match the given criteria.
+  //
+  // The following filter criteria are supported:
+  //
+  // * `payment_address` - The payment address value to be searched. In UPI,
+  // this will be Virtual Payment Address (VPA) of a participant.
+  //
+  // The returned list of payment address resources will either be empty (if no
+  // payment address value matches the filter criteria) or contain exactly one
+  // resource matching the specified filter criteria.
+  //
+  // **Note** - Use this method to search for participants with payment
+  // addresses on handles **owned** by the app invoking the API. To search for
+  // payment addresses in handles not owned by the app invoking the API, use the
+  // [SearchParticipants][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.SearchParticipants]
+  // method.
+  rpc SearchPaymentAddresses(SearchPaymentAddressesRequest)
+      returns (SearchPaymentAddressesResponse) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/paymentAddresses:search"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+}
+
+// The
+// [CreatePaymentAddress][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.CreatePaymentAddress]
+// method's request.
+message CreatePaymentAddressRequest {
+  // Required. The parent resource for payment addresses.
+  //
+  // Format: `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyProvider"
+    }
+  ];
+
+  // Required. The payment address to be created.
+  PaymentAddress payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The profile id set for which the payment address is being
+  // created. If this field is specified, then the value of the `profile` field
+  // in the `payment_address` message will be ignored. The new payment address
+  // will be associated with the profile identified by the id set specified in
+  // this field.
+  ProfileIdSet profile_id_set = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The
+// [ListPaymentAddresses][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.ListPaymentAddresses]
+// method's request.
+message ListPaymentAddressesRequest {
+  // Required. The parent resource for payment addresses.
+  //
+  // Format: `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. A set of identifiers of a profile whose active payment addresses
+  // are to be listed.
+  ProfileIdSet profile_id_set = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // The maximum number of payment addresses to return. The service may return
+  // fewer than this value. If unspecified or if the value is less than 50, then
+  // at most 50 payment addresses will be returned. The maximum value is 1000;
+  // values above 1000 will be coerced to 1000.
+  int32 page_size = 3;
+
+  // A page token, received from a previous `ListPaymentAddresses` call.
+  // Provide this to retrieve the subsequent page.
+  //
+  // When paginating, all other parameters provided to `ListPaymentAddresses`
+  // must match the call that provided the page token.
+  string page_token = 4;
+}
+
+// The
+// [ListPaymentAddresses][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.ListPaymentAddresses]
+// method's response.
+message ListPaymentAddressesResponse {
+  // The active payment addresses associated with a profile.
+  repeated PaymentAddress payment_addresses = 1;
+
+  // A token that can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// The
+// [GetPaymentAddress][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.GetPaymentAddress]
+// method's request
+message GetPaymentAddressRequest {
+  // Required. The name of the payment address to be fetched.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}/paymentAddresses/{payment_address}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAddress"
+    }
+  ];
+}
+
+// The
+// [UpdatePaymentAddress][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.UpdatePaymentAddress]
+// method's request.
+message UpdatePaymentAddressRequest {
+  // Required. The payment address with the updated fields.
+  PaymentAddress payment_address = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The list of fields to update
+  google.protobuf.FieldMask update_mask = 2
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// The
+// [SearchParticipants][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.SearchParticipants]
+// method's request.
+message SearchParticipantsRequest {
+  // Required. The parent of all payment addresses in whose context the
+  // participants are to be searched.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. The payment address of the initiator of this request. This
+  // payment address has to be associated with the profile identifiers specified
+  // in the `device` field.
+  string initiator_payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Results are filtered based on the provided value.
+  oneof filter {
+    // The address of the participant to be searched. In UPI, this will be
+    // Virtual Payment Address (VPA) of the participant to be searched.
+    string payment_address = 3;
+
+    // The account details of the participant to be searched. In UPI, this will
+    // be the IFSC and account number of the participant to be searched.
+    UpiAccountId upi_account_id = 4;
+  }
+
+  // Metadata about the request.
+  Metadata metadata = 5;
+
+  // Required. The device originating the request.
+  Device device = 6 [(google.api.field_behavior) = REQUIRED];
+
+  // The maximum number of participants to return. The service may return fewer
+  // than this value. If unspecified or if the value is less than 50, then at
+  // most 50 participants will be returned. The maximum value is 1000; values
+  // above 1000 will be coerced to 1000.
+  int32 page_size = 7;
+
+  // A page token, received from a previous `SearchParticipants` call.
+  // Provide this to retrieve the subsequent page.
+  //
+  // When paginating, all other parameters provided to `SearchParticipants` must
+  // match the call that provided the page token.
+  string page_token = 8;
+}
+
+// The
+// [SearchParticipants][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.SearchParticipants]
+// method's metadata.
+message SearchParticipantsMetadata {
+  // A unique id for the invocation of the method.
+  string invocation_id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// The
+// [SearchParticipants][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.SearchParticipants]
+// method's response returned in the
+// [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+// field of an event notification.
+message SearchParticipantsResponse {
+  // A list of participants matching the given filter criteria. If a participant
+  // is being searched by their address, then a maximum of one participant will
+  // be present in the response.
+  repeated Participant participants = 1;
+
+  // A token that can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+
+  // Output only. Details about the search participants error received from the
+  // payments orchestrator.
+  Error error = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// The
+// [SearchPaymentAddresses][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.SearchPaymentAddresses]
+// method's request.
+message SearchPaymentAddressesRequest {
+  // Required. The parent of all payment addresses in whose context the payment
+  // addresses are to be searched.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Results are filtered based on the provided value.
+  oneof filter {
+    // The address of the participant to be searched. In UPI, this will be
+    // Virtual Payment Address (VPA) of the participant to be searched.
+    string payment_address = 3;
+  }
+
+  // The maximum number of participants to return. The service may return fewer
+  // than this value. If unspecified or if the value is less than 50, then at
+  // most 50 participants will be returned. The maximum value is 1000; values
+  // above 1000 will be coerced to 1000.
+  int32 page_size = 7;
+
+  // A page token, received from a previous `SearchParticipants` call.
+  // Provide this to retrieve the subsequent page.
+  //
+  // When paginating, all other parameters provided to `SearchParticipants` must
+  // match the call that provided the page token.
+  string page_token = 8;
+}
+
+// The
+// [SearchPaymentAddresses][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.SearchPaymentAddresses]
+// method's response.
+message SearchPaymentAddressesResponse {
+  // The payment addresses matching the specified filter criteria. Note that the
+  // payment addresses could be in any state.
+  repeated PaymentAddress payment_addresses = 1;
+
+  // A token that can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}

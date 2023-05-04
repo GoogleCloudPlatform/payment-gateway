@@ -1,0 +1,798 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.acquirerswitch.v1;
+
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/cloud/paymentgateway/acquirerswitch/v1/common_fields.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/empty.proto";
+import "google/type/money.proto";
+
+option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "RegisteredAccountsProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
+option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
+option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
+
+// This service provides methods for the management of payment accounts
+// registered with a payment address.
+service PersonSwitchRegisteredAccounts {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
+  // List all accounts registered with the person switch.
+  //
+  // This method supports filtering of the results by the
+  // following fields:
+  //
+  // * `paymentAddress` - The payment address value whose registered accounts
+  // are to be listed. The specified value must be a payment address associated
+  // with the profile specified in the request.
+  //
+  // Examples of the filter include:
+  //
+  // * `paymentAddress = foo@goog`
+  // * `paymentAddress = bar@goog`
+  //
+  // Note: Although this is a *list resources* method, it is modelled as a *HTTP
+  // POST* in REST because the *profile's* information is included in the
+  // request.
+  rpc ListRegisteredAccounts(ListRegisteredAccountsRequest)
+      returns (ListRegisteredAccountsResponse) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:list"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Initiate the registration of an account with the person switch. In UPI, if
+  // the account is not provisioned with the account's issuing bank with an
+  // MPIN, then this method will trigger a call to NPCI to request for an OTP
+  // from the issuer bank to begin the registration process.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [InitiateAccountRegistrationResponse][google.cloud.paymentgateway.acquirerswitch.v1.InitiateAccountRegistrationResponse]
+  // in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  rpc InitiateAccountRegistration(InitiateAccountRegistrationRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:initiateRegistration"
+      body: "*"
+    };
+    option (google.api.method_signature) =
+        "parent,payment_address,account_id,device";
+    option (google.longrunning.operation_info) = {
+      response_type: "InitiateAccountRegistrationResponse"
+      metadata_type: "InitiateAccountRegistrationMetadata"
+    };
+  }
+
+  // Verify the registered account's registration with the account's issuer. In
+  // UPI, if the account is not provisioned with the account's issuing bank with
+  // an MPIN, then this method will trigger a call to NPCI to provision the MPIN
+  // with the issuer bank along with all the required credentials such as the
+  // OTP, the ATM card details, new MPIN, etc.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [VerifyRegisteredAccountResponse][google.cloud.paymentgateway.acquirerswitch.v1.VerifyRegisteredAccountResponse]
+  // in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  rpc VerifyAccountRegistration(VerifyAccountRegistrationRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:verifyRegistration"
+      body: "*"
+    };
+    option (google.api.method_signature) =
+        "parent,payment_address,account_id,registration_credentials,device";
+    option (google.longrunning.operation_info) = {
+      response_type: "VerifyAccountRegistrationResponse"
+      metadata_type: "VerifyAccountRegistrationMetadata"
+    };
+  }
+
+  // Initiate the registration of an account with the person switch. In UPI, if
+  // the account is not provisioned with the account's issuing bank with an
+  // MPIN, then this method will trigger a call to NPCI to request for an OTP
+  // from the issuer bank to begin the registration process.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [InitiateResetCredentialsResponse][google.cloud.paymentgateway.acquirerswitch.v1.InitiateResetCredentialsResponse]
+  // in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  rpc InitiateResetCredentials(InitiateResetCredentialsRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:initiateResetCredentials"
+      body: "*"
+    };
+    option (google.api.method_signature) =
+        "parent,payment_address,account_id,device";
+    option (google.longrunning.operation_info) = {
+      response_type: "InitiateResetCredentialsResponse"
+      metadata_type: "InitiateResetCredentialsMetadata"
+    };
+  }
+
+  // Verify the registered account's registration with the account's issuer. In
+  // UPI, if the account is not provisioned with the account's issuing bank with
+  // an MPIN, then this method will trigger a call to NPCI to provision the MPIN
+  // with the issuer bank along with all the required credentials such as the
+  // OTP, the ATM card details, new MPIN, etc.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [VerifyResetCredentialsResponse][google.cloud.paymentgateway.acquirerswitch.v1.VerifyResetCredentialsResponse]
+  // in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  rpc VerifyResetCredentials(VerifyResetCredentialsRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:verifyResetCredentials"
+      body: "*"
+    };
+    option (google.api.method_signature) =
+        "parent,payment_address,account_id,registration_credentials,device";
+    option (google.longrunning.operation_info) = {
+      response_type: "VerifyResetCredentialsResponse"
+      metadata_type: "VerifyResetCredentialsMetadata"
+    };
+  }
+
+  // Deregister (or remove) an account from the list of registered accounts of a
+  // payment address.
+  rpc DeregisterRegisteredAccount(DeregisterRegisteredAccountRequest)
+      returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:deregister"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent,payment_address,account_id";
+  }
+
+  // Queries the balance in the specified registered account from the account's
+  // issuer.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [QueryRegisteredAccountBalanceResponse][google.cloud.paymentgateway.acquirerswitch.v1.QueryRegisteredAccountBalanceResponse]
+  // in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  rpc QueryRegisteredAccountBalance(QueryRegisteredAccountBalanceRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:queryBalance"
+      body: "*"
+    };
+    option (google.api.method_signature) =
+        "parent,payment_address,account_id,credential";
+    option (google.longrunning.operation_info) = {
+      response_type: "QueryRegisteredAccountBalanceResponse"
+      metadata_type: "QueryRegisteredAccountBalanceMetadata"
+    };
+  }
+
+  // Checks if an account's balance is greater than or equal to a specified
+  // amount.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [CheckRegisteredAccountBalanceResponse][google.cloud.paymentgateway.acquirerswitch.v1.CheckRegisteredAccountBalanceResponse]
+  // in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  rpc CheckRegisteredAccountBalance(CheckRegisteredAccountBalanceRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:checkBalance"
+      body: "*"
+    };
+    option (google.api.method_signature) =
+        "parent,payment_address,account_id,device,credential,amount";
+    option (google.longrunning.operation_info) = {
+      response_type: "CheckRegisteredAccountBalanceResponse"
+      metadata_type: "CheckRegisteredAccountBalanceMetadata"
+    };
+  }
+
+  // Change (update) the credentials of a registered account by providing the
+  // old credentials for verification, and the new credentials to be set on the
+  // registered account.
+  //
+  // In UPI, this API can be used to update the MPIN associated with a
+  // registered account.
+  rpc ChangeRegisteredAccountCredentials(
+      ChangeRegisteredAccountCredentialsRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:changeCredentials"
+      body: "*"
+    };
+    option (google.api.method_signature) =
+        "parent,payment_address,account_id,device,current_credential,new_credential";
+    option (google.longrunning.operation_info) = {
+      response_type: "ChangeRegisteredAccountCredentialsResponse"
+      metadata_type: "ChangeRegisteredAccountCredentialsMetadata"
+    };
+  }
+}
+
+// The
+// [ListRegisteredAccounts][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.ListRegisteredAccounts]
+// method's request.
+message ListRegisteredAccountsRequest {
+  // Required. The app which is triggering the initiation of an account
+  // registration.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. The payment address whose registered accounts are to be listed.
+  // Note that this is not the payment address resource name, but is the payment
+  // address itself.
+  string filter = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // The maximum number of accounts to return. The service may return fewer than
+  // this value. If unspecified or if the value is less than 50, then at most 50
+  // registered accounts will be returned. The maximum value is 1000; values
+  // above 1000 will be coerced to 1000.
+  int32 page_size = 3;
+
+  // A page token, received from a previous `ListRegisteredAccounts` call.
+  // Provide this to retrieve the subsequent page.
+  //
+  // When paginating, all other parameters provided to `ListRegisteredAccounts`
+  // must match the call that provided the page token.
+  string page_token = 4;
+}
+
+// The
+// [ListRegisteredAccounts][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.ListRegisteredAccounts]
+// method's response.
+message ListRegisteredAccountsResponse {
+  // The accounts registered with a payment address.
+  repeated RegisteredAccount registered_accounts = 1;
+
+  // A token that can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// All the details required for the registration of an account into UPI.
+message UpiRegistrationCredentials {
+  // Enumeration of the possible registration types supported by UPI.
+  enum RegistrationType {
+    // Registration type unspecified.
+    REGISTRATION_TYPE_UNSPECIFIED = 0;
+
+    // FORMAT1 registration type.
+    FORMAT1 = 1;
+
+    // FORMAT2 registration type.
+    FORMAT2 = 2;
+  }
+
+  // The registration type.
+  RegistrationType registration_type = 1;
+
+  // The MPIN to be set for the account being registered.
+  UpiCredential mpin = 2;
+
+  // The OTP sent as an SMS by the issuer bank for the registration.
+  UpiCredential otp = 3;
+
+  // The ATM card details. Only the last 6 digits of the ATM card should be
+  // provided, apart from the expiry date in MMYY format.
+  CardDetails atm_card_details = 5;
+
+  // The ATM PIN.
+  UpiCredential atm_pin = 4;
+}
+
+// Credentials for registration of an account with a payment address.
+message RegistrationCredentials {
+  // The credentials.
+  oneof credentials {
+    // The registration credentials needed in UPI.
+    UpiRegistrationCredentials upi = 1;
+  }
+}
+
+// The
+// [InitiateAccountRegistration][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.InitiateAccountRegistration]
+// method's request.
+message InitiateAccountRegistrationRequest {
+  // Required. The app which is triggering the initiation of an account
+  // registration.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. The participant's payment address. Note that this is not the
+  // payment address resource name, but is the payment address itself.
+  //
+  // If the payment address is _present_ in the person switch and is associated
+  // with the profile id set specified in this request, then the account being
+  // registered will be associated with the specified payment address.
+  //
+  // If the payment address is _not present_ in the person switch, then the
+  // payment address resource will be created with the given address, will be
+  // associated with the given profile id set, and  then the account being
+  // registered will be associated with the specified payment address.
+  string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The account to be registered with the person switch. The account
+  // specified here must not be associated with any other payment address in the
+  // person switch.
+  AccountId account_id = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Metadata about the request.
+  Metadata metadata = 4;
+
+  // Required. The device originating the request.
+  Device device = 5 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The
+// [InitiateAccountRegistration][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.InitiateAccountRegistration]
+// method's metadata.
+message InitiateAccountRegistrationMetadata {
+  // A unique id for the invocation of the method.
+  string invocation_id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// The
+// [InitiateAccountRegistration][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.InitiateAccountRegistration]
+// method's response. This is returned in the
+// [response][google.longrunning.Operation.response] field of the
+// [Operation][google.longrunning.Operation] object returned in the
+// [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event] notification
+// payload.
+message InitiateAccountRegistrationResponse {
+  // The created Registered Account.
+  RegisteredAccount registered_account = 1;
+
+  // Secure PIN URL returned in the OTP response.
+  string secure_pin_uri = 2;
+
+  // Details about a registered account error received from the payments
+  // orchestrator.
+  Error error = 3;
+}
+
+// The
+// [VerifyAccountRegistration][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.VerifyAccountRegistration]
+// method's request.
+message VerifyAccountRegistrationRequest {
+  // Required. The app which is triggering the verification of an account
+  // registration.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. The payment address of the account whose registration is being
+  // verified. Note that this is not the payment address resource name, but is
+  // the payment address itself.
+  string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The account whose registration is to be verified. The specified
+  // registered account must be associated with a payment address that is
+  // associated with the profile id set specified in the request.
+  AccountId account_id = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Credentials for validating the account owner.
+  RegistrationCredentials registration_credentials = 4
+      [(google.api.field_behavior) = REQUIRED];
+
+  // Metadata about the request.
+  Metadata metadata = 5;
+
+  // Required. The device originating the request.
+  Device device = 6 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The
+// [VerifyAccountRegistration][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.VerifyAccountRegistration]
+// method's response. This is returned in the
+// [response][google.longrunning.Operation.response] field of the
+// [Operation][google.longrunning.Operation] object returned in the
+// [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event] notification
+// payload.
+message VerifyAccountRegistrationResponse {
+  // The verified registered account.
+  RegisteredAccount registered_account = 1;
+
+  // Any error received from the payments orchestrator.
+  Error error = 2;
+}
+
+// The
+// [VerifyAccountRegistration][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.VerifyAccountRegistration]
+// method's metadata.
+message VerifyAccountRegistrationMetadata {
+  // A unique id for the invocation of the method.
+  string invocation_id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// The
+// [InitiateResetCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.InitiateResetCredentials]
+// method's request.
+message InitiateResetCredentialsRequest {
+  // Required. The app which is triggering the initiation of reset of
+  // credentials.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. The payment address of the account whose credentials are being
+  // reset. Note that this is not the payment address resource name, but is the
+  // payment address itself.
+  string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The account whose credentials are to be reset. The specified
+  // registered account must be associated with a payment address that is
+  // associated with the profile id set specified in the request.
+  AccountId account_id = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Metadata about the request.
+  Metadata metadata = 4;
+
+  // Required. The device originating the request.
+  Device device = 5 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The
+// [InitiateResetCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.InitiateResetCredentials]
+// method's metadata.
+message InitiateResetCredentialsMetadata {
+  // A unique id for the invocation of the method.
+  string invocation_id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// The
+// [InitiateResetCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.InitiateResetCredentials]
+// method's response. This is returned in the
+// [response][google.longrunning.Operation.response] field of the
+// [Operation][google.longrunning.Operation] object returned in the
+// [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event] notification
+// payload.
+message InitiateResetCredentialsResponse {
+  // Secure PIN URL returned in the OTP response.
+  string secure_pin_uri = 2;
+
+  // Any error received from the payments orchestrator.
+  Error error = 3;
+}
+
+// The
+// [VerifyResetCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.VerifyResetCredentials]
+// method's request.
+message VerifyResetCredentialsRequest {
+  // Required. The app which is triggering the verification of the reset of
+  // credentials.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. The payment address of the account whose credentials are being
+  // reset. Note that this is not the payment address resource name, but is the
+  // payment address itself.
+  string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The account whose reset of credentials is to be verified. The
+  // specified registered account must be associated with a payment address that
+  // is associated with the profile id set specified in the request.
+  AccountId account_id = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Credentials for validating the account owner.
+  RegistrationCredentials registration_credentials = 4
+      [(google.api.field_behavior) = REQUIRED];
+
+  // Metadata about the request.
+  Metadata metadata = 5;
+
+  // Required. The device originating the request.
+  Device device = 6 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The
+// [VerifyResetCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.VerifyResetCredentials]
+// method's response. This is returned in the
+// [response][google.longrunning.Operation.response] field of the
+// [Operation][google.longrunning.Operation] object returned in the
+// [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event] notification
+// payload.
+message VerifyResetCredentialsResponse {
+  // Any error received from the payments orchestrator.
+  Error error = 2;
+}
+
+// The
+// [VerifyResetCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.VerifyResetCredentials]
+// method's metadata.
+message VerifyResetCredentialsMetadata {
+  // A unique id for the invocation of the method.
+  string invocation_id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// The
+// [DeregisterRegisteredAccount][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.DeregisterRegisteredAccount]
+// methods's request.
+message DeregisterRegisteredAccountRequest {
+  // Required. The app which is triggering the deletion of the registered
+  // account.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. The payment address of the account being deleted. Note that this
+  // is not the payment address resource name, but is the payment address
+  // itself.
+  string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The account to be deleted. The specified registered account must
+  // be associated with a payment address that is associated with the profile id
+  // set specified in the request.
+  AccountId account_id = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The
+// [QueryRegisteredAccountBalance][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.QueryRegisteredAccountBalance]
+// method's request.
+message QueryRegisteredAccountBalanceRequest {
+  // Required. The app which is triggering the query of the account balance.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. The payment address of the account whose balance is to be
+  // queried. This payment address must be associated with the profile id set
+  // specified in the request. Note that this is not the payment address
+  // resource name, but is the payment address itself.
+  string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The account whose balance is to be queried. The specified
+  // registered account must be associated with the payment address specified in
+  // the request.
+  AccountId account_id = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The credential to authenticate the end-user invoking the API.
+  Credential credential = 4 [(google.api.field_behavior) = REQUIRED];
+
+  // The device originating the request.
+  Device device = 5;
+
+  // Metadata about the request.
+  Metadata metadata = 6;
+}
+
+// The
+// [QueryRegisteredAccountBalance][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.QueryRegisteredAccountBalance]
+// method's metadata.
+message QueryRegisteredAccountBalanceMetadata {
+  // A unique id for the invocation of the method.
+  string invocation_id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// The
+// [QueryRegisteredAccountBalance][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.QueryRegisteredAccountBalance]
+// method's response. This is returned in the
+// [response][google.longrunning.Operation.response] field of the
+// [Operation][google.longrunning.Operation] object returned in the
+// [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event] notification
+// payload.
+message QueryRegisteredAccountBalanceResponse {
+  // The available balance amount in the account.
+  google.type.Money balance = 1;
+
+  // Details about the balance query error received from the payments
+  // orchestrator.
+  Error error = 2;
+}
+
+// The
+// [CheckRegisteredAccountBalance][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.CheckRegisteredAccountBalance]
+// method's request.
+message CheckRegisteredAccountBalanceRequest {
+  // Required. The app which is triggering the account balance check.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. The payment address of the account whose balance is to be
+  // checked. This payment address must be associated with the profile id set
+  // specified in the request. Note that this is not the payment address
+  // resource name, but is the payment address itself.
+  string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The account whose balance is to be checked. The specified
+  // registered account must be associated with the payment address specified in
+  // the request.
+  AccountId account_id = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The device originating the request.
+  Device device = 4 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The credential to authenticate the end-user invoking the API.
+  Credential credential = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The amount to be checked.
+  google.type.Money amount = 6 [(google.api.field_behavior) = REQUIRED];
+
+  // Metadata about the request.
+  Metadata metadata = 7;
+}
+
+// The
+// [CheckRegisteredAccountBalance][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.CheckRegisteredAccountBalance]
+// method's metadata.
+message CheckRegisteredAccountBalanceMetadata {
+  // A unique id for the invocation of the method.
+  string invocation_id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// The
+// [CheckRegisteredAccountBalance][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.CheckRegisteredAccountBalance]
+// method's response. This is returned in the
+// [response][google.longrunning.Operation.response] field of the
+// [Operation][google.longrunning.Operation] object returned in the
+// [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event] notification
+// payload.
+message CheckRegisteredAccountBalanceResponse {
+  // True, if the balance is the account is greater than or equal to the
+  // specified amount.
+  bool available = 1;
+
+  // Details about the balance check error received from the payments
+  // orchestrator.
+  Error error = 2;
+}
+
+// The
+// [ChangeRegisteredAccountCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.ChangeRegisteredAccountCredentials]
+// method's request.
+message ChangeRegisteredAccountCredentialsRequest {
+  // Required. The app which is triggering the account balance check.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Required. The payment address of the account whose credentials are to be
+  // changed. This payment address must be associated with the profile id set
+  // specified in the request. Note that this is not the payment address
+  // resource name, but is the payment address itself.
+  string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The account whose credentials are to be changed. The specified
+  // registered account must be associated with the payment address specified in
+  // the request.
+  AccountId account_id = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The device originating the request.
+  Device device = 4 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The current credential associated with the registered account. In
+  // UPI, this will be the MPIN associated with the registered account.
+  Credential current_credential = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The new credential to be set on the registered account. In UPI,
+  // this will be the new MPIN to be set on the registered account.
+  Credential new_credential = 6 [(google.api.field_behavior) = REQUIRED];
+
+  // Metadata about the request.
+  Metadata metadata = 7;
+}

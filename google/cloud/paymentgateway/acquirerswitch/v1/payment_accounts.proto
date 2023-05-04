@@ -1,0 +1,158 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.acquirerswitch.v1;
+
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/cloud/paymentgateway/acquirerswitch/v1/common_fields.proto";
+import "google/longrunning/operations.proto";
+
+option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "PaymentAccountsProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
+option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
+option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
+
+// This service provides methods for the management of payment accounts. Payment
+// accounts can either be those already registered with the person switch for a
+// particular payment address, or still unregistered accounts.
+service PersonSwitchAccounts {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
+  // Search and return all accounts associated with an identifier (such as a
+  // mobile number) in a particular payment provider. This method will search
+  // and fetch the list of accounts from an account provider including those
+  // that are not yet registered with the person switch.
+  //
+  // The
+  // [filter][google.cloud.paymentgateway.acquirerswitch.v1.SearchAccountsRequest.filter]
+  // field supports the following filter criteria:
+  //
+  // * `account_provider` - The name of the account provider resource from which
+  // the accounts associated with the payment address's profile are to be
+  // searched. The account provider resource's name can be obtained by a call to
+  // the `ListAccountProviders` API. This is a mandatory filter criteria.
+  //
+  // The filter is a name-value pair separated by an `=` sign. Examples include:
+  //
+  // * account_provider=projects/project1/clients/123/apps/234/accountProviders/GOOG
+  // * account_provider=projects/project1/clients/123/apps/234/accountProviders/BANK
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [SearchAccountsResponse][google.cloud.paymentgateway.acquirerswitch.v1.SearchAccountsResponse]
+  // in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  rpc SearchAccounts(SearchAccountsRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/accounts:search"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent";
+    option (google.longrunning.operation_info) = {
+      response_type: "SearchAccountsResponse"
+      metadata_type: "SearchAccountsMetadata"
+    };
+  }
+}
+
+// The
+// [SearchAccounts][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchAccounts.SearchAccounts]
+// method's request.
+message SearchAccountsRequest {
+  // Required. The parent resource for listing all accounts in an account
+  // provider.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // Optional. The payment address of the initiator of this request. This
+  // payment address has to be associated with the profile identifiers specified
+  // in the `device` field.
+  //
+  // If this value is not specified, then the person switch will use a default
+  // payment address to search for accounts.
+  string initiator_payment_address = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. Results are filtered based on the provided value.
+  string filter = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. Metadata about the request.
+  Metadata metadata = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Required. The device originating the request.
+  Device device = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional. The maximum number of accounts to return. The service may return
+  // fewer than this value. If unspecified or if the value is less than 50, then
+  // at most 50 accounts will be returned. The maximum value is 1000; values
+  // above 1000 will be coerced to 1000.
+  int32 page_size = 6 [(google.api.field_behavior) = OPTIONAL];
+
+  // Optional. A page token, received from a previous `SearchAccounts` call.
+  // Provide this to retrieve the subsequent page.
+  //
+  // When paginating, all other parameters provided to `SearchAccounts` must
+  // match the call that provided the page token.
+  string page_token = 7 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// The
+// [SearchAccounts][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchAccounts.SearchAccounts]
+// method's metadata.
+message SearchAccountsMetadata {
+  // A unique id for the invocation of the method.
+  string invocation_id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// The
+// [SearchAccounts][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchAccounts.SearchAccounts]
+// method's response returned in the
+// [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+// field of an event notification.
+message SearchAccountsResponse {
+  // A list of accounts associated with the mobile number associated with the
+  // payment address's profile.
+  repeated Account accounts = 1;
+
+  // A token that can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+
+  // Details about a search accounts error received from the payments
+  // orchestrator.
+  Error error = 3;
+}

@@ -1,0 +1,740 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.acquirerswitch.v1;
+
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/cloud/paymentgateway/acquirerswitch/v1/common_fields.proto";
+import "google/longrunning/operations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/type/money.proto";
+
+option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "PaymentsProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
+option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
+option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
+
+// This service provides all methods for management of payments including
+// initiation of payments, listing of payments, etc.
+service PersonSwitchPayments {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
+  // Initiate a request to make a payment. This request is triggered by the
+  // payer.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [Payment][google.cloud.paymentgateway.acquirerswitch.v1.Payment] in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  //
+  // The [metadata][google.longrunning.Operation.metadata] field of the returned
+  // [Operation][google.longrunning.Operation] will be of type
+  // [InitiatePayMetadata][google.cloud.paymentgateway.acquirerswitch.v1.InitiatePayMetadata].
+  rpc InitiatePay(InitiatePayRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/payments:pay"
+      body: "*"
+    };
+    option (google.api.method_signature) =
+        "parent,payer,amount,credential,device,payees";
+    option (google.longrunning.operation_info) = {
+      response_type: "Payment"
+      metadata_type: "InitiatePayMetadata"
+    };
+  }
+
+  // Initiate a request to collect a payment. This request is triggered by the
+  // payee.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [Payment][google.cloud.paymentgateway.acquirerswitch.v1.Payment] in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  //
+  // The [metadata][google.longrunning.Operation.metadata] field of the returned
+  // [Operation][google.longrunning.Operation] will be of type
+  // [InitiateCollectMetadata][google.cloud.paymentgateway.acquirerswitch.v1.InitiateCollectMetadata].
+  rpc InitiateCollect(InitiateCollectRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/payments:collect"
+      body: "*"
+    };
+    option (google.api.method_signature) =
+        "parent,payer_payment_address,payee,amount,device";
+    option (google.longrunning.operation_info) = {
+      response_type: "Payment"
+      metadata_type: "InitiateCollectMetadata"
+    };
+  }
+
+  // List all payments. This method supports filtering of the results by the
+  // following fields:
+  //
+  // * `paymentAddress` - The payment address value whose payments are to be
+  // listed. The specified value must be a payment address associated with the
+  // profile specified in the request.
+  // * `state` - The state of the payments to be listed. The value must be one
+  // of the [State][google.cloud.paymentgateway.acquirerswitch.v1.Payment.State]
+  // enum values.
+  //
+  // Examples of the filter include:
+  //
+  // * `paymentAddress = foo@goog`
+  // * `state = PENDING_AUTHORIZATION`
+  // * `paymentAddress = foo@goog && state = SUCCEEDED`
+  //
+  // The filter's behaviour is defined as follows:
+  //
+  // 1. If no filters are specified, then all payments associated with the
+  // specified profile in all states will be returned.
+  // 1. Use the `paymentAddress` filter to return only those payments associated
+  // with a specific payment address.
+  // 1. Use the `state` filter to return only those payments in a specific
+  // state.
+  rpc ListPayments(ListPaymentsRequest) returns (ListPaymentsResponse) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/payments:list"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Get a payment.
+  rpc GetPayment(GetPaymentRequest) returns (Payment) {
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/clients/*/apps/*/payments/*}"
+    };
+    option (google.api.method_signature) = "name,payment_address";
+  }
+
+  // Approve a payment collection request.
+  //
+  // If the payment request is still within its expiry time, then an
+  // [Operation][google.longrunning.Operation] is returned and the final status
+  // of the payment will be notified via an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [Payment][google.cloud.paymentgateway.acquirerswitch.v1.Payment] in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  //
+  // If the payment request has expired, then the returned
+  // [Operation][google.longrunning.Operation]'s
+  // [done][google.longrunning.Operation.done] field will be set to `true` and
+  // the [response][google.longrunning.Operation.response] field will contain
+  // the payment. In this case, the payment's status will indicate a failure due
+  // to expiry.
+  //
+  // The [metadata][google.longrunning.Operation.metadata] field of
+  // the returned [Operation][google.longrunning.Operation] will be of type
+  // [ApprovePaymentMetadata][google.cloud.paymentgateway.acquirerswitch.v1.ApprovePaymentMetadata].
+  rpc ApprovePayment(ApprovePaymentRequest)
+      returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/clients/*/apps/*/payments/*}:approve"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name,payer,device";
+    option (google.longrunning.operation_info) = {
+      response_type: "Payment"
+      metadata_type: "ApprovePaymentMetadata"
+    };
+  }
+
+  // Reject a payment collection request.
+  rpc RejectPayment(RejectPaymentRequest) returns (Payment) {
+    option (google.api.http) = {
+      post: "/v1/{name=projects/*/clients/*/apps/*/payments/*}:reject"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name,payer_payment_address,device";
+  }
+
+  // Checks the status of a payment, given either the payment's transaction id
+  // or RRN. Unlike the
+  // [GetPayment][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.GetPayment]
+  // method which returns the payment as available with the person switch, this
+  // method will check the payment status with the payments orchestrator, if the
+  // payment is not in a terminal state (SUCCEEDED or FAILED).
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // one of two possible cases:
+  //
+  // 1. If the payment is in a termninal state in the person switch's data
+  // store, then the returned [Operation][google.longrunning.Operation]'s
+  // [done][google.longrunning.Operation.done] field will be set to `true` and
+  // the [response][google.longrunning.Operation.response] field will contain
+  // the payment that matches the given input criteria.
+  // 1. If the payment is in a non-terminal state (IN_PROGRESS) in the person
+  // switch's data store, then the returned
+  // [Operation][google.longrunning.Operation]'s
+  // [done][google.longrunning.Operation.done] field will be set to `false`. The
+  // person switch will query the payment orchestrator for the status of the
+  // payment and the response will be returned as an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [Payment][google.cloud.paymentgateway.acquirerswitch.v1.Payment] in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  //
+  // The [metadata][google.longrunning.Operation.metadata] field of the returned
+  // [Operation][google.longrunning.Operation] will be of type
+  // [CheckPaymentMetadata][google.cloud.paymentgateway.acquirerswitch.v1.CheckPaymentMetadata].
+  rpc CheckPayment(CheckPaymentRequest) returns (google.longrunning.Operation) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/payments:check"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent,payment_address";
+    option (google.longrunning.operation_info) = {
+      response_type: "Payment"
+      metadata_type: "CheckPaymentMetadata"
+    };
+  }
+}
+
+// Represents an id of a payment participant. It could either be a payment
+// address value or the id of a registered account.
+message ParticipantId {
+  // The participant's payment address. Note that this is not the payment
+  // address resource name, but is the payment address itself. If this value is
+  // specified, then the primary registered account associated with
+  // [PaymentAddress][google.cloud.paymentgateway.acquirerswitch.v1.PaymentAddress]
+  // identified by the specified address will be used as the
+  // remitter/beneficiary account.
+  string payment_address = 1;
+
+  // The  [id][google.cloud.paymentgateway.acquirerswitch.v1.AccountId.id]
+  // associated with the registered account which is to be used as the
+  // remitter/beneficiary account. The person switch will determine the payment
+  // address of the payer from the specified id.
+  string registered_account_id = 2;
+}
+
+// The
+// [InitiatePay][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.InitiatePay]
+// method's request.
+message InitiatePayRequest {
+  // The recipient of the payment.
+  message PaymentRecipient {
+    // Details of a recipient as per UPI's account identification standards.
+    message UpiRecipient {
+      // Required. The name of the recipient.
+      string display_name = 1 [(google.api.field_behavior) = REQUIRED];
+
+      // Required. The account details of the recipient. The following fields
+      // must be specified:
+      // * [ifsc][google.cloud.paymentgateway.acquirerswitch.v1.UpiAccountId.id]
+      // * [account_number][google.cloud.paymentgateway.acquirerswitch.v1.UpiAccountId.account_number]
+      UpiAccountId upi_account_id = 2 [(google.api.field_behavior) = REQUIRED];
+    }
+
+    // The recipient reference.
+    oneof reference {
+      // The payment address value of the recipient. This value should be
+      // specified if the payment is being sent to a recipient identified by
+      // their payment address.
+      string payment_address = 1;
+
+      // The recipient's account details as per the UPI standards. This value
+      // should be specified if the payment is being sent to a recipient
+      // with their account details.
+      UpiRecipient upi_recipient = 2;
+    }
+  }
+
+  // Required. The parent resource for all payments.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyApp"
+    }
+  ];
+
+  // Required. The payer details. Either of the values specified has to be
+  // associated with the profile identifiers specified in the `device` field.
+  ParticipantId payer = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. Details of the _payee_ in a `Pay` initiation. _Note_ that support
+  // for more than one payee is included for future use. Currently. most systems
+  // in UPI only support a single payee per payment.
+  repeated PaymentRecipient payees = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The amount to be paid.
+  google.type.Money amount = 4 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The credential to authenticate the end-user invoking the API to
+  // initiate the payment.
+  Credential credential = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The device originating the request.
+  Device device = 6 [(google.api.field_behavior) = REQUIRED];
+
+  // Metadata about the payment. Callers can specify a value for the
+  // transaction's id in the
+  // [metadata.id][google.cloud.paymentgateway.acquirerswitch.v1.Metadata.id]
+  // field to uniquely identify the transaction. If no id is specified, then the
+  // person switch will generate a unique id for the transaction.
+  PaymentMetadata payment_metadata = 7;
+}
+
+// Metadata about an
+// [InitiatePay][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.InitiatePay]
+// request returned in the [metadata][google.longrunning.Operation.metadata]
+// field of the [Operation][google.longrunning.Operation] returned by the
+// method.
+message InitiatePayMetadata {
+  // A unique identifier generated for the payment. In UPI, this maps to the
+  // *transaction ID*.
+  string id = 1;
+
+  // An RRN generated by the person switch for this payment transaction. The RRN
+  // is guaranteed to be unique within the scope of an app.
+  string retrieval_reference_number = 2;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 3;
+}
+
+// The
+// [InitiateCollect][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.InitiateCollect]
+// method's request.
+message InitiateCollectRequest {
+  // Required. The parent resource for all payments.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyApp"
+    }
+  ];
+
+  // Required. The payer's payment address. The payment collection request will
+  // be sent to the user identified by this address.
+  string payer_payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The payee details. Either of the values specified has to be
+  // associated with the profile identifiers specified in the `device` field.
+  ParticipantId payee = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The amount to be paid.
+  google.type.Money amount = 4 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The device originating the request.
+  Device device = 5 [(google.api.field_behavior) = REQUIRED];
+
+  // Metadata about the payment. Callers can specify a value for the
+  // transaction's id in the
+  // [metadata.id][google.cloud.paymentgateway.acquirerswitch.v1.Metadata.id]
+  // field to uniquely identify the transaction. If no id is specified, then the
+  // person switch will generate a unique id for the transaction.
+  PaymentMetadata payment_metadata = 6;
+}
+
+// Metadata about an
+// [InitiateCollect][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.InitiateCollect]
+// request returned in the [metadata][google.longrunning.Operation.metadata]
+// field of the [Operation][google.longrunning.Operation] returned by the
+// method.
+message InitiateCollectMetadata {
+  // A unique identifier generated for the payment. In UPI, this maps to the
+  // *transaction ID*.
+  string id = 1;
+
+  // An RRN generated by the person switch for this payment transaction. The RRN
+  // is guaranteed to be unique within the scope of an app.
+  string retrieval_reference_number = 2;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 3;
+}
+
+// The
+// [ListPayments][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.ListPayments]
+// method's request.
+message ListPaymentsRequest {
+  // Required. The parent resource for all payments.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // The filter.
+  string filter = 2;
+
+  // The maximum number of payments to return. The service may return fewer than
+  // this value. If unspecified or if the value is less than 50, then at most 50
+  // payments will be returned. The maximum value is 1000; values
+  // above 1000 will be coerced to 1000.
+  int32 page_size = 3;
+
+  // A page token, received from a previous `ListRegisteredAccounts` call.
+  // Provide this to retrieve the subsequent page.
+  //
+  // When paginating, all other parameters provided to `ListRegisteredAccounts`
+  // must match the call that provided the page token.
+  string page_token = 4;
+
+  // The identifiers of the profile that is triggering the request to list
+  // payments.
+  ProfileIdSet profile_id_set = 5;
+}
+
+// The
+// [ListPayments][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.ListPayments]
+// method's response.
+message ListPaymentsResponse {
+  // The payments matching the specified filter.
+  repeated Payment payments = 1;
+
+  // A token that can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// The
+// [GetPayment][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.GetPayment]
+// method's request.
+message GetPaymentRequest {
+  // Required. The name of the payment resource.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}/payments/{payment}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/Payment"
+    }
+  ];
+
+  // Required. The participant's payment address. Note that this is not the
+  // payment address resource name, but is the payment address itself.
+  string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The
+// [ApprovePayment][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.ApprovePayment]
+// method's request.
+message ApprovePaymentRequest {
+  // Required. The name of the payment resource being approved. This should be
+  // the same as the name of the payment received in the
+  // [unilateral][google.cloud.paymentgateway.acquirerswitch.v1.Event.unilateral]
+  // event notification for payment approval/rejection.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}/payments/{payment}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/Payment"
+    }
+  ];
+
+  // Required. The identifier of the payer approving the payment. If the payment
+  // address is specified, then the primary registered account associated with
+  // the payment address will used as the remitter account. If the registered
+  // account id is specified, then that account will be used as the remitter
+  // account.
+  ParticipantId payer = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // The credential to authenticate the end-user invoking the API to approve the
+  // payment.
+  Credential credential = 3;
+
+  // Required. The device originating the request.
+  Device device = 4 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The
+// [RejectPayment][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.RejectPayment]
+// method's request.
+message RejectPaymentRequest {
+  // Required. The name of the payment resource being rejected. This should be
+  // the same as the name of the payment received in the
+  // [unilateral][google.cloud.paymentgateway.acquirerswitch.v1.Event.unilateral]
+  // event notification for payment approval/rejection.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}/payments/{payment}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/Payment"
+    }
+  ];
+
+  // Required. The payment address of the payer rejecting the collect payment
+  // request.
+  string payer_payment_address = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Required. The device originating the request.
+  Device device = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+// The
+// [CheckPayment][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.CheckPayment]
+// method's request.
+message CheckPaymentRequest {
+  // Required. The parent resource for all payments.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // An id to lookup the payment and check its status.
+  oneof id {
+    // The payment's id. In UPI, this maps to the transaction id.
+    string payment_id = 2;
+
+    // The Retrieval Reference Number (RRN) of the payment.
+    string retrieval_reference_number = 3;
+  }
+
+  // Required. The participant's payment address. Note that this is not the
+  // payment address resource name, but is the payment address itself.
+  string payment_address = 4 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Metadata about a
+// [CheckPayment][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.CheckPayment]
+// returned in the [metadata][google.longrunning.Operation.metadata] field of
+// the [Operation][google.longrunning.Operation] returned by the method.
+message CheckPaymentMetadata {
+  // A unique identifier generated for the check payment API. If the payment is
+  // in a terminal state in the person switch, then this value will be empty.
+  // Else, in UPI, this maps to the *transaction ID* of the API triggered to the
+  // payments orchestrator for the checking the payment status.
+  string id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// Metadata about a
+// [ApprovePayment][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.ApprovePayment]
+// returned in the [metadata][google.longrunning.Operation.metadata] field of
+// the [Operation][google.longrunning.Operation] returned by the method.
+message ApprovePaymentMetadata {
+  // A unique identifier generated for the approve payment API. In UPI, this
+  // maps to the *transaction ID* of the API triggered to the payments
+  // orchestrator for approving the payment.
+  string id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// Represents a payment that is processed by the person switch.
+message Payment {
+  option (google.api.resource) = {
+    type: "acquirerswitch.googleapis.com/Payment"
+    pattern: "projects/{project}/clients/{client}/apps/{app}/payments/{payment}"
+  };
+
+  // Enumeration of the source of the payment.
+  enum InitiationSource {
+    // Initiation source unspecified.
+    INITIATION_SOURCE_UNSPECIFIED = 0;
+
+    // Payment initiated by the payer. In UPI, this will the `PAY` type.
+    PAYER = 1;
+
+    // Payment initiated by the payee. In UPI, this will the `COLLECT` type.
+    PAYEE = 2;
+  }
+
+  // Enumeration of payment states.
+  enum State {
+    // State unspecified.
+    STATE_UNSPECIFIED = 0;
+
+    // Payment in-progress.
+    IN_PROGRESS = 1;
+
+    // Payment completed successfully.
+    SUCCEEDED = 2;
+
+    // Payment failed.
+    FAILED = 3;
+
+    // Payment rejected.
+    REJECTED = 4;
+
+    // Payment is pending authorization from the payer.
+    PENDING_AUTHORIZATION = 5;
+
+    // Payment authorized.
+    AUTHORIZED = 6;
+  }
+
+  // Output only. The name of the payment resource.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}/paymentAddresses/{paymentAddress}/payments/{payment}`
+  string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The retrieval reference number (RRN) of the payment.
+  string retrieval_reference_number = 3
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The source that initiated the payment.
+  InitiationSource initiation_source = 4;
+
+  // The amount of the payment.
+  google.type.Money amount = 5;
+
+  // The payer in the payment.
+  Participant payer = 6;
+
+  // The payee(s) in the payment. In the current release, the person switch
+  // support only a single payee in a payment.
+  repeated Participant payees = 7;
+
+  // Output only. State of the payment.
+  State state = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Metadata about the payment.
+  PaymentMetadata metadata = 9;
+
+  // Output only. Details about a payment error obtained from the payments
+  // orchestrator.
+  Error error = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// Contains metadata about a payment.
+message PaymentMetadata {
+  // The time at which the payment request expires. This is typically relevant
+  // when the payment request is initiated by the payee and they set a time
+  // limit for the payer to accept the payment.
+  google.protobuf.Timestamp expiry_time = 1;
+
+  // Other common metadata about the payment.
+  Metadata common_metadata = 2;
+}
+
+// Represents a participant in a payment (either a payer or a payee).
+message Participant {
+  // Enumeration of possible personas participating in a payment.
+  enum Persona {
+    // Persona unspecified.
+    PERSONA_UNSPECIFIED = 0;
+
+    // Represents a person.
+    PERSON = 1;
+
+    // Represents an entity.
+    ENTITY = 2;
+  }
+
+  // The payment address of a participant (payer or payee) in a payment. If the
+  // payment is being created by the payer using a payee's account details, then
+  // this field will be empty.
+  string address = 1;
+
+  // The account of the participant to be debited or credited.
+  oneof account {
+    // The account id of the participant, if the participant was not the
+    // initiator of the payment.
+    AccountId account_id = 2;
+
+    // The name of the registered account of the participant, if the participant
+    // was the initiator of the payment.
+    string registered_account = 3;
+  }
+
+  // The name of the participant. If the payment is being created by a payer
+  // using the payee's account details, then payee's name can be specified in
+  // this field.
+  string display_name = 4;
+
+  // Output only. The participant's persona.
+  Persona persona = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. If the participant is an entity, its details.
+  Entity entity = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. Device details from which the payment was processed, if
+  // available
+  DeviceDetails device_details = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// Represents an entity that participates in a payment. This could be a
+// business, a government entity, etc.
+message Entity {
+  // The entity.
+  oneof entity {
+    // Output only. A business (merchant) entity.
+    Business business = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+  }
+}
+
+// Represents information about a business (merchant) that participates in a
+// payment.
+message Business {
+  // Represents the various names of a business (merchant).
+  message BusinessNames {
+    // Output only. Brand name.
+    string brand = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+    // Output only. Legal name.
+    string legal = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+    // Output only. Franchise name.
+    string franchise = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+  }
+
+  // Output only. The merchant's id.
+  string id = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The store id.
+  string store_id = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The terminal id.
+  string terminal_id = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The names of the business (merchant).
+  BusinessNames names = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+}

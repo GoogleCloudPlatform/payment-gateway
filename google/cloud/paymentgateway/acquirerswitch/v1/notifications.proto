@@ -1,0 +1,162 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.acquirerswitch.v1;
+
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/cloud/paymentgateway/acquirerswitch/v1/payments.proto";
+import "google/longrunning/operations.proto";
+
+option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "NotificationsProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
+option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
+option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
+
+// This service provides methods for event notifications.
+service PersonSwitchNotifications {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
+  // This method returns a stream of events either raised unilaterally by the
+  // person switch, or raised in response to a previous API call from the caller
+  // which has been processed asynchronously.
+  //
+  // The person switch attempts *at least once* delivery for all events.
+  // Acknowledgement of receipt of events by the caller is based on the
+  // [id][google.cloud.paymentgateway.acquirerswitch.v1.Event.id] field.
+  rpc StreamEvents(StreamEventsRequest) returns (stream Event) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*/clients/*/apps/*}/events:stream"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // This method is invoked by clients to acknowledge that they have received an
+  // event from the person switch for processing. Clients can invoke this API
+  // either once they have accepted an event for processing or after they have
+  // processed the event. Every event will have a configurable timeout period.
+  //
+  // If an event is not acknowledged by the client, then the person switch will
+  // deliver the same event again in a
+  // [StreamEvents][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchNotifications.StreamEvents]
+  // call.
+  rpc AcknowledgeEvents(stream AcknowledgeEventsRequest)
+      returns (AcknowledgeEventsResponse) {
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/events:acknowledge"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+}
+
+// The
+// [StreamEvents][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchNotifications.StreamEvents]
+// method's request.
+message StreamEventsRequest {
+  // Required. The parent resource for events.
+  //
+  // Format: `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+}
+
+// The
+// [AcknowledgeEvents][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchNotifications.AcknowledgeEvents]
+// method's request.
+message AcknowledgeEventsRequest {
+  // Required. The parent resource for events.
+  //
+  // Format: `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+    }
+  ];
+
+  // One of more ids of events received from the person switch which are being
+  // acknowldged by the caller. The ids should be valid event
+  // [id][google.cloud.paymentgateway.acquirerswitch.v1.Event.id] from a
+  // previous event notification.
+  repeated string ids = 2;
+}
+
+// The
+// [AcknowledgeEvents][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchNotifications.AcknowledgeEvents]
+// method's response.
+message AcknowledgeEventsResponse {}
+
+// An event notification from the person switch to a client.
+message Event {
+  // A unique id for the event.
+  string id = 1;
+
+  // The event payload.
+  oneof payload {
+    // The operation that was the response to a prior API call from a client to
+    // the person switch. The [done][google.longrunning.Operation.done] field
+    // will be set to `true`. If the operation succeeded, then the
+    // [google.longrunning.Operation.response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+    // field will be set. Else, the [error][google.longrunning.Operation.error]
+    // field will be set.
+    google.longrunning.Operation response = 2;
+
+    // A unilateral notification from the person switch to the client.
+    Unilateral unilateral = 3;
+  }
+}
+
+// Unilateral represents an event notification payload from the person switch to
+// the app. This is an event that is not in response to any other API
+// invocation from the app.
+message Unilateral {
+  // The payload of the unilateral event notification.
+  oneof payload {
+    // A unilateral notification about a payment. This is sent to the app when a
+    // payment, where the account registered with the person switch is the
+    // payee, has been processed.
+    //
+    // *Note* that it is possible that the payment may have *SUCCEEDED* or
+    // *FAILED*. This will be indicated by the
+    // [state][google.cloud.paymentgateway.acquirerswitch.v1.Payment.state]
+    // field. The app might choose to notify the user about the payment and its
+    // state.
+    Payment payment_notification = 1;
+
+    // A unilateral notification about a request for the approval of a payment.
+    // This is triggered when a request is received for the collection of a
+    // payment from a payer whose account is registered with the person switch.
+    // Upon approval/rejection by the payer, the app has to invoke the
+    // [ApprovePayment][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.ApprovePayment]
+    // or
+    // [RejectPayment][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.RejectPayment]
+    // method providing the relevant action and credentials approving/rejecting
+    // the payment.
+    Payment payment_approval = 2;
+  }
+}
