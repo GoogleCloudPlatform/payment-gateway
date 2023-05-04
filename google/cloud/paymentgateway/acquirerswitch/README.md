@@ -5,4 +5,4 @@ UPI App developers can use Acquirer Switch proto files to generate the clients f
 
 ## License
 
-Apache 2.0; see [`/LICENSE`](LICENSE) for details.
+Apache 2.0; see [`LICENSE`](/LICENSE) for details.

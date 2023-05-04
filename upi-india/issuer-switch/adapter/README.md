@@ -9,4 +9,4 @@ postman collection is purely for testing purposes and does not represent any rea
 
 ## License
 
-Apache 2.0; see [`/LICENSE`](LICENSE) for details.
+Apache 2.0; see [`LICENSE`](/LICENSE) for details.
