@@ -1,0 +1,260 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.acquirerswitch.v1;
+
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "UtilitiesProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
+option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
+option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
+
+// This service provides utility functions for use by clients of the person
+// switch.
+service PersonSwitchUtilities {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
+  // List all account providers that can be used with the person switch. In UPI,
+  // this method returns the list of account providers as provided by the
+  // UPI payments orchestrator. The list of account providers is cached by the
+  // person switch and refreshed from UPI on a periodic basis.
+  rpc ListAccountProviders(ListAccountProvidersRequest)
+      returns (ListAccountProvidersResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*}/accountProviders"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // List all payment service providers operating in the payments ecosystem.
+  // In UPI, this method returns the list of payment service providers as
+  // provided by the UPI payments orchestrator. The list of payment service
+  // providers is cached by the person switch and refreshed from UPI on a
+  // periodic basis.
+  rpc ListPaymentServiceProviders(ListPaymentServiceProvidersRequest)
+      returns (ListPaymentServiceProvidersResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=projects/*}/paymentServiceProviders"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+}
+
+// The
+// [ListAccountProviders][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.ListAccountProviders]
+// method's request.
+message ListAccountProvidersRequest {
+  // Required. The parent resource for all the account providers.
+  //
+  // Format:
+  // `projects/{project}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "acquirerswitch.googleapis.com/AccountProvider"
+    }
+  ];
+
+  // The maximum number of account providers to return. The service may return
+  // fewer than this value. If unspecified or if the specified value is less
+  // than 500, at most 500 account providers will be returned. The maximum
+  // value is also 500; values above 500 will be coerced to 500. While
+  // paginating, you can specify a new page size parameter for each page of
+  // account providers to be listed.
+  int32 page_size = 2;
+
+  // A page token, received from a previous `ListAccountProviders` call.
+  // Specify this parameter to retrieve the next page of account providers.
+  string page_token = 3;
+}
+
+// The
+// [ListAccountProviders][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.ListAccountProviders]
+// method's response.
+message ListAccountProvidersResponse {
+  // The list of account providers which clients of the person switch can use to
+  // onboard payment accounts.
+  repeated AccountProvider account_providers = 1;
+
+  // Pass this token in the `ListAccountProvidersRequest` to continue to list
+  // results. If all results have been returned, this field is an empty string
+  // or not present in the response.
+  string next_page_token = 2;
+}
+
+// The
+// [ListPaymentServiceProviders][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.ListPaymentServiceProviders]
+// method's request.
+message ListPaymentServiceProvidersRequest {
+  // Required. The parent resource for all the payment service providers.
+  //
+  // Format:
+  // `projects/{project}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "acquirerswitch.googleapis.com/PaymentServiceProvider"
+    }
+  ];
+
+  // The maximum number of payment service providers to return. The service may
+  // return fewer than this value. If unspecified or if the specified value is
+  // less than 500, at most 500 payment service providers will be returned.
+  // The maximum value is also 500; values above 500 will be coerced to 500.
+  // While paginating, you can specify a new page size parameter for each page
+  // of payment service providers to be listed.
+  int32 page_size = 2;
+
+  // A page token, received from a previous `ListPaymentServiceProviders` call.
+  // Specify this parameter to retrieve the next page of payment service
+  // providers.
+  string page_token = 3;
+}
+
+// The
+// [ListPaymentServiceProviders][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.ListPaymentServiceProviders]
+// method's response.
+message ListPaymentServiceProvidersResponse {
+  // The list of payment service  providers.
+  repeated PaymentServiceProvider payment_service_providers = 1;
+
+  // Pass this token in the `ListPaymentServiceProvidersRequest` to continue to
+  // list results. If all results have been returned, this field is an empty
+  // string or not present in the response.
+  string next_page_token = 2;
+}
+
+// Represents a UPI version that an account provider or payment service provider
+// supports.
+message UpiVersion {
+  // The version number.
+  string number = 1;
+
+  // A description of the version as provided by the payments orchestrator.
+  string description = 2;
+
+  // Flag indicating if the version is to be mandatorily supported or not.
+  bool mandatory = 3;
+}
+
+// Represents an account provider in the payments system. The provider supports
+// listing of accounts, registration of accounts into the payment system, and
+// payment operations on the account.
+message AccountProvider {
+  option (google.api.resource) = {
+    type: "acquirerswitch.googleapis.com/AccountProvider"
+    pattern: "projects/{project}/accountProviders/{account_provider}"
+  };
+
+  // Details of an account provider in the UPI system.
+  message UpiAccountProvider {
+    // Enumeration of possible registration formats supported by an account
+    // provider. Check the UPI specification for an explanation of each
+    // registration format.
+    enum RegistrationFormat {
+      // Registration format unspecified.
+      REGISTRATION_FORMAT_UNSPECIFIED = 0;
+
+      // Registration format FORMAT1 as defined by the payments orchestrator.
+      REGISTRATION_FORMAT_1 = 1;
+
+      // Registration format FORMAT2 as defined by the payments orchestrator.
+      REGISTRATION_FORMAT_2 = 2;
+
+      // Registration format FORMAT3 as defined by the payments orchestrator.
+      REGISTRATION_FORMAT_3 = 3;
+    }
+
+    // The Indian Financial System Code (IFSC) of the account provider.
+    string ifsc = 1;
+
+    // The Issuer Identification Number (IIN) of the account provider.
+    string iin = 2;
+
+    // The list of registration formats supported by the account provider.
+    repeated RegistrationFormat registration_formats = 3;
+
+    // The list of UPI versions supported by the account provider.
+    repeated UpiVersion versions = 4;
+  }
+
+  // Name of the account provider.
+  //
+  // Format:
+  // projects/{project}/accountProviders/{account_provider}
+  string name = 1;
+
+  // Display name of the account provider.
+  string display_name = 2;
+
+  // Flag indicating if the account provider is actively participating in the
+  // payments ecosystem or not.
+  bool active = 3;
+
+  // Details of the account provider which will vary based on the type of
+  // payments supported by the account provider.
+  oneof details {
+    // The UPI account provider details.
+    UpiAccountProvider upi_account_provider = 5;
+  }
+}
+
+// Represents a payment service provider in the payments system.
+message PaymentServiceProvider {
+  option (google.api.resource) = {
+    type: "acquirerswitch.googleapis.com/PaymentServiceProvider"
+    pattern: "projects/{project}/paymentServiceProviders/{payment_service_provider}"
+  };
+
+  // Details of a payment service provider in the UPI system.
+  message UpiPaymentServiceProvider {
+    // The list of handles supported by the payment service provider. This
+    // refers to the tokens after the `@` in a payment address.
+    repeated string handles = 1;
+
+    // The list of UPI versions supported by the payment service provider.
+    repeated UpiVersion versions = 2;
+  }
+
+  // Name of the payment service provider.
+  //
+  // Format:
+  // projects/{project}/clients/{client}/apps/{app}/paymentServiceProviders/{payment_service_provider}
+  string name = 1;
+
+  // Display name of the payment service provider.
+  string display_name = 2;
+
+  // Flag indicating if the payment service provider is actively participating
+  // in the payments ecosystem or not.
+  bool active = 3;
+
+  // Details of the payment service provider which will vary based on the type
+  // of payments supported by the payment service provider.
+  oneof details {
+    // The UPI payment service provider details.
+    UpiPaymentServiceProvider upi_payment_service_provider = 5;
+  }
+}

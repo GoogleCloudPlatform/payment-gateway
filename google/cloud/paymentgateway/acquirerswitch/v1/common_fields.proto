@@ -1,0 +1,517 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package google.cloud.paymentgateway.acquirerswitch.v1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/protobuf/timestamp.proto";
+import "google/type/date.proto";
+import "google/type/latlng.proto";
+import "google/type/phone_number.proto";
+
+option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "CommonFieldsProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
+option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
+option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
+
+// A set of identifiers that are associated with a profile. A profile is
+// primarily identified by the instance id. Any instance id not associated with
+// any active profile in the `person switch` will require the creation of a new
+// profile. The device id and the phone number can be updated in an already
+// existing profile.
+message ProfileIdSet {
+  // The instance ID.
+  string instance_id = 1;
+
+  // The device identifier.
+  string device_id = 2;
+
+  // The phone number of the device.
+  google.type.PhoneNumber phone_number = 3;
+}
+
+// A profile in the person switch that is associated with a set of profile
+// identifiers, and has a display name of the user/entity associated with the
+// profile.
+message Profile {
+  option (google.api.resource) = {
+    type: "acquirerswitch.googleapis.com/Profile"
+    pattern: "projects/{project}/clients/{client}/apps/{app}/profiles/{profile}"
+  };
+
+  // Enumeration of possible profile states.
+  enum State {
+    // State unspecified.
+    STATE_UNSPECIFIED = 0;
+
+    // Profile is active after validation with an outgoing SMS from the device.
+    ACTIVE = 1;
+
+    // The instance id provided in the profile identifiers does not match that
+    // of any active profiles in the person switch. is different. The
+    // [CreateProfile][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles.CreateProfile]
+    // method should be invoked create a new profile in the person switch,
+    // followed with an outgoing SMS to validate and complete the new profile's
+    // creation.
+    INSTANCE_ID_UNKNOWN = 3;
+
+    // The instance ID provided in the profile identifiers is the same as that
+    // of an existing profile. However, the phone number provided by the caller
+    // does not match the one associated with the matching profile. The phone
+    // number should be updated with an
+    // [UpdateProfile][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles.UpdateProfile]
+    // API call. This status is returned only if the caller provides a phone
+    // number as part of the profile identifiers.
+    PHONE_NUMBER_CHANGED = 4;
+
+    // The instance id and phone number (if specified) provided in the profile
+    // identifiers is the same as that in an existing profile, but the device id
+    // is different. The device id should be updated with an
+    // [UpdateProfile][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles.UpdateProfile]
+    // API call.
+    DEVICE_ID_CHANGED = 5;
+
+    // Profile creation is in progress. This would indicate that the SMS
+    // provider has not validated the profile yet.
+    CREATING = 6;
+
+    // Profile update is in progress. This would indicate tha the SMS provider
+    // has not validate the new phone number associated with a profile yet.
+    UPDATING = 7;
+
+    // The profile has been blocked from all operations. This means that all
+    // payment addresses and registered accounts associated with this profile
+    // are also blocked from any operation.
+    BLOCKED = 8;
+
+    // Profile is inactive. An active profile will be marked inactive when
+    // another profile with the same phone number gets activated. An inactive
+    // profile cannot be reactivated. It would require the creation of a new
+    // profile.
+    INACTIVE = 9;
+  }
+
+  // The name of the profile in the person switch.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}/profiles/{profile}`
+  string name = 1;
+
+  // The display name of the user/entity associated with the profile. The
+  // maximum length of this field is 99 characters.
+  string display_name = 2;
+
+  // State of the profile.
+  State state = 3;
+
+  // The profile identifiers.
+  ProfileIdSet id_set = 4;
+
+  // Output only. The payment addresses associated with the profile. This is
+  // returned only if the
+  // [state][google.cloud.paymentgateway.acquirerswitch.v1.Profile.state]
+  // is
+  // [ACTIVE][google.cloud.paymentgateway.acquirerswitch.v1.Profile.State.ACTIVE].
+  repeated PaymentAddress payment_addresses = 5
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. All details needed to send an outgoing SMS from the device
+  // during the profile creation process. This field will be specified only if
+  // the profile is being returned in the
+  // [CreateProfile][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles.CreateProfile]
+  // or
+  // [UpdateProfile][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles.UpdateProfile]
+  // response.
+  OutgoingSmsDetails outgoing_sms_details = 6
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// All details required for sending an outgoing SMS from the device. This is
+// required in the following scenarios:
+//
+// 1. Creation of a new profile with a new instance id and possibly a new device
+// ID.
+// 2. Associate a new phone number with an existing profile when neither the
+// device ID nor the instance ID of an existing profile has changed.
+//
+// The information provided should be used by callers to trigger an SMS
+// from the device.
+//
+// 1. `Token` - A unique string to be included in the SMS content.
+// 2. `Encryption key` - The key to use to encrypt the SMS content.
+// 3. `SMS destination` - The phone number to which the encrypted
+// SMS is to be sent.
+//
+// The device must create a pipe-separate string concatenating the
+// [token][google.cloud.paymentgateway.acquirerswitch.v1.OutgoingSmsDetails.token]
+// , the device id and the instance id. The
+// string should then be encrypted with
+// the[encryption_public_key][google.cloud.paymentgateway.acquirerswitch.v1.OutgoingSmsDetails.encryption_public_key],
+// base64 encoded and sent as an SMS to the
+// [sms_destination][google.cloud.paymentgateway.acquirerswitch.v1.OutgoingSmsDetails.sms_destination].
+message OutgoingSmsDetails {
+  // The token to be included in the outgoing SMS content.
+  string token = 3;
+
+  // The public key to use for encrypting the SMS content. This is the public
+  // key of an RSA 2048 bit key pair provided as an encoded string using the
+  // standard PEM encoding format.
+  string encryption_public_key = 4;
+
+  // The phone number to which an SMS containing the token and other details
+  // encrypted with the specified key is to be sent.
+  google.type.PhoneNumber sms_destination = 5;
+}
+
+// Details of a device which is the source of an API call to the person switch.
+message DeviceDetails {
+  // The geo-code of the device.
+  google.type.LatLng geo_code = 1;
+
+  // The coarse location of the device.
+  string location = 2;
+
+  // The device's IP address.
+  string ip_address = 3;
+
+  // The operating system on the device.
+  string operating_system = 4;
+
+  // The type of device.
+  string type = 5;
+
+  // The payment application on the device.
+  string payment_app = 6;
+
+  // The capability of the device.
+  string capability = 7;
+
+  // The device's telecom provider.
+  string telecom_provider = 8;
+}
+
+// A device that is the originator of all requests processed by the person
+// switch.
+message Device {
+  // The profile's identifiers.
+  ProfileIdSet profile_id_set = 1;
+
+  // Details about the device.
+  DeviceDetails device_details = 2;
+}
+
+// A set of ids to uniquely identify an account according to India's UPI
+// standards.
+message UpiAccountId {
+  // Required. IFSC of a bank's branch.
+  string ifsc = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Type of account. Examples include SAVINGS, CURRENT, etc.
+  string account_type = 2;
+
+  // Required. Unique number for an account in a bank and branch. This will be a
+  // masked account number with only the last 4 digits being visible.
+  string account_number = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Represents the id(s) of a payment account that can be used as a source
+// or destination of funds in payment transfers.
+message AccountId {
+  // Required. A unique identifier for the account.
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Additional details about the account for different channels.
+  oneof details {
+    // A reference to a bank account as per India's UPI standards.
+    UpiAccountId upi = 2;
+  }
+}
+
+// Represents an account that is associated with the phone number associated
+// with a payment address's profile. The account may or may not be registered
+// with the person switch.
+message Account {
+  // Enumeration of all channels for which an account could be provisioned.
+  enum Channel {
+    // Channel unspecified.
+    CHANNEL_UNSPECIFIED = 0;
+
+    // Indicates that the account is provisioned for mobile based UPI
+    // i.e. the MPIN has already been provisioned for this account.
+    UPI_MOBILE = 1;
+
+    // Indicates that the account is provisioned for Aadhaar based UPI.
+    UPI_AADHAAR = 2;
+  }
+
+  // Metadata about the credentials required by the account for payments.
+  message CredentialMetadata {
+    // Enumeration of credentials types
+    enum CredentialType {
+      // Credential type unspecified.
+      CREDENTIAL_TYPE_UNSPECIFIED = 0;
+
+      // Credential is numeric.
+      NUMERIC = 1;
+
+      // Credentials is alphanumeric.
+      ALPHANUMERIC = 2;
+    }
+
+    // Minimum length of the credentials. UPI's MPIN will have the same value
+    // for both min and max lengths.
+    int32 min_length = 1;
+
+    // Maximum length of the credentials. UPI's MPIN will have the same value
+    // for both min and max lengths.
+    int32 max_length = 2;
+
+    // The type of credential supported by the account. UPI's MPIN is always
+    // numeric.
+    CredentialType credential_type = 3;
+  }
+
+  // The account id associated with the payment address.
+  AccountId account_id = 1;
+
+  // A set of payment channels for which this account is already provisioned.
+  // This could include UPI, AEPS, IMPS, etc.
+  repeated Channel channels = 2;
+
+  // Metadata about the credential needed for payments using the account.
+  CredentialMetadata credential_metadata = 3;
+}
+
+// Represents a payment account registered in the person switch with a payment
+// address. A single payment address can have multiple payment accounts
+// registered with it. One of these registered payment accounts is marked as the
+// *primary* account.
+message RegisteredAccount {
+  option (google.api.resource) = {
+    type: "acquirerswitch.googleapis.com/RegisteredAccount"
+    pattern: "projects/{project}/clients/{client}/apps/{app}/paymentAddresses/{payment_address}/registeredAccounts/{registered_account}"
+  };
+
+  // Enumeration of states of a registered account.
+  enum State {
+    // State unspecified.
+    STATE_UNSPECIFIED = 0;
+
+    // Account registration has been initiated, but not completed successfully.
+    REGISTRATION_INITIATED = 1;
+
+    // Account registered successfully and active.
+    ACTIVE = 2;
+
+    // Account registration failed.
+    FAILED = 3;
+
+    // Registered account inactive.
+    INACTIVE = 4;
+  }
+
+  // Output only. The name of the payment address account.
+  // Format:
+  // projects/{project}/clients/{client}/apps/{app}/paymentAddresses/{payment_address}/registeredAccounts/{registered_account}
+  string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The payment account registered with the payment address.
+  Account account = 3;
+
+  // Output only. True, if the account is the primary account of the payment
+  // address. Only one account will be the primary account for a payment
+  // address.
+  bool primary = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // State of the registered account.
+  State state = 5;
+}
+
+// A payment address registered in the payment switch and associated with a
+// particular app and a particular device.
+message PaymentAddress {
+  option (google.api.resource) = {
+    type: "acquirerswitch.googleapis.com/PaymentAddress"
+    pattern: "projects/{project}/clients/{client}/apps/{app}/paymentAddresses/{payment_address}"
+  };
+
+  // The type of the address. In UPI, this could be the VPA, Aadhaar or the
+  // central mapper number.
+  enum AddressType {
+    // Address type unspecified.
+    ADDRESS_TYPE_UNSPECIFIED = 0;
+
+    // Address type is UPI's VPA.
+    UPI_VPA = 1;
+  }
+
+  // Enumeration of possible payment address states.
+  enum State {
+    // Payment address state unspecified.
+    STATE_UNSPECIFIED = 0;
+
+    // Payment address active.
+    ACTIVE = 1;
+
+    // Payment address inactive.
+    INACTIVE = 2;
+
+    // Payment address blocked.
+    BLOCKED = 3;
+  }
+
+  // The name of the payment address.
+  //
+  // Format:
+  // projects/{project}/clients/{client}/apps/{app}/paymentAddresses/{payment_address}
+  string name = 1;
+
+  // Immutable. The address. In UPI, this will be the VPA.
+  string address = 2 [(google.api.field_behavior) = IMMUTABLE];
+
+  // Immutable. The address type.
+  AddressType address_type = 3 [(google.api.field_behavior) = IMMUTABLE];
+
+  // The name of the profile associated with this payment address.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}/profiles/{profile}`
+  string profile = 4;
+
+  // Payment address state.
+  State state = 5;
+
+  // Output only. The list of accounts registered with the payment address. This
+  // field is populated only when the
+  // [GetPaymentAddress][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.GetPaymentAddress]
+  // method is called.
+  repeated RegisteredAccount registered_accounts = 6
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The primary registered account associated with the payment address. This is
+  // the account that will receive payment credits for this payment address.
+  // This value has to be the name of one of the registered accounts associated
+  // with the payment address. This field is required if the
+  // UpdatePaymentAddress is called with field mask primary_registered_account
+  string primary_registered_account = 7 [(google.api.resource_reference) = {
+    type: "acquirerswitch.googleapis.com/RegisteredAccount"
+  }];
+}
+
+// Represents a credential used in various UPI API flows.
+message UpiCredential {
+  // The index of the key used for encryption.
+  string key_index = 1;
+
+  // The encrypted value. This value is not decrypted or interpreted in any way
+  // by the person switch.
+  string value = 2;
+}
+
+// Represents details of a card. This could be a debit (ATM) card, credit card,
+// etc.
+message CardDetails {
+  // The card number. The format is a series of digits without any spaces or
+  // other special characters. The number of digits provided could vary.
+  string card_number = 1;
+
+  // The expiry date of the card. Typically, only the year and month are
+  // specified and the day field is 0.
+  google.type.Date expiry_date = 2;
+}
+
+// Represents an end-user credential used for authenticating a user in any
+// transaction.
+message Credential {
+  // The credential. The credential is interpreted based on where it is used.
+  // For example, in UPI, this will be the MPIN.
+  oneof credential {
+    // The credentials in UPI.
+    UpiCredential upi = 1;
+  }
+}
+
+// Common metadata about an entity.
+message Metadata {
+  // A unique id for the entity. In UPI, this value should adhere to the 35
+  // character transaction id standard documented in the UPI specification.
+  string id = 1;
+
+  // The time at which the caller initiates the API request.
+  google.protobuf.Timestamp initiation_time = 2;
+
+  // A note or description on the entity.
+  string note = 3;
+
+  // Channel specific metadata.
+  oneof metadata {
+    // UPI specific metadata.
+    UpiMetadata upi = 4;
+  }
+}
+
+// Common metadata about an entity that is specific to UPI API flows.
+message UpiMetadata {
+  // The initiation mode.
+  string initiation_mode = 1;
+
+  // The purpose code
+  string purpose_code = 2;
+
+  // A reference id.
+  string reference_id = 3;
+
+  // A reference URI.
+  string reference_uri = 4;
+
+  // Output only. The API transaction's type.
+  string type = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Output only. The API transaction's subtype.
+  string sub_type = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// Information about an error that occurred in an API request routed to a
+// payment orchestrator. Note that this message is not used for errors
+// originating from within the `person switch`.
+message Error {
+  // An error message.
+  string message = 1;
+
+  // Channel specific error.
+  oneof error {
+    // UPI specific error.
+    UpiError upi = 2;
+  }
+}
+
+// UPI specific error information.
+message UpiError {
+  // The UPI error code.
+  string code = 1;
+}
+
+// Common metadata about any long running operation returned by the `person
+// switch`.
+message OperationMetadata {
+  // Output only. The time at which the long running operation was created.
+  google.protobuf.Timestamp create_time = 1
+      [(google.api.field_behavior) = OUTPUT_ONLY];
+}
