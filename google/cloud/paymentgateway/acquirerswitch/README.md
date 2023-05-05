@@ -1,8 +1,0 @@
-# Google Cloud Acquirer Switch APIs
-
-
-UPI App developers can use Acquirer Switch proto files to generate the clients for invoking Acquirer switch APIs over gRPC/REST.
-
-## License
-
-Apache 2.0; see [`LICENSE`](/LICENSE) for details.

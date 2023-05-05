@@ -92,7 +92,7 @@ message SearchAccountsRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
     }
   ];
 

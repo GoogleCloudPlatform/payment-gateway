@@ -271,7 +271,7 @@ message ListRegisteredAccountsRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
     }
   ];
 
@@ -358,7 +358,7 @@ message InitiateAccountRegistrationRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
     }
   ];
 
@@ -429,7 +429,7 @@ message VerifyAccountRegistrationRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
     }
   ];
 
@@ -492,7 +492,7 @@ message InitiateResetCredentialsRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
     }
   ];
 
@@ -551,7 +551,7 @@ message VerifyResetCredentialsRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
     }
   ];
 
@@ -611,7 +611,7 @@ message DeregisterRegisteredAccountRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
     }
   ];
 
@@ -637,7 +637,7 @@ message QueryRegisteredAccountBalanceRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
     }
   ];
 
@@ -700,7 +700,7 @@ message CheckRegisteredAccountBalanceRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
     }
   ];
 
@@ -767,7 +767,7 @@ message ChangeRegisteredAccountCredentialsRequest {
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference) = {
-      type: "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
     }
   ];
 
