@@ -16,10 +16,10 @@ syntax = "proto3";
 
 package google.cloud.paymentgateway.issuerswitch.adapter.bank.v1;
 
-import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/bank/v1/account_types.proto";
-import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/bank/v1/customer_types.proto";
-import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/bank/v1/payment_settlement_types.proto";
-import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/bank/v1/resolution_types.proto";
+import "payment-gateway/upi-india/adapter/spec/issuer/bank/v1/account_types.proto";
+import "payment-gateway/upi-india/adapter/spec/issuer/bank/v1/customer_types.proto";
+import "payment-gateway/upi-india/adapter/spec/issuer/bank/v1/payment_settlement_types.proto";
+import "payment-gateway/upi-india/adapter/spec/issuer/bank/v1/resolution_types.proto";
 import "google/api/annotations.proto";
 
 option java_outer_classname = "IssuerBankAdapterServiceProto";

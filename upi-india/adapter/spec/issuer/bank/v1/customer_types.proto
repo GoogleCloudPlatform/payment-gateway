@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package google.cloud.paymentgateway.issuerswitch.adapter.bank.v1;
 
-import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/bank/v1/common_types.proto";
+import "payment_gateway/upi_india/adapter/spec/issuer/bank/v1/common_types.proto";
 import "google/api/field_behavior.proto";
 import "google/type/date.proto";
 
@@ -282,6 +282,16 @@ message InitiateRegistrationResponse {
     string validation_page_link = 1;
     // Any additional metadata about the response from the bank adapter.
     ResponseMetadata response_metadata = 2;
+    // Any metadata about the account being registered / reset which the bank
+    // adapter wishes to return to the issuer switch.
+    //
+    // If this field is non-empty, then the values provided in the metadata here
+    // will overwrite any existing metadata about the account already present in
+    // the issuer switch.
+    //
+    // If this field is empty, then any existing metadata associated with the
+    // account is left unaltered.
+    AccountReference.Metadata account_reference_metadata = 3;
   }
 
   // The response sent can be either a plain text response or encrypted in a
@@ -320,12 +330,12 @@ message InitiateRegistrationRequest {
     CardInfo card_info = 3;
     // Participant initiating the registration.
     Participant participant = 4 [(google.api.field_behavior) = REQUIRED];
-    // The type of registration indicating if the specified reference is being
-    // registered newly or being reset.
-    RegistrationType type = 5 [(google.api.field_behavior) = REQUIRED];
     // Metadata about the API invocation received by the issuer switch which
     // triggered this request to the bank adapter.
-    InvocationMetadata invocation_metadata = 6
+    InvocationMetadata invocation_metadata = 5
+        [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the registration / reset initiation.
+    RegistrationMetadata registration_metadata = 6
         [(google.api.field_behavior) = REQUIRED];
   }
 
@@ -378,12 +388,12 @@ message ValidateRegistrationRequest {
     string otp = 5 [(google.api.field_behavior) = REQUIRED];
     // Participant validating the registration.
     Participant participant = 6 [(google.api.field_behavior) = REQUIRED];
-    // The type of registration indicating if the specified reference is being
-    // registered newly or being reset.
-    RegistrationType type = 7 [(google.api.field_behavior) = REQUIRED];
     // Metadata about the API invocation received by the issuer switch which
     // triggered this request to the bank adapter.
-    InvocationMetadata invocation_metadata = 8
+    InvocationMetadata invocation_metadata = 7
+        [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the registration / reset validation.
+    RegistrationMetadata registration_metadata = 8
         [(google.api.field_behavior) = REQUIRED];
   }
 
@@ -512,4 +522,17 @@ enum RegistrationType {
   // An existing registration for a particular customer or account reference is
   // being reset with a new MPIN.
   REGISTRATION_TYPE_RESET = 2;
+}
+
+message RegistrationMetadata {
+  // The type of registration indicating if the call is for a new registration
+  // or for a credentials reset.
+  RegistrationType type = 1 [(google.api.field_behavior) = REQUIRED];
+  // A unique reference id for the registration operation. This id will be the
+  // same between two consecutive
+  // [InitiateRegistration][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.BankAdapterService.InitiateRegistration]
+  // and
+  // [ValidateRegistration][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.BankAdapterService.ValidateRegistration]
+  // calls for the same IFSC / account number combination.
+  string reference_id = 2 [(google.api.field_behavior) = REQUIRED];
 }

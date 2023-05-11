@@ -198,13 +198,11 @@ message AccountReference {
   //
   // Bank adapters return the value for this metadata in the response to the
   // [SearchAccounts][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.BankAdapterService.SearchAccounts]
+  // method or in the response to the
+  // [InitiateRegistration][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.BankAdapterService.InitiateRegistration]
   // method. The issuer switch will persist this information and include it in
   // all subsequent calls where operations are triggered on behalf of the user
   // owning the account.
-  //
-  // *Note* that this field will not be included in the account reference
-  // of the payee when the issuer switch is processing the
-  // `SettlePayment-CREDIT` into an account.
   Metadata metadata = 4;
 }
 

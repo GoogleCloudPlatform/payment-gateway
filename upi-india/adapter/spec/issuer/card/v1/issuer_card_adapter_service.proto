@@ -16,9 +16,9 @@ syntax = "proto3";
 
 package google.cloud.paymentgateway.issuerswitch.adapter.card.v1;
 
-import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/card/v1/account_types.proto";
-import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/card/v1/customer_types.proto";
-import "payment-gateway/upi-india/issuer-switch/adapter/spec/issuer/card/v1/payment_settlement_types.proto";
+import "payment-gateway/upi-india/adapter/spec/issuer/card/v1/account_types.proto";
+import "payment-gateway/upi-india/adapter/spec/issuer/card/v1/customer_types.proto";
+import "payment-gateway/upi-india/adapter/spec/issuer/card/v1/payment_settlement_types.proto";
 import "google/api/annotations.proto";
 
 option java_outer_classname = "IssuerCardAdapterServiceProto";
