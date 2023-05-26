@@ -46,31 +46,29 @@ message SettlePaymentRequest {
     // Retrieval Reference Number (RRN) for the transaction.
     string retrieval_reference_number = 6
         [(google.api.field_behavior) = REQUIRED];
-    // Free form string providing a description of the payment settlement.
-    string description = 7 [(google.api.field_behavior) = REQUIRED];
     // Specifies the amount held and the holding reference i.e. the bank's
     // reference for the funds held in the account which are being debited or
     // reversed in this request. A value will be specified for this field only
     // for `DEBIT` settlements which are initiated against funds held in the
     // account or `DEBIT_REVERSAL` settlements which are initiated against
     // deemed `DEBIT` settlements.
-    HoldDetails hold_details = 8;
+    HoldDetails hold_details = 7;
     // Timestamp of the current request.
-    google.protobuf.Timestamp request_time = 9
+    google.protobuf.Timestamp request_time = 8
         [(google.api.field_behavior) = REQUIRED];
     // Additional information about the payment settlement.
-    PaymentAdditionalInfo additional_info = 10;
+    PaymentAdditionalInfo additional_info = 9;
     // If this request's _settlement type_ is `DEBIT_REVERSAL` or
     // `CREDIT_REVERSAL`, then details of the original transaction that is being
     // reversed will be provided in this field.
-    OriginalTransaction original_transaction = 11;
+    OriginalTransaction original_transaction = 10;
     // If this request is being triggered as part of a complaint raised via
     // UPI's UDIR system, then details of the complaint will be available in
     // this field.
-    CaseDetails case_details = 12;
+    CaseDetails case_details = 11;
     // Metadata about the API invocation received by the issuer switch which
     // triggered this request to the bank adapter.
-    InvocationMetadata invocation_metadata = 13
+    InvocationMetadata invocation_metadata = 12
         [(google.api.field_behavior) = REQUIRED];
 
     // A payment rule as provided by the payments orchestrator.
@@ -91,7 +89,7 @@ message SettlePaymentRequest {
     }
     // A list of rules specified by the payments orchestrator for the payment
     // settlement.
-    repeated Rule rules = 14;
+    repeated Rule rules = 13;
 
     // Details of a foreign inward remittance. This will have a value only if
     // the current payment is a foreign inward remittance payment. The
@@ -100,7 +98,7 @@ message SettlePaymentRequest {
     // [additional_info][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SettlePaymentRequest.Payload.additional_info]
     // will be set to
     // [FOREIGN_INWARD_REMITTANCE][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.PaymentAdditionalInfo.InitiationMode.FOREIGN_INWARD_REMITTANCE].
-    ForeignInwardRemittance foreign_inward_remittance = 15;
+    ForeignInwardRemittance foreign_inward_remittance = 14;
   }
 
   // The request sent can be either a plain text request or encrypted in a
@@ -278,6 +276,11 @@ message OriginalTransaction {
   SettlementType settlement_type = 4;
   // Timestamp of the original transaction request.
   google.protobuf.Timestamp request_time = 5;
+  // Backend settlement id of the original transaction, if it was successfully
+  // processed. The issuer switch will pass the same value returned in the
+  // [backend_settlement_id][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.SettlePaymentInfo.backend_settlement_id]
+  // field of the original transaction's response from the bank adapter.
+  string backend_settlement_id = 6;
 }
 
 // Details of the foreign inward remittance being processed in the payment

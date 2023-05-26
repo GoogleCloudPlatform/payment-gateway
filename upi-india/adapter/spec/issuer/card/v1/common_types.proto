@@ -35,7 +35,7 @@ enum ErrorReason {
   // Unspecified error reason.
   ERROR_REASON_UNSPECIFIED = 0;
   // The account is associated with multiple customers.
-  ACCT_MULTIPLE_CUSTOMERS = 1;
+  CARD_ACCOUNT_MULTIPLE_CUSTOMERS = 1;
   // Card is blocked.
   CARD_BLOCKED = 2;
   // Card has expired.
@@ -66,11 +66,24 @@ enum ErrorReason {
   OTP_EXPIRED = 15;
   // Maximu number of requests allowed for an OTP has been exceeded.
   OTP_REQUESTS_EXCEEDED = 16;
+  // The requested operation could not be performed because of an error/bug in
+  // the Card Adapter service.
+  SERVICE_ERROR = 17;
+  // The requested operation could not be performed because the Card Adapter
+  // service or one or more of the bank's services timed out.
+  SERVICE_TIMEOUT = 18;
+  // The requested operation could not be performed because the Card Adapter
+  // service or one or more of the bank's services are unavailable.
+  SERVICE_UNAVAILABLE = 19;
   // The registered mobile number associated with the card has changed in the
   // bank's card management systems.
-  REGISTERED_MOBILE_NUMBER_CHANGED = 17;
-  // Unable to update card management system services.
-  UNABLE_TO_UPDATE_CARD_SERVICES = 18;
+  REGISTERED_MOBILE_NUMBER_CHANGED = 20;
+  // The requested operation could not be performed because the Card Adapter
+  // service could not encrypt the payload.
+  ENCRYPTION_FAILED = 21;
+  // The requested operation could not be performed because the Card Adapter
+  // service could not decrypt the payload.
+  DECRYPTION_FAILED = 22;
 }
 
 // The combination of a reference type and reference number that uniquely
@@ -96,23 +109,20 @@ message CustomerReference {
 
 // Provides information about a card account.
 message CardAccountInfo {
-  // The name on the card account.
-  string display_name = 1;
-
   // The bank identifier number (BIN) of the card account. This number should be
   // at least 6 digits long. Card adapter developers could choose to return
   // more digits based on their interfaces with backend systems.
-  string bank_identifier_number = 2 [(google.api.field_behavior) = REQUIRED];
+  string bank_identifier_number = 1 [(google.api.field_behavior) = REQUIRED];
 
   // The card's account reference number. Card adapter developers need to ensure
   // that a unique card account reference number is returned. This could map to
   // the card's AAN or similar number.
-  string account_reference_number = 3 [(google.api.field_behavior) = REQUIRED];
+  string account_reference_number = 2 [(google.api.field_behavior) = REQUIRED];
 
   // The card number's suffix digits. At least the last 2 digits of the card
   // number should be present. Card adapter developers could choose to return
   // more digits based on their interfaces with backend systems.
-  string card_number_suffix = 4 [(google.api.field_behavior) = REQUIRED];
+  string card_number_suffix = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Unique identification of an account according to India's UPI standards.
@@ -125,7 +135,7 @@ message AccountReference {
   string account_number = 3 [(google.api.field_behavior) = REQUIRED];
   // Details of the card account. This will be present only if the account_type
   // is `CREDIT`. This information is returned by the card adapter to the
-  // issuer switch in a prior call to the
+  // issuer switch in a call to the
   // [SearchAccounts][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.CardAdapterService.SearchAccounts]
   // method. The issuer switch will store this data and pass it back to the card
   // adapter service in all methods that include an account reference.

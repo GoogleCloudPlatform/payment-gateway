@@ -359,6 +359,10 @@ message MerchantAdditionalInfo {
     BANK = 1;
     // Onboarded by aggreagator.
     AGGREGATOR = 2;
+    // Onboarded by network.
+    NETWORK = 3;
+    // Onboarded by TPAP.
+    TPAP = 4;
   }
 
   // Indicates the type of ownership for the merchant.

@@ -53,9 +53,29 @@ message SearchAccountsRequest {
 message SearchAccountsResponse {
   // Payload for search accounts response.
   message Payload {
+    // Information about an account that matches the search criteria. Card
+    // specific account information along with any metadata about the account
+    // can be returned.
+    message AccountInfo {
+      // The name on the card account.
+      string display_name = 1;
+      // Card specific account information.
+      CardAccountInfo card_account_info = 2
+          [(google.api.field_behavior) = REQUIRED];
+      // The IFSC of the card account. If all card accounts have the same IFSC,
+      // then the card adapter can accept that default IFSC in its configuration
+      // and include the same static value in this field.
+      string ifsc = 3 [(google.api.field_behavior) = REQUIRED];
+      // Any metadata about the account. This field will be persisted by the
+      // issuer switch and included as
+      // [metadata][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.AccountReference.metadata]
+      // field in all subsequent calls to the card adapter which include the
+      // [AccountReference][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.AccountReference]
+      // message.
+      AccountReference.Metadata metadata = 4;
+    }
     // List of card accounts matching the search criteria.
-    repeated CardAccountInfo accounts = 1
-        [(google.api.field_behavior) = REQUIRED];
+    repeated AccountInfo accounts = 1 [(google.api.field_behavior) = REQUIRED];
     // Any additional metadata about the response from the card adapter.
     ResponseMetadata response_metadata = 2;
   }

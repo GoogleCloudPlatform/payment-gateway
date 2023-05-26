@@ -44,20 +44,18 @@ message SettlePaymentRequest {
     // Retrieval Reference Number (RRN) for the transaction.
     string retrieval_reference_number = 6
         [(google.api.field_behavior) = REQUIRED];
-    // Free form string providing a description of the payment settlement.
-    string description = 7 [(google.api.field_behavior) = REQUIRED];
     // Timestamp of the current request.
-    google.protobuf.Timestamp request_time = 9
+    google.protobuf.Timestamp request_time = 7
         [(google.api.field_behavior) = REQUIRED];
     // Additional information about the payment settlement.
-    PaymentAdditionalInfo additional_info = 10;
+    PaymentAdditionalInfo additional_info = 8;
     // If this request's _settlement type_ is `DEBIT_REVERSAL` or
     // `CREDIT_REVERSAL`, then details of the original transaction that is being
     // reversed will be provided in this field.
-    OriginalTransaction original_transaction = 11;
+    OriginalTransaction original_transaction = 9;
     // Metadata about the API invocation received by the issuer switch which
     // triggered this request to the card adapter.
-    InvocationMetadata invocation_metadata = 13
+    InvocationMetadata invocation_metadata = 10
         [(google.api.field_behavior) = REQUIRED];
 
     // A payment rule as provided by the payments orchestrator.
@@ -78,7 +76,7 @@ message SettlePaymentRequest {
     }
     // A list of rules specified by the payments orchestrator for the payment
     // settlement.
-    repeated Rule rules = 14;
+    repeated Rule rules = 11;
   }
 
   // The request sent can be either a plain text request or encrypted in a
@@ -156,6 +154,11 @@ message OriginalTransaction {
   SettlementType settlement_type = 4;
   // Timestamp of the original transaction request.
   google.protobuf.Timestamp request_time = 5;
+  // Backend settlement id of the original transaction, if it was successfully
+  // processed. The issuer switch will pass the same value returned in the
+  // [backend_settlement_id][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.SettlePaymentInfo.backend_settlement_id]
+  // field of the original transaction's response from the card adapter.
+  string backend_settlement_id = 6;
 }
 
 // Request to search for a payment settlement.
