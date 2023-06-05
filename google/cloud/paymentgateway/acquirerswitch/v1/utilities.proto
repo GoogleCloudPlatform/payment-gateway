@@ -19,33 +19,53 @@ package google.cloud.paymentgateway.acquirerswitch.v1;
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
+import "google/api/policy.proto";
 import "google/api/resource.proto";
+import "google/cloud/paymentgateway/acquirerswitch/v1/common_fields.proto";
+import "google/longrunning/operations.proto";
+import "google/type/date.proto";
 
 option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
-option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
-option java_multiple_files = true;
-option java_outer_classname = "UtilitiesProto";
-option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
 option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
 option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
+option java_outer_classname = "UtilitiesProto";
+option java_multiple_files = true;
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
+option use_java_stubby_library = true;
+option go_api_flag = "OPAQUE_V0";  // see http://go/go-api-flag.
 
 // This service provides utility functions for use by clients of the person
 // switch.
 service PersonSwitchUtilities {
-  option (google.api.default_host) = "acquirerswitch.googleapis.com";
-  option (google.api.oauth_scopes) =
-      "https://www.googleapis.com/auth/cloud-platform";
-
   // List all account providers that can be used with the person switch. In UPI,
   // this method returns the list of account providers as provided by the
   // UPI payments orchestrator. The list of account providers is cached by the
   // person switch and refreshed from UPI on a periodic basis.
   rpc ListAccountProviders(ListAccountProvidersRequest)
       returns (ListAccountProvidersResponse) {
+    option (google.api.method_signature) = "parent";
+    option (google.api.method_policy) = {
+      authorization: "AUTO_CLOUD_IAM"
+      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
+      request_policies {
+        selector: "parent"
+        resource_type: "RESOURCE, acquirerswitch.googleapis.com/RegisteredAccount"
+        resource_permission: "acquirerswitch.googleapis.com/accountProviders.list"
+        resource_access_type: "DATA_READ"
+        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
+      }
+      metadata {
+        key: "cloudaudit.googleapis.com/onboarding_ticket"
+        value: "b/260163677"
+      },
+      metadata {
+        key: "gin.googleprod.com/accessing_process_name"
+        value: "accountProviders-list"
+      }
+    };
     option (google.api.http) = {
       get: "/v1/{parent=projects/*}/accountProviders"
     };
-    option (google.api.method_signature) = "parent";
   }
 
   // List all payment service providers operating in the payments ecosystem.
@@ -55,10 +75,173 @@ service PersonSwitchUtilities {
   // periodic basis.
   rpc ListPaymentServiceProviders(ListPaymentServiceProvidersRequest)
       returns (ListPaymentServiceProvidersResponse) {
+    option (google.api.method_signature) = "parent";
+    option (google.api.method_policy) = {
+      authorization: "AUTO_CLOUD_IAM"
+      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
+      request_policies {
+        selector: "parent"
+        resource_type: "RESOURCE, acquirerswitch.googleapis.com/RegisteredAccount"
+        resource_permission: "acquirerswitch.googleapis.com/paymentServiceProviders.list"
+        resource_access_type: "DATA_READ"
+        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
+      }
+      metadata {
+        key: "cloudaudit.googleapis.com/onboarding_ticket"
+        value: "b/260163677"
+      },
+      metadata {
+        key: "gin.googleprod.com/accessing_process_name"
+        value: "paymentServiceProviders-list"
+      }
+    };
     option (google.api.http) = {
       get: "/v1/{parent=projects/*}/paymentServiceProviders"
     };
+  }
+
+  // Get all public keys of payment system operators. The
+  // keyset identifier in the request should be one of the following values:
+  //
+  // * `UPI`
+  // * `UPI_LITE`
+  //
+  // Examples:
+  //
+  // * `/v1/projects/examples-project-1/paymentOperatorKeysets/UPI`
+  // * `/v1/projects/examples-project-1/paymentOperatorKeysets/UPI_LITE`
+  //
+  // In UPI, this method returns the list of public keys as provided by the
+  // UPI payments operator. The list is cached by the person switch and
+  // refreshed from UPI on a periodic basis.
+  rpc GetPaymentOperatorsKeyset(GetPaymentOperatorsKeysetRequest)
+      returns (PaymentOperatorsKeyset) {
+    option (google.api.method_signature) = "name";
+    option (google.api.method_policy) = {
+      authorization: "AUTO_CLOUD_IAM"
+      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
+      request_policies {
+        selector: "name"
+        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentOperatorsKeyset"
+        resource_permission: "acquirerswitch.googleapis.com/paymentOperatorsKeysets.get"
+        resource_access_type: "DATA_READ"
+        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
+      }
+      metadata {
+        key: "cloudaudit.googleapis.com/onboarding_ticket"
+        value: "b/260163677"
+      },
+      metadata {
+        key: "gin.googleprod.com/accessing_process_name"
+        value: "payments-operator-key-sets-fetch"
+      }
+    };
+    option (google.api.http) = {
+      get: "/v1/{name=projects/*/paymentOperatorsKeysets/*}"
+    };
+  }
+
+  // Search, based on certain filter criteria, and return all key resources
+  // which match the given criteria.
+  //
+  // The following filter criteria are supported:
+  //
+  // * `key_code` - The code of the key to be searched. In UPI, this will be
+  // the payment service provider org ID of the key to be searched.
+  //
+  // The returned list of key resources will either be empty (if no
+  // key code value matches the filter criteria) or contain exactly one
+  // resource matching the specified filter criteria.
+  //
+  // **Note** - Use this method to search for payment service provider keys
+  // registered with the payments orchestrator.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [SearchPaymentServiceProviderKeysResponse][google.cloud.paymentgateway.acquirerswitch.v1.SearchPaymentServiceProviderKeysResponse]
+  // in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  rpc SearchPaymentServiceProviderKeys(SearchPaymentServiceProviderKeysRequest)
+      returns (SearchPaymentServiceProviderKeysResponse) {
     option (google.api.method_signature) = "parent";
+    option (google.api.method_policy) = {
+      authorization: "AUTO_CLOUD_IAM"
+      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
+      request_policies {
+        selector: "parent"
+        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentServiceProviderKey"
+        resource_permission: "acquirerswitch.googleapis.com/paymentServiceProviderKeys.search"
+        resource_access_type: "DATA_READ"
+        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
+      }
+      metadata {
+        key: "cloudaudit.googleapis.com/onboarding_ticket"
+        value: "b/260163677"
+      },
+      metadata {
+        key: "gin.googleprod.com/accessing_process_name"
+        value: "keys-Search"
+      }
+    };
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*}/paymentServiceProviderKeys:search"
+      body: "*"
+    };
+  }
+
+  // Fetch the token of a particular type from the payments orchestrator.
+  // This token is used by the client apps during registration with the
+  // common library.
+  //
+  // The method returns an [Operation][google.longrunning.Operation], with the
+  // response returned in an
+  // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event]. The event
+  // notification will contain a
+  // [FetchTokenResponse][google.cloud.paymentgateway.acquirerswitch.v1.FetchTokenResponse]
+  // in the
+  // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+  // field of the payload.
+  //
+  // Note: Although this is similar to *Get*" request, it is modelled as a
+  // custom method because the resource needs to be fetched from the payments
+  // orchestrator. It accepts a challenge which is PII and hence the method is
+  // modelled as a HTTP POST.
+  // (-- api-linter: core::0131::synonyms=disabled
+  //     aip.dev/not-precedent: We need to do this because we have to fetch the
+  //     resource from the payments orchestrator and hence need to return an
+  //     LRO. --)
+  rpc FetchToken(FetchTokenRequest) returns (google.longrunning.Operation) {
+    option (google.api.method_signature) = "parent,type,credential";
+    option (google.api.method_policy) = {
+      authorization: "AUTO_CLOUD_IAM"
+      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
+      request_policies {
+        selector: "parent"
+        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAppProvider"
+        resource_permission: "acquirerswitch.googleapis.com/paymentAppProviders.fetchToken"
+        resource_access_type: "DATA_READ"
+        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
+      }
+      metadata {
+        key: "cloudaudit.googleapis.com/onboarding_ticket"
+        value: "b/260163677"
+      },
+      metadata {
+        key: "gin.googleprod.com/accessing_process_name"
+        value: "token-fetch"
+      }
+    };
+    option (google.api.http) = {
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/tokens:fetch",
+      body: "*"
+    };
+    option (google.longrunning.operation_info) = {
+      response_type: "FetchTokenResponse"
+      metadata_type: "FetchTokenMetadata"
+    };
   }
 }
 
@@ -66,15 +249,14 @@ service PersonSwitchUtilities {
 // [ListAccountProviders][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.ListAccountProviders]
 // method's request.
 message ListAccountProvidersRequest {
-  // Required. The parent resource for all the account providers.
+  // The parent resource for all the account providers.
   //
   // Format:
   // `projects/{project}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {
-      child_type: "acquirerswitch.googleapis.com/AccountProvider"
-    }
+    (google.api.resource_reference).child_type =
+        "acquirerswitch.googleapis.com/AccountProvider"
   ];
 
   // The maximum number of account providers to return. The service may return
@@ -108,15 +290,14 @@ message ListAccountProvidersResponse {
 // [ListPaymentServiceProviders][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.ListPaymentServiceProviders]
 // method's request.
 message ListPaymentServiceProvidersRequest {
-  // Required. The parent resource for all the payment service providers.
+  // The parent resource for all the payment service providers.
   //
   // Format:
   // `projects/{project}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {
-      child_type: "acquirerswitch.googleapis.com/PaymentServiceProvider"
-    }
+    (google.api.resource_reference).child_type =
+        "acquirerswitch.googleapis.com/PaymentServiceProvider"
   ];
 
   // The maximum number of payment service providers to return. The service may
@@ -146,6 +327,143 @@ message ListPaymentServiceProvidersResponse {
   string next_page_token = 2;
 }
 
+// The
+// [GetPaymentOperatorsKeyset][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.GetPaymentOperatorsKeyset]
+// method's request.
+message GetPaymentOperatorsKeysetRequest {
+  // The name of the payment operators key set resource.
+  //
+  // Format:
+  // `projects/{project}/paymentOperatorsKeySets/{paymentOperatorKeySet}`
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type =
+        "acquirerswitch.googleapis.com/PaymentOperatorsKeyset"
+  ];
+}
+
+// The
+// [SearchPaymentServiceProviderKeys][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.SearchPaymentServiceProviderKeys]
+// method's request.
+message SearchPaymentServiceProviderKeysRequest {
+  // The parent of all keys in whose context the keys are to be searched.
+  //
+  // Format:
+  // `projects/{project}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).child_type =
+        "acquirerswitch.googleapis.com/Key"
+  ];
+
+  // Results are filtered based on the provided value.
+  oneof filter {
+    // The code of the key to be searched. In UPI, this will be the
+    // payment service provider org ID of the key to be searched.
+    string key_code = 2;
+  }
+
+  // The maximum number of keys to return. The service may return fewer than
+  // this value. If unspecified or if the specified value is less than 500,
+  // at most 500 keys will be returned. The maximum value is also 500;
+  // values above 500 will be coerced to 500.
+  // While paginating, you can specify a new page size parameter for each page
+  // of keys to be listed.
+  int32 page_size = 3;
+
+  // A page token, received from a previous
+  // `SearchPaymentServiceProviderKeysRequest` call. Specify this parameter to
+  // retrieve the next page of keys
+  string page_token = 4;
+}
+
+// The
+// [SearchPaymentServiceProviderKeys][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.SearchPaymentServiceProviderKeys]
+// method's response.
+message SearchPaymentServiceProviderKeysResponse {
+  // The payment service provider keys matching the specified filter criteria.
+  repeated PaymentServiceProviderKey keys = 1;
+
+  // A token that can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// The
+// [FetchToken][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.FetchToken]
+// method's request.
+message FetchTokenRequest {
+  // The app which is triggering the token fetch request.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type =
+        "acquirerswitch.googleapis.com/ThirdPartyAppProvider"
+  ];
+
+  // Enumeration of possible types of the tokens which can be fetched from the
+  // payments orchestrator.
+  enum TokenType {
+    // Type unspecified.
+    TYPE_UNSPECIFIED = 0;
+    // Represents `GetToken` type.
+    UPI_TOKEN = 1;
+    // Represents `GetLite` type.
+    UPI_LITE_TOKEN = 2;
+  }
+
+  // The type of the token to be fetched.
+  TokenType type = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // The credential to authenticate the end-user invoking the API.
+  TokenCredentials credential = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Metadata about the request.
+  Metadata metadata = 4;
+}
+
+// The
+// [FetchToken][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.FetchToken]
+// method's metadata.
+message FetchTokenMetadata {
+  // A unique id for the invocation of the method.
+  string invocation_id = 1;
+
+  // Common metadata about the long running operation.
+  OperationMetadata common_metadata = 2;
+}
+
+// The
+// [FetchToken][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.FetchToken]
+// method's response. This is returned in the
+// [response][google.longrunning.Operation.response] field of the
+// [Operation][google.longrunning.Operation] object returned in the
+// [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event] notification
+// payload.
+message FetchTokenResponse {
+  // The token provided by the payments orchestrator.
+  Token token = 1;
+}
+
+// Represents the list of public keys provided by the UPI payments operator.
+message PaymentOperatorsKeyset {
+  option (google.api.resource) = {
+    type: "acquirerswitch.googleapis.com/PaymentServiceOperatorsKeyset"
+    pattern: "projects/{project}/paymentServiceOperatorsKeysets/{payment_service_operators_keyset}"
+  };
+
+  // The name of the payment operators key set resource.
+  //
+  // Format:
+  // `projects/{project}/paymentOperatorKeySets/{paymentOperatorKeySet}`
+  string name = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The signed XML response as received from the payments operator.
+  string xml_payload = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
 // Represents a UPI version that an account provider or payment service provider
 // supports.
 message UpiVersion {
@@ -168,8 +486,27 @@ message AccountProvider {
     pattern: "projects/{project}/accountProviders/{account_provider}"
   };
 
+  // Name of the account provider.
+  //
+  // Format:
+  // projects/{project}/accountProviders/{account_provider}
+  string name = 1;
+
+  // Display name of the account provider.
+  string display_name = 2;
+
+  // Flag indicating if the account provider is actively participating in the
+  // payments ecosystem or not.
+  bool active = 3;
+
   // Details of an account provider in the UPI system.
   message UpiAccountProvider {
+    // The Indian Financial System Code (IFSC) of the account provider.
+    string ifsc = 1;
+
+    // The Issuer Identification Number (IIN) of the account provider.
+    string iin = 2;
+
     // Enumeration of possible registration formats supported by an account
     // provider. Check the UPI specification for an explanation of each
     // registration format.
@@ -187,31 +524,12 @@ message AccountProvider {
       REGISTRATION_FORMAT_3 = 3;
     }
 
-    // The Indian Financial System Code (IFSC) of the account provider.
-    string ifsc = 1;
-
-    // The Issuer Identification Number (IIN) of the account provider.
-    string iin = 2;
-
     // The list of registration formats supported by the account provider.
     repeated RegistrationFormat registration_formats = 3;
 
     // The list of UPI versions supported by the account provider.
     repeated UpiVersion versions = 4;
   }
-
-  // Name of the account provider.
-  //
-  // Format:
-  // projects/{project}/accountProviders/{account_provider}
-  string name = 1;
-
-  // Display name of the account provider.
-  string display_name = 2;
-
-  // Flag indicating if the account provider is actively participating in the
-  // payments ecosystem or not.
-  bool active = 3;
 
   // Details of the account provider which will vary based on the type of
   // payments supported by the account provider.
@@ -228,6 +546,19 @@ message PaymentServiceProvider {
     pattern: "projects/{project}/paymentServiceProviders/{payment_service_provider}"
   };
 
+  // Name of the payment service provider.
+  //
+  // Format:
+  // projects/{project}/paymentServiceProviders/{payment_service_provider}
+  string name = 1;
+
+  // Display name of the payment service provider.
+  string display_name = 2;
+
+  // Flag indicating if the payment service provider is actively participating
+  // in the payments ecosystem or not.
+  bool active = 3;
+
   // Details of a payment service provider in the UPI system.
   message UpiPaymentServiceProvider {
     // The list of handles supported by the payment service provider. This
@@ -238,23 +569,96 @@ message PaymentServiceProvider {
     repeated UpiVersion versions = 2;
   }
 
-  // Name of the payment service provider.
-  //
-  // Format:
-  // projects/{project}/clients/{client}/apps/{app}/paymentServiceProviders/{payment_service_provider}
-  string name = 1;
-
-  // Display name of the payment service provider.
-  string display_name = 2;
-
-  // Flag indicating if the payment service provider is actively participating
-  // in the payments ecosystem or not.
-  bool active = 3;
-
   // Details of the payment service provider which will vary based on the type
   // of payments supported by the payment service provider.
   oneof details {
     // The UPI payment service provider details.
     UpiPaymentServiceProvider upi_payment_service_provider = 5;
+  }
+}
+
+// Represents a key in the payments system.
+message PaymentServiceProviderKey {
+  option (google.api.resource) = {
+    type: "acquirerswitch.googleapis.com/PaymentServiceProviderKey"
+    pattern: "projects/{project}/paymentServiceProviderKeys/{payment_service_provider_key}"
+  };
+
+  // Name of the key.
+  //
+  // Format:
+  // projects/{project}/keys/{key}
+  string name = 1;
+
+  // Code of the account provider.
+  string code = 2;
+
+  // Type of the key.
+  string type = 3;
+
+  // Key index date.
+  google.type.Date index_date = 4;
+
+  // Base64 encoded certificate.
+  bytes value = 5;
+}
+
+// Represents a token in the payments system.
+message Token {
+  // Code of the account provider.
+  string code = 1;
+
+  // Type of the tken.
+  string type = 2;
+
+  // Token index date.
+  google.type.Date index_date = 3;
+
+  // Base64 encoded token.
+  bytes value = 4;
+}
+
+// UPI Credentials for fetching the token from the payments orchestrator.
+message UpiTokenCredentials {
+  // Enumeration of credentials types.
+  enum CredentialType {
+    // Credential type unspecified.
+    CREDENTIAL_TYPE_UNSPECIFIED = 0;
+    // Credential type is `challenge`.
+    CHALLENGE = 1;
+    // Credentials type is `device`.
+    DEVICE = 2;
+  }
+
+  // Type of the credentials.
+  CredentialType type = 1;
+
+  // Enumeration of credentials subtypes.
+  enum CredentialSubtype {
+    // Credential subtype unspecified.
+    CREDENTIAL_SUBTYPE_UNSPECIFIED = 0;
+    // Credential subtype is `initial`.
+    INITIAL = 1;
+    // Credentials subtype is `reset`.
+    RESET = 2;
+    // Credentials subtype is `rotate`.
+    ROTATE = 3;
+  }
+
+  // Subtype of the credentials.
+  CredentialSubtype subtype = 2;
+
+  // The common library generated challenge.
+  string challenge = 3;
+}
+
+// Credentials for fetching the token from the payments orchestrator.
+// This token is needed by the client apps while registering with the common
+// library.
+message TokenCredentials {
+  // The credentials.
+  oneof credentials {
+    // The token credentials needed in UPI.
+    UpiTokenCredentials upi = 1;
   }
 }
