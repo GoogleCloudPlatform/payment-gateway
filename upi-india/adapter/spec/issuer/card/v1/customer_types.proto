@@ -18,6 +18,7 @@ package google.cloud.paymentgateway.issuerswitch.adapter.card.v1;
 
 import "payment_gateway/upi_india/adapter/spec/issuer/card/v1/common_types.proto";
 import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
 
 option java_outer_classname = "CustomerTypesProto";
 option java_multiple_files = true;
@@ -203,4 +204,7 @@ message RegistrationMetadata {
   // [ValidateRegistration][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.CardAdapterService.ValidateRegistration]
   // calls for the same IFSC / account number combination.
   string reference_id = 2 [(google.api.field_behavior) = REQUIRED];
+  // The timestamp at which the registration was initiated by the issuer switch.
+  google.protobuf.Timestamp initiation_time = 3
+      [(google.api.field_behavior) = REQUIRED];
 }
