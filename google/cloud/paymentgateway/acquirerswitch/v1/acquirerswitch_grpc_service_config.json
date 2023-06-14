@@ -1,0 +1,39 @@
+{
+  "methodConfig": [
+    {
+      "name": [
+        {
+          "service": "google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchNotifications"
+        },
+        {
+          "service": "google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchAccounts"
+        },
+        {
+          "service": "google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses"
+        },
+        {
+          "service": "google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAppProviders"
+        },
+        {
+          "service": "google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments"
+        },
+        {
+          "service": "google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles"
+        },
+        {
+          "service": "google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts"
+        },
+        {
+          "service": "google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities"
+        }
+      ],
+      "timeout": "60s",
+      "retryPolicy": {
+        "initialBackoff": "1s",
+        "maxBackoff": "10s",
+        "backoffMultiplier": 1.3,
+        "retryableStatusCodes": ["UNAVAILABLE"]
+      }
+    }
+  ]
+}

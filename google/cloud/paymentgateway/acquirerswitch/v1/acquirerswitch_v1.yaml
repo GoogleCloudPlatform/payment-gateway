@@ -1,0 +1,82 @@
+type: google.api.Service
+config_version: 3
+name: acquirerswitch.googleapis.com
+title: Acquirer switch API
+
+apis:
+- name: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchAccounts
+- name: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchNotifications
+- name: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses
+- name: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAppProviders
+- name: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments
+- name: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles
+- name: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts
+- name: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities
+
+types:
+- name: google.cloud.paymentgateway.acquirerswitch.v1.ApprovePaymentMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.CheckPaymentMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.CheckRegisteredAccountBalanceMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.CheckRegisteredAccountBalanceResponse
+- name: google.cloud.paymentgateway.acquirerswitch.v1.CompleteValidationMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.CompleteValidationResponse
+- name: google.cloud.paymentgateway.acquirerswitch.v1.FetchTokenMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.FetchTokenResponse
+- name: google.cloud.paymentgateway.acquirerswitch.v1.InitiateAccountRegistrationMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.InitiateAccountRegistrationResponse
+- name: google.cloud.paymentgateway.acquirerswitch.v1.InitiateCollectMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.InitiatePayMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.InitiateResetCredentialsMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.InitiateResetCredentialsResponse
+- name: google.cloud.paymentgateway.acquirerswitch.v1.InitiateValidationMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.InitiateValidationResponse
+- name: google.cloud.paymentgateway.acquirerswitch.v1.QueryRegisteredAccountBalanceMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.QueryRegisteredAccountBalanceResponse
+- name: google.cloud.paymentgateway.acquirerswitch.v1.SearchAccountsMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.SearchAccountsResponse
+- name: google.cloud.paymentgateway.acquirerswitch.v1.SearchParticipantsMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.SearchParticipantsResponse
+- name: google.cloud.paymentgateway.acquirerswitch.v1.VerifyAccountRegistrationMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.VerifyAccountRegistrationResponse
+- name: google.cloud.paymentgateway.acquirerswitch.v1.VerifyResetCredentialsMetadata
+- name: google.cloud.paymentgateway.acquirerswitch.v1.VerifyResetCredentialsResponse
+
+authentication:
+  rules:
+  - selector: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchAccounts.SearchAccounts
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchNotifications.AcknowledgeEvents
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchNotifications.StreamEvents
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: 'google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAppProviders.ListPaymentAppProviders
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: 'google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPayments.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: 'google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: 'google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: 'google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+

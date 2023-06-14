@@ -19,7 +19,6 @@ package google.cloud.paymentgateway.acquirerswitch.v1;
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
-import "google/api/policy.proto";
 import "google/api/resource.proto";
 import "google/cloud/paymentgateway/acquirerswitch/v1/common_fields.proto";
 import "google/longrunning/operations.proto";
@@ -27,17 +26,20 @@ import "google/protobuf/empty.proto";
 import "google/type/money.proto";
 
 option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "RegisteredAccountsProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
 option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
 option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
-option java_outer_classname = "RegisteredAccountsProto";
-option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
-option use_java_stubby_library = true;
-option go_api_flag = "OPAQUE_V0";  // see http://go/go-api-flag.
 
 // This service provides methods for the management of payment accounts
 // registered with a payment address.
 service PersonSwitchRegisteredAccounts {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
   // List all accounts registered with the person switch.
   //
   // This method supports filtering of the results by the
@@ -55,38 +57,13 @@ service PersonSwitchRegisteredAccounts {
   // Note: Although this is a *list resources* method, it is modelled as a *HTTP
   // POST* in REST because the *profile's* information is included in the
   // request.
-  // (-- api-linter: core::0132::http-method=disabled
-  //     api-linter: core::0132::http-body=disabled
-  //     api-linter: core::0132::method-signature=disabled
-  //     aip.dev/not-precedent: We need to do this because the caller needs to
-  //     provide PII in the request including a device id, SIM id, etc and
-  //     hence, this has to be modelled as a HTTP POST. --)
   rpc ListRegisteredAccounts(ListRegisteredAccountsRequest)
       returns (ListRegisteredAccountsResponse) {
-    option (google.api.method_signature) = "parent,filter";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/RegisteredAccount"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.list"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-list"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:list",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:list"
       body: "*"
     };
+    option (google.api.method_signature) = "parent,filter";
   }
 
   // Create a registered account resource in the person switch associated with a
@@ -121,38 +98,14 @@ service PersonSwitchRegisteredAccounts {
   // be used to trigger payments to other parties until the MPIN provisioning
   // process is completed and the registered account's state changes to
   // `ACTIVE`.
-  // (-- api-linter: core::0133::method-signature=disabled
-  //  -- api-linter: core::0133::http-body=disabled
-  //     aip.dev/not-precedent: We need to do this because the create request
-  //     includes fields such as the profile id set which are not part of the
-  //     resource being created, but are needed for validations. --)
   rpc CreateRegisteredAccount(CreateRegisteredAccountRequest)
       returns (RegisteredAccount) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id,device";
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts"
       body: "*"
     };
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAppProvider"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.create"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-create"
-      }
-    };
+    option (google.api.method_signature) =
+        "parent,payment_address,account_id,device";
   }
 
   // Initiate the registration of an account with the person switch. In UPI, if
@@ -170,31 +123,12 @@ service PersonSwitchRegisteredAccounts {
   // field of the payload.
   rpc InitiateAccountRegistration(InitiateAccountRegistrationRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id,device";
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:initiateRegistration",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:initiateRegistration"
       body: "*"
     };
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAppProvider"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.create"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-create"
-      }
-    };
+    option (google.api.method_signature) =
+        "parent,payment_address,account_id,device";
     option (google.longrunning.operation_info) = {
       response_type: "InitiateAccountRegistrationResponse"
       metadata_type: "InitiateAccountRegistrationMetadata"
@@ -218,31 +152,12 @@ service PersonSwitchRegisteredAccounts {
   // field of the payload.
   rpc VerifyAccountRegistration(VerifyAccountRegistrationRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id,registration_credentials,device";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAppProvider"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.verify"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-verify"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:verifyRegistration",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:verifyRegistration"
       body: "*"
     };
+    option (google.api.method_signature) =
+        "parent,payment_address,registered_account_id,registration_credentials,device";
     option (google.longrunning.operation_info) = {
       response_type: "VerifyAccountRegistrationResponse"
       metadata_type: "VerifyAccountRegistrationMetadata"
@@ -263,31 +178,12 @@ service PersonSwitchRegisteredAccounts {
   // field of the payload.
   rpc InitiateResetCredentials(InitiateResetCredentialsRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id,device";
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:initiateResetCredentials",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:initiateResetCredentials"
       body: "*"
     };
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAppProvider"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.create"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-create"
-      }
-    };
+    option (google.api.method_signature) =
+        "parent,payment_address,registered_account_id,device";
     option (google.longrunning.operation_info) = {
       response_type: "InitiateResetCredentialsResponse"
       metadata_type: "InitiateResetCredentialsMetadata"
@@ -309,31 +205,12 @@ service PersonSwitchRegisteredAccounts {
   // field of the payload.
   rpc VerifyResetCredentials(VerifyResetCredentialsRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id,registration_credentials,device";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAppProvider"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.verify"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-verify"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:verifyResetCredentials",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:verifyResetCredentials"
       body: "*"
     };
+    option (google.api.method_signature) =
+        "parent,payment_address,registered_account_id,registration_credentials,device";
     option (google.longrunning.operation_info) = {
       response_type: "VerifyResetCredentialsResponse"
       metadata_type: "VerifyResetCredentialsMetadata"
@@ -368,31 +245,12 @@ service PersonSwitchRegisteredAccounts {
   // field of the payload.
   rpc InitiateValidation(InitiateValidationRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id,device";
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:initiateValidation",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:initiateValidation"
       body: "*"
     };
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAppProvider"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.create"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-create"
-      }
-    };
+    option (google.api.method_signature) =
+        "parent,payment_address,registered_account_id,device";
     option (google.longrunning.operation_info) = {
       response_type: "InitiateValidationResponse"
       metadata_type: "InitiateValidationMetadata"
@@ -421,31 +279,12 @@ service PersonSwitchRegisteredAccounts {
   // field of the payload.
   rpc CompleteValidation(CompleteValidationRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id,registration_credentials,device";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAppProvider"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.verify"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-verify"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:completeValidation",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:completeValidation"
       body: "*"
     };
+    option (google.api.method_signature) =
+        "parent,payment_address,registered_account_id,registration_credentials,device";
     option (google.longrunning.operation_info) = {
       response_type: "CompleteValidationResponse"
       metadata_type: "CompleteValidationMetadata"
@@ -456,31 +295,12 @@ service PersonSwitchRegisteredAccounts {
   // payment address.
   rpc DeregisterRegisteredAccount(DeregisterRegisteredAccountRequest)
       returns (google.protobuf.Empty) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/RegisteredAccount"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.delete"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-delete"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:deregister",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:deregister"
       body: "*"
     };
+    option (google.api.method_signature) =
+        "parent,payment_address,registered_account_id";
   }
 
   // Queries the balance in the specified registered account from the account's
@@ -496,31 +316,12 @@ service PersonSwitchRegisteredAccounts {
   // field of the payload.
   rpc QueryRegisteredAccountBalance(QueryRegisteredAccountBalanceRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id,credential";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/RegisteredAccount"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.queryBalance"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-queryBalance"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:queryBalance",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:queryBalance"
       body: "*"
     };
+    option (google.api.method_signature) =
+        "parent,payment_address,registered_account_id,credential";
     option (google.longrunning.operation_info) = {
       response_type: "QueryRegisteredAccountBalanceResponse"
       metadata_type: "QueryRegisteredAccountBalanceMetadata"
@@ -538,36 +339,14 @@ service PersonSwitchRegisteredAccounts {
   // in the
   // [response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
   // field of the payload.
-  // (-- api-linter: core::0136::http-uri-suffix=disabled
-  //     aip.dev/not-precedent: We need to do this because the API linter is not
-  //     correctly interpreting the URI. --)
   rpc CheckRegisteredAccountBalance(CheckRegisteredAccountBalanceRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id,device,credential,amount";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/RegisteredAccount"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.checkBalance"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-checkBalance"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:checkBalance",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:checkBalance"
       body: "*"
     };
+    option (google.api.method_signature) =
+        "parent,payment_address,registered_account_id,device,credential,amount";
     option (google.longrunning.operation_info) = {
       response_type: "CheckRegisteredAccountBalanceResponse"
       metadata_type: "CheckRegisteredAccountBalanceMetadata"
@@ -583,31 +362,12 @@ service PersonSwitchRegisteredAccounts {
   rpc ChangeRegisteredAccountCredentials(
       ChangeRegisteredAccountCredentialsRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) =
-        "parent,payment_address,registered_account_id,device,current_credential,new_credential";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/RegisteredAccount"
-        resource_permission: "acquirerswitch.googleapis.com/registeredAccounts.changeCredentials"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "registeredAccounts-changeCredentials"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:changeCredentials",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/registeredAccounts:changeCredentials"
       body: "*"
     };
+    option (google.api.method_signature) =
+        "parent,payment_address,registered_account_id,device,current_credential,new_credential";
     option (google.longrunning.operation_info) = {
       response_type: "ChangeRegisteredAccountCredentialsResponse"
       metadata_type: "ChangeRegisteredAccountCredentialsMetadata"
@@ -619,19 +379,21 @@ service PersonSwitchRegisteredAccounts {
 // [ListRegisteredAccounts][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.ListRegisteredAccounts]
 // method's request.
 message ListRegisteredAccountsRequest {
-  // The app which is triggering the initiation of an account registration.
+  // Required. The app which is triggering the initiation of an account
+  // registration.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address whose registered accounts are to be listed. Note that
-  // this is not the payment address resource name, but is the payment address
-  // itself.
+  // Required. The payment address whose registered accounts are to be listed.
+  // Note that this is not the payment address resource name, but is the payment
+  // address itself.
   string filter = 2 [(google.api.field_behavior) = REQUIRED];
 
   // The maximum number of accounts to return. The service may return fewer than
@@ -666,8 +428,10 @@ message UpiRegistrationCredentials {
   enum RegistrationType {
     // Registration type unspecified.
     REGISTRATION_TYPE_UNSPECIFIED = 0;
+
     // FORMAT1 registration type.
     FORMAT1 = 1;
+
     // FORMAT2 registration type.
     FORMAT2 = 2;
   }
@@ -701,26 +465,12 @@ message RegistrationCredentials {
 // The
 // [CreateRegisteredAccount][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.CreateRegisteredAccount]
 // method's request.
-// (-- api-linter: core::0133::request-resource-field=disabled
-//     aip.dev/not-precedent: We need to do this because this method requires
-//     additional fields which are not part of the resource, but are used for
-//     validations. --)
 message CreateRegisteredAccountRequest {
-  // The app which is triggering the creation of a registered account.
-  //
-  // Format:
-  // `projects/{project}/clients/{client}/apps/{app}`
-  string parent = 1 [
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
-  ];
-
   // Details about the payment address to be associated with the registered
   // account.
   message AssociatedPaymentAddress {
-    // The participant's payment address. Note that this is not the payment
-    // address resource name, but is the payment address itself.
+    // Required. The participant's payment address. Note that this is not the
+    // payment address resource name, but is the payment address itself.
     //
     // If no value is specified for this field, then the default payment address
     // (`phoneNumber@handle`) will be used as the payment address. The phone
@@ -737,10 +487,6 @@ message CreateRegisteredAccountRequest {
     // payment address resource will be created with the given address, will be
     // associated with the given profile id set, and then the registered account
     // being created will be associated with the specified payment address.
-    // (-- api-linter: core::0133::request-unknown-fields=disabled
-    //     aip.dev/not-precedent: We really need this field because the payment
-    //     address is needed for validation and association with a payment
-    //     address resource. --)
     string payment_address = 1 [(google.api.field_behavior) = REQUIRED];
 
     // The type of the address. This value can be specified if the payment
@@ -751,24 +497,25 @@ message CreateRegisteredAccountRequest {
     PaymentAddress.AddressType address_type = 2;
   }
 
+  // Required. The app which is triggering the creation of a registered account.
+  //
+  // Format:
+  // `projects/{project}/clients/{client}/apps/{app}`
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
+  ];
+
   // The payment address to be associated with the registered account resource
   // being created.
-  // (-- api-linter: core::0133::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because the payment
-  //     address is an input to create the registered account resource. --)
   AssociatedPaymentAddress payment_address = 2;
 
-  // The account id to be registered with the person switch.
-  // (-- api-linter: core::0133::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because the account id
-  //     is required to create the registered account resource. --)
+  // Required. The account id to be registered with the person switch.
   RegisteredAccountId account_id = 3 [(google.api.field_behavior) = REQUIRED];
 
-  // The device originating the request.
-  // (-- api-linter: core::0133::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because the profile
-  //     associated with the device needs to be validated before the resource is
-  //     created. --)
+  // Required. The device originating the request.
   Device device = 4 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -776,35 +523,37 @@ message CreateRegisteredAccountRequest {
 // [InitiateAccountRegistration][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.InitiateAccountRegistration]
 // method's request.
 message InitiateAccountRegistrationRequest {
-  // The app which is triggering the initiation of an account registration.
+  // Required. The app which is triggering the initiation of an account
+  // registration.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The participant's payment address. Note that this is not the payment
-  // address resource name, but is the payment address itself. The payment
-  // address must be associated with the profile identified by the id set
-  // specified in the request.
+  // Required. The participant's payment address. Note that this is not the
+  // payment address resource name, but is the payment address itself. The
+  // payment address must be associated with the profile identified by the id
+  // set specified in the request.
   //
   // This payment address must already be provisioned in the acquirer switch and
   // associated with the profile identified by the id set in the request.
   string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The account identifier for which account registration with the payments
-  // orchestrator and issuer bank is to be initiated. The registered account
-  // must already be provisioned in the acquirer switch and associated with the
-  // payment address specified in the request.
+  // Required. The account identifier for which account registration with the
+  // payments orchestrator and issuer bank is to be initiated. The registered
+  // account must already be provisioned in the acquirer switch and associated
+  // with the payment address specified in the request.
   RegisteredAccountId account_id = 3 [(google.api.field_behavior) = REQUIRED];
 
   // Metadata about the request.
   Metadata metadata = 4;
 
-  // The device originating the request.
+  // Required. The device originating the request.
   Device device = 5 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -842,37 +591,39 @@ message InitiateAccountRegistrationResponse {
 // [VerifyAccountRegistration][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.VerifyAccountRegistration]
 // method's request.
 message VerifyAccountRegistrationRequest {
-  // The app which is triggering the verification of an account registration.
+  // Required. The app which is triggering the verification of an account
+  // registration.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the account whose registration is being verified.
-  // Note that this is not the payment address resource name, but is the payment
-  // address itself.
+  // Required. The payment address of the account whose registration is being
+  // verified. Note that this is not the payment address resource name, but is
+  // the payment address itself.
   //
   // The payment address must be associated with the profile identified by the
   // id set specified in the request.
   string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The account whose registration is to be verified. The specified
+  // Required. The account whose registration is to be verified. The specified
   // registered account must be associated with the specified payment address.
   RegisteredAccountId registered_account_id = 3
       [(google.api.field_behavior) = REQUIRED];
 
-  // Credentials for validating the account owner.
+  // Required. Credentials for validating the account owner.
   RegistrationCredentials registration_credentials = 4
       [(google.api.field_behavior) = REQUIRED];
 
   // Metadata about the request.
   Metadata metadata = 5;
 
-  // The device originating the request.
+  // Required. The device originating the request.
   Device device = 6 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -906,33 +657,36 @@ message VerifyAccountRegistrationMetadata {
 // [InitiateResetCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.InitiateResetCredentials]
 // method's request.
 message InitiateResetCredentialsRequest {
-  // The app which is triggering the initiation of reset of credentials.
+  // Required. The app which is triggering the initiation of reset of
+  // credentials.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the account whose credentials are being reset. Note
-  // that this is not the payment address resource name, but is the payment
-  // address itself.
+  // Required. The payment address of the account whose credentials are being
+  // reset. Note that this is not the payment address resource name, but is the
+  // payment address itself.
   //
   // The payment address must be associated with the profile identified by the
   // id set specified in the request.
   string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The registered account id whose credentials are to be reset. The specified
-  // registered account must be associated with the specified payment address.
+  // Required. The registered account id whose credentials are to be reset. The
+  // specified registered account must be associated with the specified payment
+  // address.
   RegisteredAccountId registered_account_id = 3
       [(google.api.field_behavior) = REQUIRED];
 
   // Metadata about the request.
   Metadata metadata = 4;
 
-  // The device originating the request.
+  // Required. The device originating the request.
   Device device = 5 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -966,37 +720,40 @@ message InitiateResetCredentialsResponse {
 // [VerifyResetCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.VerifyResetCredentials]
 // method's request.
 message VerifyResetCredentialsRequest {
-  // The app which is triggering the verification of the reset of credentials.
+  // Required. The app which is triggering the verification of the reset of
+  // credentials.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the account whose credentials are being reset. Note
-  // that this is not the payment address resource name, but is the payment
-  // address itself.
+  // Required. The payment address of the account whose credentials are being
+  // reset. Note that this is not the payment address resource name, but is the
+  // payment address itself.
   //
   // The payment address must be associated with the profile identified by the
   // id set specified in the request.
   string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The account whose reset of credentials is to be verified. The specified
-  // registered account must be associated with the specified payment address.
+  // Required. The account whose reset of credentials is to be verified. The
+  // specified registered account must be associated with the specified payment
+  // address.
   RegisteredAccountId registered_account_id = 3
       [(google.api.field_behavior) = REQUIRED];
 
-  // Credentials for validating the account owner.
+  // Required. Credentials for validating the account owner.
   RegistrationCredentials registration_credentials = 4
       [(google.api.field_behavior) = REQUIRED];
 
   // Metadata about the request.
   Metadata metadata = 5;
 
-  // The device originating the request.
+  // Required. The device originating the request.
   Device device = 6 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -1027,35 +784,36 @@ message VerifyResetCredentialsMetadata {
 // [InitiateValidationRegistration][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.InitiateValidation]
 // method's request.
 message InitiateValidationRequest {
-  // The app which is triggering the initiation of an OTP.
+  // Required. The app which is triggering the initiation of an OTP.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the registered account for which an OTP request is
-  // to be initiated. Note that this is not the payment address resource name,
-  // but is the payment address itself.
+  // Required. The payment address of the registered account for which an OTP
+  // request is to be initiated. Note that this is not the payment address
+  // resource name, but is the payment address itself.
   //
   // The payment address must be associated with the profile id set specified in
   // the request.
   string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The registered account id for which an OTP request is to be initiated. This
-  // registered account, the payment address that it is associated with and the
-  // profile that the payment address is associated with must all be in the
-  // `ACTIVE` state.
+  // Required. The registered account id for which an OTP request is to be
+  // initiated. This registered account, the payment address that it is
+  // associated with and the profile that the payment address is associated with
+  // must all be in the `ACTIVE` state.
   RegisteredAccountId registered_account_id = 3
       [(google.api.field_behavior) = REQUIRED];
 
   // Metadata about the request.
   Metadata metadata = 4;
 
-  // The device originating the request.
+  // Required. The device originating the request.
   Device device = 5 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -1090,37 +848,40 @@ message InitiateValidationResponse {
 // [CompleteValidation][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.CompleteValidation]
 // method's request.
 message CompleteValidationRequest {
-  // The app which is triggering the completion of the validation process.
+  // Required. The app which is triggering the completion of the validation
+  // process.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the registered account whose validation process is
-  // being completed. Note that this is not the payment address resource name,
-  // but is the payment address itself.
+  // Required. The payment address of the registered account whose validation
+  // process is being completed. Note that this is not the payment address
+  // resource name, but is the payment address itself.
   //
   // The payment address must be associated with the profile identified by the
   // id set specified in the request.
   string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The registered account id whose validation process is being completed. The
-  // registered account must be associated with the specified payment address.
+  // Required. The registered account id whose validation process is being
+  // completed. The registered account must be associated with the specified
+  // payment address.
   RegisteredAccountId registered_account_id = 3
       [(google.api.field_behavior) = REQUIRED];
 
-  // Credentials for validating the account owner.
+  // Required. Credentials for validating the account owner.
   RegistrationCredentials registration_credentials = 4
       [(google.api.field_behavior) = REQUIRED];
 
   // Metadata about the request.
   Metadata metadata = 5;
 
-  // The device originating the request.
+  // Required. The device originating the request.
   Device device = 6 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -1151,22 +912,25 @@ message CompleteValidationMetadata {
 // [DeregisterRegisteredAccount][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.DeregisterRegisteredAccount]
 // methods's request.
 message DeregisterRegisteredAccountRequest {
-  // The app which is triggering the deletion of the registered account.
+  // Required. The app which is triggering the deletion of the registered
+  // account.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the account being deleted. Note that this is not the
-  // payment address resource name, but is the payment address itself.
+  // Required. The payment address of the account being deleted. Note that this
+  // is not the payment address resource name, but is the payment address
+  // itself.
   string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The account to be deleted. The specified registered account must be
-  // associated with a payment address that is associated with the profile id
+  // Required. The account to be deleted. The specified registered account must
+  // be associated with a payment address that is associated with the profile id
   // set specified in the request.
   RegisteredAccountId registered_account_id = 3
       [(google.api.field_behavior) = REQUIRED];
@@ -1176,29 +940,30 @@ message DeregisterRegisteredAccountRequest {
 // [QueryRegisteredAccountBalance][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.QueryRegisteredAccountBalance]
 // method's request.
 message QueryRegisteredAccountBalanceRequest {
-  // The app which is triggering the query of the account balance.
+  // Required. The app which is triggering the query of the account balance.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the account whose balance is to be queried. This
-  // payment address must be associated with the profile id set specified in the
-  // request. Note that this is not the payment address resource name, but is
-  // the payment address itself.
+  // Required. The payment address of the account whose balance is to be
+  // queried. This payment address must be associated with the profile id set
+  // specified in the request. Note that this is not the payment address
+  // resource name, but is the payment address itself.
   string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The account whose balance is to be queried. The specified registered
-  // account must be associated with the payment address specified in the
-  // request.
+  // Required. The account whose balance is to be queried. The specified
+  // registered account must be associated with the payment address specified in
+  // the request.
   RegisteredAccountId registered_account_id = 3
       [(google.api.field_behavior) = REQUIRED];
 
-  // The credential to authenticate the end-user invoking the API.
+  // Required. The credential to authenticate the end-user invoking the API.
   Credential credential = 4 [(google.api.field_behavior) = REQUIRED];
 
   // The device originating the request.
@@ -1227,47 +992,51 @@ message QueryRegisteredAccountBalanceMetadata {
 // [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event] notification
 // payload.
 message QueryRegisteredAccountBalanceResponse {
-  // The available balance amount in the account.
+  // The current (ledger) balance amount in the account.
   google.type.Money balance = 1;
+
+  // The available balance amount in the account.
+  google.type.Money available_balance = 2;
 
   // Details about the balance query error received from the payments
   // orchestrator.
-  Error error = 2;
+  Error error = 3;
 }
 
 // The
 // [CheckRegisteredAccountBalance][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.CheckRegisteredAccountBalance]
 // method's request.
 message CheckRegisteredAccountBalanceRequest {
-  // The app which is triggering the account balance check.
+  // Required. The app which is triggering the account balance check.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the account whose balance is to be checked. This
-  // payment address must be associated with the profile id set specified in the
-  // request. Note that this is not the payment address resource name, but is
-  // the payment address itself.
+  // Required. The payment address of the account whose balance is to be
+  // checked. This payment address must be associated with the profile id set
+  // specified in the request. Note that this is not the payment address
+  // resource name, but is the payment address itself.
   string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The account whose balance is to be checked. The specified registered
-  // account must be associated with the payment address specified in the
-  // request.
+  // Required. The account whose balance is to be checked. The specified
+  // registered account must be associated with the payment address specified in
+  // the request.
   RegisteredAccountId registered_account_id = 3
       [(google.api.field_behavior) = REQUIRED];
 
-  // The device originating the request.
+  // Required. The device originating the request.
   Device device = 4 [(google.api.field_behavior) = REQUIRED];
 
-  // The credential to authenticate the end-user invoking the API.
+  // Required. The credential to authenticate the end-user invoking the API.
   Credential credential = 5 [(google.api.field_behavior) = REQUIRED];
 
-  // The amount to be checked.
+  // Required. The amount to be checked.
   google.type.Money amount = 6 [(google.api.field_behavior) = REQUIRED];
 
   // Metadata about the request.
@@ -1306,63 +1075,41 @@ message CheckRegisteredAccountBalanceResponse {
 // [ChangeRegisteredAccountCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.ChangeRegisteredAccountCredentials]
 // method's request.
 message ChangeRegisteredAccountCredentialsRequest {
-  // The app which is triggering the account balance check.
+  // Required. The app which is triggering the account balance check.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the account whose credentials are to be changed.
-  // This payment address must be associated with the profile id set specified
-  // in the request. Note that this is not the payment address resource name,
-  // but is the payment address itself.
+  // Required. The payment address of the account whose credentials are to be
+  // changed. This payment address must be associated with the profile id set
+  // specified in the request. Note that this is not the payment address
+  // resource name, but is the payment address itself.
   string payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The account whose credentials are to be changed. The specified registered
-  // account must be associated with the payment address specified in the
-  // request.
+  // Required. The account whose credentials are to be changed. The specified
+  // registered account must be associated with the payment address specified in
+  // the request.
   RegisteredAccountId registered_account_id = 3
       [(google.api.field_behavior) = REQUIRED];
 
-  // The device originating the request.
+  // Required. The device originating the request.
   Device device = 4 [(google.api.field_behavior) = REQUIRED];
 
-  // The current credential associated with the registered account. In UPI, this
-  // will be the MPIN associated with the registered account.
+  // Required. The current credential associated with the registered account. In
+  // UPI, this will be the MPIN associated with the registered account.
   Credential current_credential = 5 [(google.api.field_behavior) = REQUIRED];
 
-  // The new credential to be set on the registered account. In UPI, this
-  // will be the new MPIN to be set on the registered account.
+  // Required. The new credential to be set on the registered account. In UPI,
+  // this will be the new MPIN to be set on the registered account.
   Credential new_credential = 6 [(google.api.field_behavior) = REQUIRED];
 
   // Metadata about the request.
   Metadata metadata = 7;
 }
 
-// The
-// [ChangeRegisteredAccountCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.ChangeRegisteredAccountCredentials]
-// method's metadata.
-message ChangeRegisteredAccountCredentialsMetadata {
-  // A unique id for the invocation of the method.
-  string invocation_id = 1;
-
-  // Common metadata about the long running operation.
-  OperationMetadata common_metadata = 2;
-}
-
-// The
-// [ChangeRegisteredAccountCredentials][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchRegisteredAccounts.ChangeRegisteredAccountCredentials]
-// method's response. This is returned in the
-// [response][google.longrunning.Operation.response] field of the
-// [Operation][google.longrunning.Operation] object returned in the
-// [Event][google.cloud.paymentgateway.acquirerswitch.v1.Event] notification
-// payload.
-message ChangeRegisteredAccountCredentialsResponse {
-  // Details about the change registered account credentials error received
-  // from the payments orchestrator.
-  Error error = 1;
-}

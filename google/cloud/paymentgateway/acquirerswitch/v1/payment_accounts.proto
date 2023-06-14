@@ -19,24 +19,26 @@ package google.cloud.paymentgateway.acquirerswitch.v1;
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
-import "google/api/policy.proto";
 import "google/api/resource.proto";
 import "google/cloud/paymentgateway/acquirerswitch/v1/common_fields.proto";
 import "google/longrunning/operations.proto";
 
 option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "PaymentAccountsProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
 option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
 option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
-option java_outer_classname = "PaymentAccountsProto";
-option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
-option use_java_stubby_library = true;
-option go_api_flag = "OPAQUE_V0";  // see http://go/go-api-flag.
 
 // This service provides methods for the management of payment accounts. Payment
 // accounts can either be those already registered with the person switch for a
 // particular payment address, or still unregistered accounts.
 service PersonSwitchAccounts {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
   // Search and return all accounts associated with an identifier (such as a
   // mobile number) in a particular payment provider. This method will search
   // and fetch the list of accounts from an account provider including those
@@ -49,12 +51,22 @@ service PersonSwitchAccounts {
   // * `account_provider` - The name of the account provider resource from which
   // the accounts associated with the payment address's profile are to be
   // searched. The account provider resource's name can be obtained by a call to
-  // the `ListAccountProviders` API. This is a mandatory filter criteria.
+  // the
+  // [ListAccountProviders][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.ListAccountProviders]
+  // API.
+  // * `iin` - The _issuer identifier number (IIN)_ of the account provider from
+  // which the accounts associated with the payment address's profile are to be
+  // searched. The `IIN` can be obtained by a call to the
+  // [ListAccountProviders][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchUtilities.ListAccountProviders]
+  // API.
   //
-  // The filter is a name-value pair separated by an `=` sign. Examples include:
+  // The filter is a name-value pair separated by an `=` sign. Exactly one
+  // name-value pair must be specified as the filter in the request. Examples
+  // include:
   //
   // * account_provider=projects/project1/clients/123/apps/234/accountProviders/GOOG
   // * account_provider=projects/project1/clients/123/apps/234/accountProviders/BANK
+  // * iin=1234
   //
   // The method returns an [Operation][google.longrunning.Operation], with the
   // response returned in an
@@ -66,30 +78,11 @@ service PersonSwitchAccounts {
   // field of the payload.
   rpc SearchAccounts(SearchAccountsRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) = "parent";
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/accounts:search",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/accounts:search"
       body: "*"
     };
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAddress"
-        resource_permission: "acquirerswitch.googleapis.com/paymentAddresses.paymentAccountsSearch"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "paymentAddresses-paymentAccountsSearch"
-      }
-    };
+    option (google.api.method_signature) = "parent";
     option (google.longrunning.operation_info) = {
       response_type: "SearchAccountsResponse"
       metadata_type: "SearchAccountsMetadata"
@@ -101,40 +94,42 @@ service PersonSwitchAccounts {
 // [SearchAccounts][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchAccounts.SearchAccounts]
 // method's request.
 message SearchAccountsRequest {
-  // The parent resource for listing all accounts in an account provider.
+  // Required. The parent resource for listing all accounts in an account
+  // provider.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the initiator of this request. This payment address
-  // has to be associated with the profile identifiers specified in the `device`
-  // field.
+  // Optional. The payment address of the initiator of this request. This
+  // payment address has to be associated with the profile identifiers specified
+  // in the `device` field.
   //
   // If this value is not specified, then the person switch will use a default
   // payment address to search for accounts.
   string initiator_payment_address = 2 [(google.api.field_behavior) = OPTIONAL];
 
-  // Results are filtered based on the provided value.
+  // Required. Results are filtered based on the provided value.
   string filter = 3 [(google.api.field_behavior) = REQUIRED];
 
-  // Metadata about the request.
+  // Optional. Metadata about the request.
   Metadata metadata = 4 [(google.api.field_behavior) = OPTIONAL];
 
-  // The device originating the request.
+  // Required. The device originating the request.
   Device device = 5 [(google.api.field_behavior) = REQUIRED];
 
-  // The maximum number of accounts to return. The service may return fewer than
-  // this value. If unspecified or if the value is less than 50, then at most 50
-  // accounts will be returned. The maximum value is 1000; values above 1000
-  // will be coerced to 1000.
+  // Optional. The maximum number of accounts to return. The service may return
+  // fewer than this value. If unspecified or if the value is less than 50, then
+  // at most 50 accounts will be returned. The maximum value is 1000; values
+  // above 1000 will be coerced to 1000.
   int32 page_size = 6 [(google.api.field_behavior) = OPTIONAL];
 
-  // A page token, received from a previous `SearchAccounts` call.
+  // Optional. A page token, received from a previous `SearchAccounts` call.
   // Provide this to retrieve the subsequent page.
   //
   // When paginating, all other parameters provided to `SearchAccounts` must
@@ -171,3 +166,4 @@ message SearchAccountsResponse {
   // orchestrator.
   Error error = 3;
 }
+

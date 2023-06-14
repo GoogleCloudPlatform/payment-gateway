@@ -19,48 +19,31 @@ package google.cloud.paymentgateway.acquirerswitch.v1;
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
-import "google/api/policy.proto";
 import "google/api/resource.proto";
 
 option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "PaymentAppProvidersProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
 option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
 option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
-option java_outer_classname = "PaymentAppProvidersProto";
-option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
-option use_java_stubby_library = true;
-option go_api_flag = "OPAQUE_V0";  // see http://go/go-api-flag.
 
 // This service provides methods for the management of payment application
 // providers that are clients of the person switch.
 service PersonSwitchPaymentAppProviders {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
   // List all the payment application providers that are clients of the
   // person switch.
   rpc ListPaymentAppProviders(ListPaymentAppProvidersRequest)
       returns (ListPaymentAppProvidersResponse) {
-    option (google.api.method_signature) = "parent";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/RegisteredAccount"
-        resource_permission: "acquirerswitch.googleapis.com/paymentAppProviders.list"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "paymentAppProviders-list"
-      }
-    };
     option (google.api.http) = {
-      get: "/v1/{parent=projects/*}/paymentAppProviders",
+      get: "/v1/{parent=projects/*}/paymentAppProviders"
     };
+    option (google.api.method_signature) = "parent";
   }
 }
 
@@ -68,7 +51,7 @@ service PersonSwitchPaymentAppProviders {
 // [ListPaymentAppProviders][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAppProviders.ListPaymentAppProviders]
 // method's request.
 message ListPaymentAppProvidersRequest {
-  // The parent resource for all payment application providers.
+  // Required. The parent resource for all payment application providers.
   //
   // Format:
   // `projects/{project}`
@@ -126,8 +109,6 @@ message PaymentAppProvider {
 
   // Details of the payment application specific to a particular payment
   // channel.
-  // (-- Using a oneof here to allow for support of different payment channels
-  // in the future. --)
   oneof payment_channel_details {
     // Provides details of the payment application provider in the UPI
     // ecosystem.
@@ -143,8 +124,6 @@ message UpiPaymentAppProvider {
   string org_id = 1;
 
   // The handle used for payment addresses (VPA).
-  // (-- The format can be referenced in the UPI API specification here -
-  // https://drive.google.com/open?id=1zu8hSMnCz0TK8BbRFh3gFyNiQuGXmMpK&authuser=0&usp=drive_link
-  // --)
   string payment_address_handle = 2;
 }
+

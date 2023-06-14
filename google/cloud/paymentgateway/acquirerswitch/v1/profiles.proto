@@ -19,23 +19,25 @@ package google.cloud.paymentgateway.acquirerswitch.v1;
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
-import "google/api/policy.proto";
 import "google/api/resource.proto";
 import "google/cloud/paymentgateway/acquirerswitch/v1/common_fields.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "ProfilesProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
 option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
 option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
-option java_outer_classname = "ProfilesProto";
-option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
-option use_java_stubby_library = true;
-option go_api_flag = "OPAQUE_V0";  // see http://go/go-api-flag.
 
 // This service provides methods for the creation and validation of profiles.
 service PersonSwitchProfiles {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
   // Creates a profile with the specified set of profile identifiers. This
   // method will return an error if an active profile with specified instance
   // ID exists in the person switch.
@@ -64,57 +66,19 @@ service PersonSwitchProfiles {
   // field populated. Callers must follow the outgoing SMS flows to verify the
   // profile. Post verification, the profile's state will be set to `ACTIVE`.
   rpc CreateProfile(CreateProfileRequest) returns (Profile) {
-    option (google.api.method_signature) = "parent,profile";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/Profile"
-        resource_permission: "acquirerswitch.googleapis.com/profiles.create"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "profiles-create"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/profiles",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/profiles"
       body: "profile"
     };
+    option (google.api.method_signature) = "parent,profile";
   }
 
   // Get the profile with the given name.
   rpc GetProfile(GetProfileRequest) returns (Profile) {
-    option (google.api.method_signature) = "name";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "name"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/Profile"
-        resource_permission: "acquirerswitch.googleapis.com/profiles.get"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "profiles-get"
-      }
-    };
     option (google.api.http) = {
       get: "/v1/{name=projects/*/clients/*/apps/*/profiles/*}"
     };
+    option (google.api.method_signature) = "name";
   }
 
   // Check the profile with the given identifiers.
@@ -139,30 +103,11 @@ service PersonSwitchProfiles {
   //         2. [ErrorInfo.domain][google.rpc.ErrorInfo.domain] - This will be
   //         set to `acquirerswitch.googleapis.com`.
   rpc CheckProfile(CheckProfileRequest) returns (Profile) {
-    option (google.api.method_signature) = "parent";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/Profile"
-        resource_permission: "acquirerswitch.googleapis.com/profiles.check"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "profiles-check"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/profiles:check",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/profiles:check"
       body: "*"
     };
+    option (google.api.method_signature) = "parent";
   }
 
   // Reclaim any payment addresses for a profile. This method can only be
@@ -179,27 +124,8 @@ service PersonSwitchProfiles {
   // then no payment addresses will be reclaimed.
   rpc ReclaimPaymentAddresses(ReclaimPaymentAddressesRequest)
       returns (Profile) {
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "profile"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/Profile"
-        resource_permission: "acquirerswitch.googleapis.com/profiles.reclaimPaymentAddresses"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "profiles-reclaimPaymentAddresses"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{profile=projects/*/clients/*/apps/*/profiles/*}:reclaimPaymentAddresses",
+      post: "/v1/{profile=projects/*/clients/*/apps/*/profiles/*}:reclaimPaymentAddresses"
       body: "*"
     };
   }
@@ -234,7 +160,8 @@ service PersonSwitchProfiles {
   // 3. Both id_set.phone_number and id_set.device_id can also be updated as
   // part of the same Update operation by providing both the paths in the
   // update_mask. The changes triggered by this will be a combination of steps
-  // #1 and #2 mentioned above.
+  // # 1 and #2 mentioned above.
+  //
   // 4. The [state][google.cloud.paymentgateway.acquirerswitch.v1.Profile.state]
   // can be updated only if the current state of the profile is either `ACTIVE`,
   // or `BLOCKED`. An `ACTIVE` profile can be made `BLOCKED`, or vice versa.
@@ -243,30 +170,11 @@ service PersonSwitchProfiles {
   // [display_name][google.cloud.paymentgateway.acquirerswitch.v1.Profile.display_name]
   // of the profile can be updated to any non-nil value.
   rpc UpdateProfile(UpdateProfileRequest) returns (Profile) {
-    option (google.api.method_signature) = "profile,update_mask";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "profile.name"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/Profile"
-        resource_permission: "acquirerswitch.googleapis.com/profiles.update"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "profiles-update"
-      }
-    };
     option (google.api.http) = {
-      patch: "/v1/{profile.name=projects/*/clients/*/apps/*/profiles/*}",
+      patch: "/v1/{profile.name=projects/*/clients/*/apps/*/profiles/*}"
       body: "profile"
     };
+    option (google.api.method_signature) = "profile,update_mask";
   }
 
   // Verify a profile by providing the content of the encrypted SMS content
@@ -276,30 +184,11 @@ service PersonSwitchProfiles {
   // This API is specifically meant for being called by SMS providers and not by
   // app services.
   rpc VerifyProfile(VerifyProfileRequest) returns (VerifyProfileResponse) {
-    option (google.api.method_signature) = "parent";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/Profile"
-        resource_permission: "acquirerswitch.googleapis.com/profiles.verify"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "profiles-verify"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*}/profiles:verify",
+      post: "/v1/{parent=projects/*}/profiles:verify"
       body: "*"
     };
+    option (google.api.method_signature) = "parent";
   }
 }
 
@@ -307,16 +196,17 @@ service PersonSwitchProfiles {
 // [CreateProfile][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles.CreateProfile]
 // method's request.
 message CreateProfileRequest {
-  // The parent resource for profiles.
+  // Required. The parent resource for profiles.
   //
   // Format: `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The profile to be created. The
+  // Required. The profile to be created. The
   // [display_name][google.cloud.paymentgateway.acquirerswitch.v1.Profile.display_name]
   // and
   // [profile_id_set][google.cloud.paymentgateway.acquirerswitch.v1.Profile.id_set]
@@ -328,9 +218,6 @@ message CreateProfileRequest {
   // person switch after the outgoing SMS has been triggered from the device.
   // The content of the SMS that the SMS provider will use in the
   // `VerifyProfile` call must be specified in this field.
-  // (-- api-linter: core::0133::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because clients have
-  //     to provide the profile identifiers to create a payment address. --)
   string sms_content = 3;
 }
 
@@ -338,13 +225,14 @@ message CreateProfileRequest {
 // [GetProfile][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles.GetProfile]
 // method's request.
 message GetProfileRequest {
-  // The name of the profile.
+  // Required. The name of the profile.
   //
   // Format: `projects/{project}/clients/{client}/apps/{app}/profiles/{profile}`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/Profile"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/Profile"
+    }
   ];
 }
 
@@ -352,13 +240,14 @@ message GetProfileRequest {
 // [CheckProfile][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles.CheckProfile]
 // method's request.
 message CheckProfileRequest {
-  // The parent resource for profiles.
+  // Required. The parent resource for profiles.
   //
   // Format: `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
   // The profile identifiers. If the phone number is specified in the request,
@@ -374,10 +263,10 @@ message CheckProfileRequest {
 // [UpdateProfile][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchProfiles.UpdateProfile]
 // method's request.
 message UpdateProfileRequest {
-  // The profile to be updated.
+  // Required. The profile to be updated.
   Profile profile = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The list of fields to update
+  // Required. The list of fields to update
   google.protobuf.FieldMask update_mask = 2
       [(google.api.field_behavior) = REQUIRED];
 }
@@ -424,3 +313,4 @@ message ReclaimPaymentAddressesRequest {
   // Format: `projects/{project}/clients/{client}/apps/{app}/profiles/{profile}`
   string profile = 1;
 }
+

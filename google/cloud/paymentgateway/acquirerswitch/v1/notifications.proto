@@ -19,22 +19,24 @@ package google.cloud.paymentgateway.acquirerswitch.v1;
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
-import "google/api/policy.proto";
 import "google/api/resource.proto";
 import "google/cloud/paymentgateway/acquirerswitch/v1/payments.proto";
 import "google/longrunning/operations.proto";
 
 option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "NotificationsProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
 option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
 option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
-option java_outer_classname = "NotificationsProto";
-option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
-option use_java_stubby_library = true;
-option go_api_flag = "OPAQUE_V0";  // see http://go/go-api-flag.
 
 // This service provides methods for event notifications.
 service PersonSwitchNotifications {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
   // This method returns a stream of events either raised unilaterally by the
   // person switch, or raised in response to a previous API call from the caller
   // which has been processed asynchronously.
@@ -43,29 +45,10 @@ service PersonSwitchNotifications {
   // Acknowledgement of receipt of events by the caller is based on the
   // [id][google.cloud.paymentgateway.acquirerswitch.v1.Event.id] field.
   rpc StreamEvents(StreamEventsRequest) returns (stream Event) {
-    option (google.api.method_signature) = "parent";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAppProvider"
-        resource_permission: "acquirerswitch.googleapis.com/paymentAppProviders.streamEvents"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "paymentAppProviders-streamEvents"
-      }
-    };
     option (google.api.http) = {
       get: "/v1/{parent=projects/*/clients/*/apps/*}/events:stream"
     };
+    option (google.api.method_signature) = "parent";
   }
 
   // This method is invoked by clients to acknowledge that they have received an
@@ -79,30 +62,11 @@ service PersonSwitchNotifications {
   // call.
   rpc AcknowledgeEvents(stream AcknowledgeEventsRequest)
       returns (AcknowledgeEventsResponse) {
-    option (google.api.method_signature) = "parent";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAppProvider"
-        resource_permission: "acquirerswitch.googleapis.com/paymentAppProviders.acknowledgeEvents"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "paymentAppProviders-acknowledgeEvents"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/events:acknowledge",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/events:acknowledge"
       body: "*"
     };
+    option (google.api.method_signature) = "parent";
   }
 }
 
@@ -110,13 +74,14 @@ service PersonSwitchNotifications {
 // [StreamEvents][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchNotifications.StreamEvents]
 // method's request.
 message StreamEventsRequest {
-  // The parent resource for events.
+  // Required. The parent resource for events.
   //
   // Format: `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 }
 
@@ -124,13 +89,14 @@ message StreamEventsRequest {
 // [AcknowledgeEvents][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchNotifications.AcknowledgeEvents]
 // method's request.
 message AcknowledgeEventsRequest {
-  // The parent resource for events.
+  // Required. The parent resource for events.
   //
   // Format: `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
   // One of more ids of events received from the person switch which are being
@@ -155,8 +121,9 @@ message Event {
     // The operation that was the response to a prior API call from a client to
     // the person switch. The [done][google.longrunning.Operation.done] field
     // will be set to `true`. If the operation succeeded, then the
-    // [google.longrunning.Operation.response][response] field will be set.
-    // Else, the [error][google.longrunning.Operation.error] field will be set.
+    // [google.longrunning.Operation.response][google.cloud.paymentgateway.acquirerswitch.v1.Event.response]
+    // field will be set. Else, the [error][google.longrunning.Operation.error]
+    // field will be set.
     google.longrunning.Operation response = 2;
 
     // A unilateral notification from the person switch to the client.
@@ -193,3 +160,4 @@ message Unilateral {
     Payment payment_approval = 2;
   }
 }
+
