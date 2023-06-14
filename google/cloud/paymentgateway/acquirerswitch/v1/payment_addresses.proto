@@ -19,7 +19,6 @@ package google.cloud.paymentgateway.acquirerswitch.v1;
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/api/field_behavior.proto";
-import "google/api/policy.proto";
 import "google/api/resource.proto";
 import "google/cloud/paymentgateway/acquirerswitch/v1/common_fields.proto";
 import "google/cloud/paymentgateway/acquirerswitch/v1/payments.proto";
@@ -27,16 +26,19 @@ import "google/longrunning/operations.proto";
 import "google/protobuf/field_mask.proto";
 
 option csharp_namespace = "Google.Cloud.PaymentGateway.AcquirerSwitch.V1";
+option go_package = "cloud.google.com/go/paymentgateway/acquirerswitch/apiv1/acquirerswitchpb;acquirerswitchpb";
+option java_multiple_files = true;
+option java_outer_classname = "PaymentAddressesProto";
+option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
 option php_namespace = "Google\\Cloud\\PaymentGateway\\AcquirerSwitch\\V1";
 option ruby_package = "Google::Cloud::PaymentGateway::AcquirerSwitch::V1";
-option java_outer_classname = "PaymentAddressesProto";
-option java_multiple_files = true;
-option java_package = "com.google.cloud.paymentgateway.acquirerswitch.v1";
-option use_java_stubby_library = true;
-option go_api_flag = "OPAQUE_V0";  // see http://go/go-api-flag.
 
 // This service provides methods for the management of payment addresses.
 service PersonSwitchPaymentAddresses {
+  option (google.api.default_host) = "acquirerswitch.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
+
   // Create a new payment address associated with a profile. Once a profile is
   // created and active, this method can be invoked any number fo times create a
   // new payment address associated with the profile.
@@ -56,30 +58,11 @@ service PersonSwitchPaymentAddresses {
   // associated with the profile) is used as the `address`.
   rpc CreatePaymentAddress(CreatePaymentAddressRequest)
       returns (PaymentAddress) {
-    option (google.api.method_signature) = "parent,payment_address";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAddress"
-        resource_permission: "acquirerswitch.googleapis.com/paymentAddresses.create"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "paymentAddresses-create"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/paymentAddresses",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/paymentAddresses"
       body: "payment_address"
     };
+    option (google.api.method_signature) = "parent,payment_address";
   }
 
   // List all active payment addresses registered with the specified profiles.
@@ -95,65 +78,21 @@ service PersonSwitchPaymentAddresses {
   // Note: Although this is a *list resources* method, it is modelled as a *HTTP
   // POST* in REST because the *device's* information is included in the
   // request.
-  // (-- api-linter: core::0132::http-method=disabled
-  //     api-linter: core::0132::http-body=disabled
-  //     api-linter: core::0132::method-signature=disabled
-  //     aip.dev/not-precedent: We need to do this because the caller needs to
-  //     provide PII in the request including a device id, SIM id, etc and
-  //     hence, this has to be modelled as a HTTP POST. --)
   rpc ListPaymentAddresses(ListPaymentAddressesRequest)
       returns (ListPaymentAddressesResponse) {
-    option (google.api.method_signature) = "parent,profile_id_set";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAddress"
-        resource_permission: "acquirerswitch.googleapis.com/paymentAddresses.list"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "paymentAddresses-list"
-      }
-    };
     option (google.api.http) = {
-      post: "/v1/{parent=projects/*/clients/*/apps/*}/paymentAddresses:list",
+      post: "/v1/{parent=projects/*/clients/*/apps/*}/paymentAddresses:list"
       body: "*"
     };
+    option (google.api.method_signature) = "parent,profile_id_set";
   }
 
   // Get all the details of a specific payment address.
   rpc GetPaymentAddress(GetPaymentAddressRequest) returns (PaymentAddress) {
-    option (google.api.method_signature) = "name";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "name"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAddress"
-        resource_permission: "acquirerswitch.googleapis.com/paymentAddresses.get"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "paymentAddresses-get"
-      }
-    };
     option (google.api.http) = {
       get: "/v1/{name=projects/*/clients/*/apps/*/paymentAddresses/*}"
     };
+    option (google.api.method_signature) = "name";
   }
 
   // Update a payment address. The following fields of a `PaymentAddress` can be
@@ -171,30 +110,11 @@ service PersonSwitchPaymentAddresses {
   // above, then this method will raise an error.
   rpc UpdatePaymentAddress(UpdatePaymentAddressRequest)
       returns (PaymentAddress) {
-    option (google.api.method_signature) = "payment_address,update_mask";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "payment_address.name"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAddress"
-        resource_permission: "acquirerswitch.googleapis.com/paymentAddresses.update"
-        resource_access_type: "DATA_WRITE"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "paymentAddresses-update"
-      }
-    };
     option (google.api.http) = {
-      patch: "/v1/{payment_address.name=projects/*/clients/*/apps/*/paymentAddresses/*}",
+      patch: "/v1/{payment_address.name=projects/*/clients/*/apps/*/paymentAddresses/*}"
       body: "payment_address"
     };
+    option (google.api.method_signature) = "payment_address,update_mask";
   }
 
   // Search, based on certain filter criteria, and return all participants who
@@ -230,31 +150,12 @@ service PersonSwitchPaymentAddresses {
   // field of the payload.
   rpc SearchParticipants(SearchParticipantsRequest)
       returns (google.longrunning.Operation) {
-    option (google.api.method_signature) =
-        "parent,initiator_payment_address,device";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAddress"
-        resource_permission: "acquirerswitch.googleapis.com/paymentAddresses.searchParticipants"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "paymentAddresses-searchParticipants"
-      }
-    };
     option (google.api.http) = {
       post: "/v1/{parent=projects/*/clients/*/apps/*}/paymentAddresses:searchParticipants"
       body: "*"
     };
+    option (google.api.method_signature) =
+        "parent,initiator_payment_address,device";
     option (google.longrunning.operation_info) = {
       response_type: "SearchParticipantsResponse"
       metadata_type: "SearchParticipantsMetadata"
@@ -280,30 +181,11 @@ service PersonSwitchPaymentAddresses {
   // method.
   rpc SearchPaymentAddresses(SearchPaymentAddressesRequest)
       returns (SearchPaymentAddressesResponse) {
-    option (google.api.method_signature) = "parent";
-    option (google.api.method_policy) = {
-      authorization: "AUTO_CLOUD_IAM"
-      auditing: "CLOUD_AUDIT_REQUEST_AND_RESPONSE,GIN_AUDIT,READ_ACTION"
-      request_policies {
-        selector: "parent"
-        resource_type: "RESOURCE, acquirerswitch.googleapis.com/PaymentAddress"
-        resource_permission: "acquirerswitch.googleapis.com/paymentAddresses.search"
-        resource_access_type: "DATA_READ"
-        auditing: "AUDIT,AUDIT_TARGET_RESOURCE"
-      }
-      metadata {
-        key: "cloudaudit.googleapis.com/onboarding_ticket"
-        value: "b/260163677"
-      },
-      metadata {
-        key: "gin.googleprod.com/accessing_process_name"
-        value: "paymentAddresses-search"
-      }
-    };
     option (google.api.http) = {
       post: "/v1/{parent=projects/*/clients/*/apps/*}/paymentAddresses:search"
       body: "*"
     };
+    option (google.api.method_signature) = "parent";
   }
 }
 
@@ -311,26 +193,24 @@ service PersonSwitchPaymentAddresses {
 // [CreatePaymentAddress][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.CreatePaymentAddress]
 // method's request.
 message CreatePaymentAddressRequest {
-  // The parent resource for payment addresses.
+  // Required. The parent resource for payment addresses.
   //
   // Format: `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/ThirdPartyProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/ThirdPartyProvider"
+    }
   ];
 
-  // The payment address to be created.
+  // Required. The payment address to be created.
   PaymentAddress payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
-  // The profile id set for which the payment address is being created. If this
-  // field is specified, then the value of the `profile` field in the
-  // `payment_address` message will be ignored. The new payment address will be
-  // associated with the profile identified by the id set specified in this
-  // field.
-  // (-- api-linter: core::0133::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because clients have
-  //     to provide the profile identifiers to create a payment address. --)
+  // Required. The profile id set for which the payment address is being
+  // created. If this field is specified, then the value of the `profile` field
+  // in the `payment_address` message will be ignored. The new payment address
+  // will be associated with the profile identified by the id set specified in
+  // this field.
   ProfileIdSet profile_id_set = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -338,21 +218,18 @@ message CreatePaymentAddressRequest {
 // [ListPaymentAddresses][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.ListPaymentAddresses]
 // method's request.
 message ListPaymentAddressesRequest {
-  // The parent resource for payment addresses.
+  // Required. The parent resource for payment addresses.
   //
   // Format: `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // A set of identifiers of a profile whose active payment addresses are to be
-  // listed.
-  // (-- api-linter: core::0132::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: We really need this field because clients have
-  //     to provide the profile identifiers for validating their request to list
-  //     payment addresses. --)
+  // Required. A set of identifiers of a profile whose active payment addresses
+  // are to be listed.
   ProfileIdSet profile_id_set = 2 [(google.api.field_behavior) = REQUIRED];
 
   // The maximum number of payment addresses to return. The service may return
@@ -385,14 +262,15 @@ message ListPaymentAddressesResponse {
 // [GetPaymentAddress][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.GetPaymentAddress]
 // method's request
 message GetPaymentAddressRequest {
-  // The name of the payment address to be fetched.
+  // Required. The name of the payment address to be fetched.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}/paymentAddresses/{payment_address}`
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAddress"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAddress"
+    }
   ];
 }
 
@@ -400,10 +278,10 @@ message GetPaymentAddressRequest {
 // [UpdatePaymentAddress][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.UpdatePaymentAddress]
 // method's request.
 message UpdatePaymentAddressRequest {
-  // The payment address with the updated fields.
+  // Required. The payment address with the updated fields.
   PaymentAddress payment_address = 1 [(google.api.field_behavior) = REQUIRED];
 
-  // The list of fields to update
+  // Required. The list of fields to update
   google.protobuf.FieldMask update_mask = 2
       [(google.api.field_behavior) = REQUIRED];
 }
@@ -412,20 +290,21 @@ message UpdatePaymentAddressRequest {
 // [SearchParticipants][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.SearchParticipants]
 // method's request.
 message SearchParticipantsRequest {
-  // The parent of all payment addresses in whose context the participants are
-  // to be searched.
+  // Required. The parent of all payment addresses in whose context the
+  // participants are to be searched.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
-  // The payment address of the initiator of this request. This payment address
-  // has to be associated with the profile identifiers specified in the `device`
-  // field.
+  // Required. The payment address of the initiator of this request. This
+  // payment address has to be associated with the profile identifiers specified
+  // in the `device` field.
   string initiator_payment_address = 2 [(google.api.field_behavior) = REQUIRED];
 
   // Results are filtered based on the provided value.
@@ -442,7 +321,7 @@ message SearchParticipantsRequest {
   // Metadata about the request.
   Metadata metadata = 5;
 
-  // The device originating the request.
+  // Required. The device originating the request.
   Device device = 6 [(google.api.field_behavior) = REQUIRED];
 
   // The maximum number of participants to return. The service may return fewer
@@ -480,19 +359,26 @@ message SearchParticipantsResponse {
   message Participant {
     // The payment address of the participant.
     string address = 1;
+
     // IFSC associated with participant bank account.
     string ifsc = 2;
+
     // Type of account. Examples include SAVINGS, CURRENT, etc.
     string account_type = 3;
+
     // The name of the participant.
     string display_name = 4;
+
     // The participant's persona.
     Persona persona = 5;
+
     // The issuer identification number (IIN).
     string issuer_identification_number = 6;
+
     // If the participant is an entity, its details.
     Entity entity = 7;
   }
+
   // A list of participants matching the given filter criteria. If a participant
   // is being searched by their address, then a maximum of one participant will
   // be present in the response.
@@ -502,8 +388,8 @@ message SearchParticipantsResponse {
   // If this field is omitted, there are no subsequent pages.
   string next_page_token = 2;
 
-  // Details about the search participants error received from the payments
-  // orchestrator.
+  // Output only. Details about the search participants error received from the
+  // payments orchestrator.
   Error error = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
@@ -511,15 +397,16 @@ message SearchParticipantsResponse {
 // [SearchPaymentAddresses][google.cloud.paymentgateway.acquirerswitch.v1.PersonSwitchPaymentAddresses.SearchPaymentAddresses]
 // method's request.
 message SearchPaymentAddressesRequest {
-  // The parent of all payment addresses in whose context the payment addresses
-  // are to be searched.
+  // Required. The parent of all payment addresses in whose context the payment
+  // addresses are to be searched.
   //
   // Format:
   // `projects/{project}/clients/{client}/apps/{app}`
   string parent = 1 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).type =
-        "acquirerswitch.googleapis.com/PaymentAppProvider"
+    (google.api.resource_reference) = {
+      type: "acquirerswitch.googleapis.com/PaymentAppProvider"
+    }
   ];
 
   // Results are filtered based on the provided value.
