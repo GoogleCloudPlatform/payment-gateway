@@ -36,54 +36,64 @@ enum ErrorReason {
   ERROR_REASON_UNSPECIFIED = 0;
   // The account is associated with multiple customers.
   CARD_ACCOUNT_MULTIPLE_CUSTOMERS = 1;
+  // The card account details specified are not
+  // found in the bank's card management systems.
+  CARD_ACCT_NOT_FOUND = 2;
   // Card is blocked.
-  CARD_BLOCKED = 2;
+  CARD_BLOCKED = 3;
+  // The card account under consideration for the operation is dormant (as
+  // defined by the bank's policies).
+  CARD_DORMANT = 4;
   // Card has expired.
-  CARD_EXPIRED = 3;
+  CARD_EXPIRED = 5;
   // Card is frozen.
-  CARD_FROZEN = 4;
+  CARD_FROZEN = 6;
   // Card is inactive.
-  CARD_INACTIVE = 5;
+  CARD_INACTIVE = 7;
   // Card is invalid.
-  CARD_INVALID = 6;
+  CARD_INVALID = 8;
   // Failure in the bank's card management system.
-  CARD_MANAGEMENT_SYSTEM_FAILURE = 7;
+  CARD_MANAGEMENT_SYSTEM_FAILURE = 9;
   // Card is restricted for payments.
-  CARD_RESTRICTED = 8;
-  // Transaction is fraudulent.
-  FRAUDULENT_TRANSACTION = 9;
-  // The specified PIN is incorrect.
-  INCORRECT_PIN = 10;
-  // The specified OTP is incorrect.
-  INCORRECT_OTP = 11;
-  // Insufficient credit in the card to process the debit payment settlement.
-  INSUFFICIENT_CREDIT = 12;
-  // Transaction is invalid.
-  INVALID_TRANSACTION = 13;
-  // More than one customer is associated with the same mobile number.
-  MOBILE_NUMBER_MULTIPLE_CUSTOMERS = 14;
-  // Specified OTP has expired.
-  OTP_EXPIRED = 15;
-  // Maximu number of requests allowed for an OTP has been exceeded.
-  OTP_REQUESTS_EXCEEDED = 16;
-  // The requested operation could not be performed because of an error/bug in
-  // the Card Adapter service.
-  SERVICE_ERROR = 17;
-  // The requested operation could not be performed because the Card Adapter
-  // service or one or more of the bank's services timed out.
-  SERVICE_TIMEOUT = 18;
-  // The requested operation could not be performed because the Card Adapter
-  // service or one or more of the bank's services are unavailable.
-  SERVICE_UNAVAILABLE = 19;
-  // The registered mobile number associated with the card has changed in the
-  // bank's card management systems.
-  REGISTERED_MOBILE_NUMBER_CHANGED = 20;
-  // The requested operation could not be performed because the Card Adapter
-  // service could not encrypt the payload.
-  ENCRYPTION_FAILED = 21;
+  CARD_RESTRICTED = 10;
   // The requested operation could not be performed because the Card Adapter
   // service could not decrypt the payload.
-  DECRYPTION_FAILED = 22;
+  DECRYPTION_FAILED = 11;
+  // The requested operation could not be performed because the Card Adapter
+  // service could not encrypt the payload.
+  ENCRYPTION_FAILED = 12;
+  // Transaction is fraudulent.
+  FRAUDULENT_TRANSACTION = 13;
+  // The specified PIN is incorrect.
+  INCORRECT_PIN = 14;
+  // The specified OTP is incorrect.
+  INCORRECT_OTP = 15;
+  // Insufficient credit in the card to process the debit payment settlement.
+  INSUFFICIENT_CREDIT = 16;
+  // The parameters provided are invalid.
+  INVALID_PARAMETERS = 17;
+  // Transaction is invalid.
+  INVALID_TRANSACTION = 18;
+  // More than one customer is associated with the same mobile number.
+  MOBILE_NUMBER_MULTIPLE_CUSTOMERS = 19;
+  // Specified OTP has expired.
+  OTP_EXPIRED = 20;
+  // Maximu number of requests allowed for an OTP has been exceeded.
+  OTP_REQUESTS_EXCEEDED = 21;
+  // The registered mobile number associated with the card has changed in the
+  // bank's card management systems.
+  REGISTERED_MOBILE_NUMBER_CHANGED = 22;
+  // The requested operation could not be performed because of an error/bug in
+  // the Card Adapter service.
+  SERVICE_ERROR = 23;
+  // The requested operation could not be performed because the Card Adapter
+  // service or one or more of the bank's services timed out.
+  SERVICE_TIMEOUT = 24;
+  // The requested operation could not be performed because the Card Adapter
+  // service or one or more of the bank's services are unavailable.
+  SERVICE_UNAVAILABLE = 25;
+  // The requested transaction is not permitted.
+  TRANSACTION_NOT_PERMITTED = 26;
 }
 
 // The combination of a reference type and reference number that uniquely
