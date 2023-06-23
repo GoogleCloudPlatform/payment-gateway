@@ -584,6 +584,9 @@ message HoldDetails {
   string reference = 1 [(google.api.field_behavior) = REQUIRED];
   // The amount held in the account.
   HoldAmount amount = 2 [(google.api.field_behavior) = REQUIRED];
+  // An identifier for the original hold request. In UPI, this field maps to the
+  // Unified Mandate Number (UMN).
+  string request_id = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Provides details of the case raised by a user / remitter bank.

@@ -103,6 +103,10 @@ message HoldFundsRequest {
     // triggered this request to the bank adapter.
     InvocationMetadata invocation_metadata = 11
         [(google.api.field_behavior) = REQUIRED];
+    // Retrieval Reference Number (RRN) for the transaction that is triggering
+    // the hold of funds.
+    string retrieval_reference_number = 12
+        [(google.api.field_behavior) = REQUIRED];
     // Indicates whether the hold funds request is for a mandate or a voucher.
     enum HoldReason {
       // Unspecified hold reason.
@@ -189,6 +193,10 @@ message ReleaseFundsRequest {
     // will not be included in the request as this API will be invoked directly
     // by the issuer switch and not as part of any UPI API flows.
     InvocationMetadata invocation_metadata = 8
+        [(google.api.field_behavior) = REQUIRED];
+    // Retrieval Reference Number (RRN) for the transaction that is triggering
+    // the release of funds.
+    string retrieval_reference_number = 9
         [(google.api.field_behavior) = REQUIRED];
   }
 
