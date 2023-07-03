@@ -208,3 +208,84 @@ message RegistrationMetadata {
   google.protobuf.Timestamp initiation_time = 3
       [(google.api.field_behavior) = REQUIRED];
 }
+
+// Request body for customer notification.
+message NotifyCustomerRequest {
+  // Payload for notify customer request.
+  message Payload {
+    // Details of the MPIN update operation.
+    message MPINUpdated {
+      // Possible states of the MPIN update operation.
+      enum State {
+        // Unspecified state.
+        STATE_UNSPECIFIED = 0;
+        // MPIN update succeeded.
+        SUCCEEDED = 1;
+        // MPIN update failed.
+        FAILED = 2;
+      }
+      // State of the MPIN update operation.
+      State state = 1 [(google.api.field_behavior) = REQUIRED];
+    }
+    // Details of the locking of the user's MPIN that needs to be notified to
+    // the user.
+    message MPINLocked {
+      // Number of consecutive MPIN authentication failures by the user which
+      // caused their MPIN to get locked.
+      int32 failure_count = 1 [(google.api.field_behavior) = REQUIRED];
+      // Timestamp at which the MPIN was locked by the issuer switch.
+      google.protobuf.Timestamp locked_time = 3
+          [(google.api.field_behavior) = REQUIRED];
+    }
+    // Participant to be notified.
+    Participant participant = 1 [(google.api.field_behavior) = REQUIRED];
+    // Unique identification of an account according to India's UPI standards.
+    // This is the details of the account of the customer who is to be notified.
+    AccountReference account = 2 [(google.api.field_behavior) = REQUIRED];
+    // Metadata about the API invocation received by the issuer switch which
+    // triggered this request to the card adapter.
+    InvocationMetadata invocation_metadata = 3
+        [(google.api.field_behavior) = REQUIRED];
+    // The details of the notification. Exactly one of two values will be
+    // specified. The type of notification to be sent can be inferred from which
+    // of the two possible values are set in the request.
+    oneof details {
+      // Details of the MPIN operation processed by the issuer switch.
+      MPINUpdated mpin_updated = 4;
+      // Details of the MPIN locked by the issuer switch.
+      MPINLocked mpin_locked = 5;
+    }
+  }
+
+  // The request sent can be either a plain text request or encrypted in a
+  // Base64 encoded JSON string.
+  oneof request {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.NotifyCustomerRequest.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}
+
+// Response for a customer notification.
+message NotifyCustomerResponse {
+  // Payload for the customer notification response.
+  message Payload {
+    // Any additional metadata about the response from the card adapter.
+    ResponseMetadata response_metadata = 1;
+  }
+  // The response sent can be either a plain text response or encrypted in a
+  // Base64 encoded JSON string.
+  oneof response {
+    // The plain text payload.
+    Payload plain = 1;
+    // The encrypted payload encoded as a Base64 string. After decoding and
+    // decrypting, this value will be the same as the
+    // [Payload][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.ReleaseFundsResponse.Payload]
+    // message.
+    string encrypted = 2;
+  }
+}

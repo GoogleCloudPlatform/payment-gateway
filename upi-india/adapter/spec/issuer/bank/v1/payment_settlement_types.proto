@@ -189,6 +189,16 @@ message SearchPaymentsRequest {
     // triggered this request to the bank adapter.
     InvocationMetadata invocation_metadata = 5
         [(google.api.field_behavior) = REQUIRED];
+    // Details of any funds held in the payer's account against which the issuer
+    // switch had previously initiated a
+    // [SettlePayment][google.cloud.paymentgateway.issuerswitch.adapter.bank.v1.BankAdapterService.SettlePayment]
+    // request, and that same payment is being searched for in this request.  If
+    // the original payment did not involve any held funds, then this field will
+    // not be included in the request.
+    //
+    // **Note** that only the `request_id` and `amount` fields will be populated
+    // in this message.
+    HoldDetails hold_details = 6;
   }
 
   // The request sent can be either a plain text request or encrypted in a

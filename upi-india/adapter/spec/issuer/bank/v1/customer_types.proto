@@ -74,6 +74,16 @@ message NotifyCustomerRequest {
       // State of the MPIN update operation.
       State state = 1 [(google.api.field_behavior) = REQUIRED];
     }
+    // Details of the locking of the user's MPIN that needs to be notified to
+    // the user.
+    message MPINLocked {
+      // Number of consecutive MPIN authentication failures by the user which
+      // caused their MPIN to get locked.
+      int32 failure_count = 1 [(google.api.field_behavior) = REQUIRED];
+      // Timestamp at which the MPIN was locked by the issuer switch.
+      google.protobuf.Timestamp locked_time = 3
+          [(google.api.field_behavior) = REQUIRED];
+    }
     // Details of the notification needed for recurring mandate (auto-pay)
     // operations.
     message RecurringMandate {
@@ -238,6 +248,8 @@ message NotifyCustomerRequest {
       // Details of the international outward activation processed by the
       // issuer switch
       InternationalOutwardActivation international_outward_activation = 6;
+      // Details of the MPIN locked by the issuer switch.
+      MPINLocked mpin_locked = 7;
     }
   }
 

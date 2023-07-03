@@ -259,4 +259,51 @@ service CardAdapterService {
       body: "*"
     };
   }
+
+  // This is an API to notify the bank's customer via SMS/email when certain
+  // actions are taken by the issuer switch, or when it receives certain
+  // notifications from the NPCI.
+  //
+  // There are a few scenarios when this API will be invoked by the issuer
+  // switch.
+  //
+  // MPIN Updated
+  // : The validation of the current M-PIN of a user, and the updating to a new
+  // M-PIN is handled by the issuer switch. The card adapter is invoked after
+  // the new M-PIN has been updated successfully by the issuer switch for any
+  // further processing by the bank's systems. The NPCI circular RMD-014
+  // requires issuer banks to send an SMS notification to customers when the UPI
+  // M-PIN is successfully set for a user. This is to make the user aware of any
+  // fradulent attempts to modify the user's M-PIN. This SMS notification could
+  // be one of the possible actions taken when this API is invoked on the card
+  // adapter.
+  // : **Note** that a customer is to be notified both in the case of a
+  // successful update of their M-PIN or when the M-PIN update fails.
+  //
+  // MPIN Locked
+  // : A user's MPIN is locked for a period of 24 hours when the user tries to
+  // authenticate a UPI operation using an incorrect MPIN consecutively `X`
+  // times. The number `X` is configurable on the issuer switch and is set to
+  // `3` by default. This API is invoked to notify the user that their MPIN has
+  // been locked due to consecutive incorrect MPIN authentication attempts.
+  //
+  // This API should return a `400` HTTP status code if it is unable to process
+  // the request. The `reason` field in the
+  // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
+  // response should contain one of the following values:
+  //
+  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
+  // payload.
+  //
+  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
+  // payload.
+  //
+  // _Note:_ This API will be invoked in the UPI `ReqSetCre` API flow, or in the
+  // `ReqValCust` (mandate notification) API flow.
+  rpc NotifyCustomer(NotifyCustomerRequest) returns (NotifyCustomerResponse) {
+    option (google.api.http) = {
+      post: "/v1/users:notifyCustomer"
+      body: "*"
+    };
+  }
 }

@@ -537,62 +537,59 @@ service BankAdapterService {
   // There are a few scenarios when this API will be invoked by the issuer
   // switch.
   //
-  // 1. The validation of the current M-PIN of a user, and the updating to a new
-  //    M-PIN is handled by the issuer switch. The bank adapter is invoked after
-  //    the new M-PIN has been updated successfully by the issuer switch for any
-  //    further processing by the bank's systems. The NPCI circular RMD-014
-  //    requires issuer banks to send an SMS notification to customers when the
-  //    UPI M-PIN is successfully set for a user. This is to make the user aware
-  //    of any fradulent attempts to modify the user's M-PIN. This SMS
-  //    notification could be one of the possible actions taken when this API is
-  //    invoked on the Bank Adapter. **Note** that a customer is to be notified
-  //    both in the case of a successful update of their M-PIN or when the M-PIN
-  //    update fails.
+  // MPIN Updated
+  // : The validation of the current M-PIN of a user, and the updating to a new
+  // M-PIN is handled by the issuer switch. The bank adapter is invoked after
+  // the new M-PIN has been updated successfully by the issuer switch for any
+  // further processing by the bank's systems. The NPCI circular RMD-014
+  // requires issuer banks to send an SMS notification to customers when the UPI
+  // M-PIN is successfully set for a user. This is to make the user aware of any
+  // fradulent attempts to modify the user's M-PIN. This SMS notification could
+  // be one of the possible actions taken when this API is invoked on the bank
+  // adapter.
+  // : **Note** that a customer is to be notified both in the case of a
+  // successful update of their M-PIN or when the M-PIN update fails.
   //
-  // 1. The issuer switch performs a number of operations with recurring
-  //    (auto-pay) mandates. These include the following operations:
+  // MPIN Locked
+  // : A user's MPIN is locked for a period of 24 hours when the user tries to
+  // authenticate a UPI operation using an incorrect MPIN consecutively `X`
+  // times. The number `X` is configurable on the issuer switch and is set to
+  // `3` by default. This API is invoked to notify the user that their MPIN has
+  // been locked due to consecutive incorrect MPIN authentication attempts.
   //
-  //    * Creation
-  //    * Modification
-  //    * Revocation
-  //    * Pause
-  //    * Unpause
+  // Recurring (auto-pay) mandates
+  // : The issuer switch performs a number of operations with recurring
+  // (auto-pay) mandates. These include the following operations:
+  //      * Creation
+  //      * Modification
+  //      * Revocation
+  //      * Pause
+  //      * Unpause
+  // : The NPCI circular OC-151 requires the issuer switch to notify the
+  // customer of the success/failure of the operation with an SMS. The issuer
+  // switch will invoke this Bank Adapter API with the details about the
+  // specific operation performed with the recurring (auto-pay) mandate. The
+  // Bank Adapter can then invoke other services to send out the appropriate SMS
+  // notification to the customer.
   //
-  //    The NPCI circular OC-151 requires the issuer switch to notify the
-  //    customer of the success/failure of the operation with an SMS. The
-  //    issuer switch will invoke this Bank Adapter API with the details
-  //    about the specific operation performed with the recurring (auto-pay)
-  //    mandate. The Bank Adapter can then invoke other services to send out
-  //    the appropriate SMS notification to the customer.
-  //
-  // 1. 24 hours before a recurring mandate accepted by a customer is to be used
-  //    for a payment settlement, a notification is to be sent to the customer
-  //    with details about the mandate that will be executed. The issuer switch
-  //    will invoke the bank adapter with all the details about the mandate that
-  //    is to be executed in the next 24 hours for further processing by the
-  //    bank adapter. This could include the bank adapter invoking the
-  //    appropriate services in the bank's backend to notify the customer about
-  //    the upcoming mandate execution. The NPCI's `Recurring Mandate Technical
-  //    Specification` document describes this requirement. This notification is
-  //    to allow the customer to either pause / revoke the mandate, or ensure
-  //    that there are sufficient funds available in the account that will be
-  //    debited upon mandate execution.
-  //
+  // Pre-Debit Notification
+  // : 24 hours before a recurring mandate accepted by a customer is to be used
+  // for a payment settlement, a notification is to be sent to the customer with
+  // details about the mandate that will be executed. The issuer switch will
+  // invoke the bank adapter with all the details about the mandate that is to
+  // be executed in the next 24 hours for further processing by the bank
+  // adapter. This could include the bank adapter invoking the appropriate
+  // services in the bank's backend to notify the customer about the upcoming
+  // mandate execution.
+  // : The NPCI's `Recurring Mandate Technical Specification` document describes
+  // this requirement. This notification is to allow the customer to either
+  // pause / revoke the mandate, or ensure that there are sufficient funds
+  // available in the account that will be debited upon mandate execution.
   //
   // This API should return a `400` HTTP status code if it is unable to process
   // the request. The `reason` field in the
   // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
   // response should contain one of the following values:
-  //
-  // * `ACCT_BLOCKED` = Account is blocked.
-  //
-  // * `ACCT_DORMANT` = Account is dormant.
-  //
-  // * `ACCT_FROZEN` = Account is frozen.
-  //
-  // * `ACCT_INACTIVE` = Account is inactive.
-  //
-  // * `ACCT_NOT_FOUND` = Account not found in the bank's systems.
   //
   // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
   // payload.
