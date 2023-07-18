@@ -260,3 +260,4 @@ message SearchPaymentsResponse {
     string encrypted = 2;
   }
 }
+
