@@ -227,6 +227,18 @@ message NotifyCustomerRequest {
       }
       Action action = 3 [(google.api.field_behavior) = REQUIRED];
     }
+    // Details of the notification to be sent for summary of debits in an
+    // account managed by the account manager.
+    message AccountManagerSummary {
+      // The id of the account whose details are to be notified. When used with
+      // UPI Lite, this will be the Lite Reference Number (LRN) of the account.
+      string account_id = 1 [(google.api.field_behavior) = REQUIRED];
+      // The amount that was debited for the account during the day.
+      Amount amount_debited = 2 [(google.api.field_behavior) = REQUIRED];
+      // The date for which the amount debited is being notified.
+      google.protobuf.Timestamp date = 3
+          [(google.api.field_behavior) = REQUIRED];
+    }
     // Participant to be notified.
     Participant participant = 1 [(google.api.field_behavior) = REQUIRED];
     // Unique identification of an account according to India's UPI standards.
@@ -236,9 +248,9 @@ message NotifyCustomerRequest {
     // triggered this request to the bank adapter.
     InvocationMetadata invocation_metadata = 3
         [(google.api.field_behavior) = REQUIRED];
-    // The details of the notification. Exactly one of two values will be
+    // The details of the notification. Exactly one of the values will be
     // specified. The type of notification to be sent can be inferred from which
-    // of the two possible values are set in the request.
+    // of the possible values are set in the request.
     oneof details {
       // Details of the MPIN operation processed by the issuer switch.
       MPINUpdated mpin_updated = 4;
@@ -250,6 +262,9 @@ message NotifyCustomerRequest {
       InternationalOutwardActivation international_outward_activation = 6;
       // Details of the MPIN locked by the issuer switch.
       MPINLocked mpin_locked = 7;
+      // Details of the summary of debits for an account managed
+      // by account manager.
+      AccountManagerSummary account_manager_summary = 8;
     }
   }
 

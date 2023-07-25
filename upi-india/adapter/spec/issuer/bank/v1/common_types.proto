@@ -523,6 +523,10 @@ message PaymentAdditionalInfo {
     UPI_LITE_OFFLINE_PAYMENT = 21;
     // Disable zero balance UPI Lite Reference Number (LRN).
     UPI_LITE_DISABLE_LRN = 22;
+    // Purpose type 18
+    PURPOSE_TYPE_18 = 23;
+    // Purpose type 19
+    PURPOSE_TYPE_19 = 24;
   }
 
   // The category of the transaction.

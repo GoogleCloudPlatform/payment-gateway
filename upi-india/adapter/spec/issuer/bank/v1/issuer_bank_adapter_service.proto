@@ -586,6 +586,14 @@ service BankAdapterService {
   // pause / revoke the mandate, or ensure that there are sufficient funds
   // available in the account that will be debited upon mandate execution.
   //
+  // Account Manager Daily Summary
+  // : When used for UPI Lite, as per the National Payments Corporation of India
+  // (NPCI), banks are required to send a notification to their customers every
+  // day, informing them of the cumulative debit that has occurred on their UPI
+  // Lite account. At the end of the day, the issuer switch will reconcile all
+  // balances with the data shared by NPCI. Once this is done, the SMS will be
+  // sent out.
+  //
   // This API should return a `400` HTTP status code if it is unable to process
   // the request. The `reason` field in the
   // [ErrorInfo](https://cloud.google.com/apis/design/errors#error_info)
@@ -597,8 +605,9 @@ service BankAdapterService {
   // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
   // payload.
   //
-  // _Note:_ This API will be invoked in the UPI `ReqSetCre` API flow, or in the
-  // `ReqValCust` (mandate notification) API flow.
+  // _Note:_ This API will be invoked in the UPI `ReqSetCre` API flow, in the
+  // `ReqValCust` (mandate notification) API flow or during UPI Lite
+  // reconciliation.
   rpc NotifyCustomer(NotifyCustomerRequest) returns (NotifyCustomerResponse) {
     option (google.api.http) = {
       post: "/v1/users:notifyCustomer"
