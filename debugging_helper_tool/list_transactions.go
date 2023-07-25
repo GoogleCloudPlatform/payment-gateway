@@ -48,9 +48,9 @@ func printJSONResponse(message proto.Message) {
         fmt.Println(indentedJSONString)
 }
 
-func PrintListTransactionsResponse(ctx context.Context, istc pb.IssuerSwitchTransactionsClient, reqFilter []string) error {
-        // Invoke ListFinancialTransactions
+func printListTransactionsResponse(ctx context.Context, istc pb.IssuerSwitchTransactionsClient, reqFilter []string) error {
         for _, filter := range reqFilter {
+                // Invoke ListFinancialTransactions
                 reqFinancial := pb.ListFinancialTransactionsRequest{
                         Parent:   "projects/common-dev-6",
                         Filter:   filter,
@@ -63,7 +63,7 @@ func PrintListTransactionsResponse(ctx context.Context, istc pb.IssuerSwitchTran
                 allRespFinancial := respFinancial.GetFinancialTransactions()
                 if allRespFinancial != nil {
                         for _, r := range allRespFinancial {
-                                fmt.Println("\n\n_______________________Financial_Response_______________________\n")
+                                fmt.Println("\n\n_______________________FINANCIAL_RESPONSE_______________________\n")
                                 printJSONResponse(r)
                         }
                 }
@@ -81,7 +81,7 @@ func PrintListTransactionsResponse(ctx context.Context, istc pb.IssuerSwitchTran
                 allRespMetadata := respMetadata.GetMetadataTransactions()
                 if allRespMetadata != nil {
                         for _, r := range allRespMetadata {
-                                fmt.Println("\n\n_______________________Metadata_Response_______________________\n")
+                                fmt.Println("\n\n_______________________METADATA_RESPONSE_______________________\n")
                                 printJSONResponse(r)
                         }
                 }
@@ -99,7 +99,7 @@ func PrintListTransactionsResponse(ctx context.Context, istc pb.IssuerSwitchTran
                 allRespMandate := respMandate.GetMandateTransactions()
                 if allRespMandate != nil {
                         for _, r := range allRespMandate {
-                                fmt.Println("\n\n_______________________Mandate_Response_______________________\n")
+                                fmt.Println("\n\n_______________________MANDATE_RESPONSE_______________________\n")
                                 printJSONResponse(r)
                         }
                 }
