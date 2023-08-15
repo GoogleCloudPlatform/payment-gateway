@@ -168,6 +168,21 @@ enum ErrorReason {
   // The requested operation could not be performed because the Bank Adapter
   // service could not decrypt the payload.
   DECRYPTION_FAILED = 45;
+  // Operations on the account are not possible due to the account holder's
+  // death.
+  ACCT_HOLDER_DEATH = 46;
+  // Operations on the account are not possible due to the account holder's
+  // lunacy.
+  ACCT_HOLDER_LUNACY = 47;
+  // Operations on the account are not possible due to the account holder's
+  // insolvency.
+  ACCT_HOLDER_INSOLVENCY = 48;
+  // The requested settle payment operation could not be performed as it was
+  // stopped by an attachment order.
+  STOPPED_BY_ATTACHMENT_ORDER = 49;
+  // Cutoff is in process in the bank's systems due to which the operation
+  // cannot be performed.
+  CUTOFF_IN_PROCESS = 50;
 }
 
 // Unique identification of an account according to India's UPI standards.

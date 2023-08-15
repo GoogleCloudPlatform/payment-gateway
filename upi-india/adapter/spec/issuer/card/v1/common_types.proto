@@ -94,6 +94,18 @@ enum ErrorReason {
   SERVICE_UNAVAILABLE = 25;
   // The requested transaction is not permitted.
   TRANSACTION_NOT_PERMITTED = 26;
+  // Operations on the card are not possible due to the card holder's death.
+  CARD_HOLDER_DEATH = 46;
+  // Operations on the card are not possible due to the card holder's lunacy.
+  CARD_HOLDER_LUNACY = 47;
+  // Operations on the card are not possible due to the card holder's
+  // insolvency.
+  CARD_HOLDER_INSOLVENCY = 48;
+  // Cutoff is in process in the bank's systems due to which the operation
+  // cannot be performed.
+  CUTOFF_IN_PROCESS = 49;
+  // Card is lost or stolen.
+  CARD_LOST_OR_STOLEN = 50;
 }
 
 // The combination of a reference type and reference number that uniquely

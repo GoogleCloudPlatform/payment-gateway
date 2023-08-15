@@ -237,6 +237,24 @@ message NotifyCustomerRequest {
       google.protobuf.Timestamp locked_time = 3
           [(google.api.field_behavior) = REQUIRED];
     }
+    // Details of the MPIN provisioning operation. This could be used either
+    // when an MPIN is newly provisioned for a user or when the MPIN is reset by
+    // a user.
+    message MPINProvisioned {
+      // Possible states of the MPIN provisioning operation.
+      enum State {
+        // Unspecified state.
+        STATE_UNSPECIFIED = 0;
+        // MPIN update succeeded.
+        SUCCEEDED = 1;
+        // MPIN update failed.
+        FAILED = 2;
+      }
+      // State of the MPIN update operation.
+      State state = 1 [(google.api.field_behavior) = REQUIRED];
+      // Indicates if the MPIN was provisioned newly or was reset.
+      RegistrationType type = 2 [(google.api.field_behavior) = REQUIRED];
+    }
     // Participant to be notified.
     Participant participant = 1 [(google.api.field_behavior) = REQUIRED];
     // Unique identification of an account according to India's UPI standards.
@@ -254,6 +272,8 @@ message NotifyCustomerRequest {
       MPINUpdated mpin_updated = 4;
       // Details of the MPIN locked by the issuer switch.
       MPINLocked mpin_locked = 5;
+      // Details of the MPIN provisioning operation.
+      MPINProvisioned mpin_provisioned = 6;
     }
   }
 

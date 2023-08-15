@@ -124,6 +124,8 @@ service CardAdapterService {
   // * `CARD_INVALID` = Card details provided are invalid, or not found in the
   // bank's card management systems.
   //
+  // * `CARD_LOST_OR_STOLEN` = Card is lost or stolen.
+  //
   // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Card management system is down.
   //
   // * `CARD_RESTRICTED` = Card is restricted from performing payments.
@@ -163,6 +165,8 @@ service CardAdapterService {
   // * `CARD_INVALID` = Card details provided are invalid, or not found in the
   // bank's card management systems.
   //
+  // * `CARD_LOST_OR_STOLEN` = Card is lost or stolen.
+  //
   // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Card management system is down.
   //
   // * `CARD_RESTRICTED` = Card is restricted from performing payments.
@@ -195,6 +199,8 @@ service CardAdapterService {
   //
   // * `CARD_INVALID` = Card details provided are invalid, or not found in the
   // bank's card management systems.
+  //
+  // * `CARD_LOST_OR_STOLEN` = Card is lost or stolen.
   //
   // * `CARD_MANAGEMENT_SYSTEM_FAILURE` = Card management system is down.
   //
@@ -266,6 +272,15 @@ service CardAdapterService {
   //
   // There are a few scenarios when this API will be invoked by the issuer
   // switch.
+  //
+  // MPIN Provisioned
+  // : A user is to be notified when the user attempts to provision an MPIN for
+  // their card account, irrespective of whether the provisioning fails or
+  // succeeds. The request payload will indicate the following information:
+  //    * A `state` to indicate if the MPIN provisioning succeeded or failed.
+  //    * A `type` indicating if the MPIN was being provisioned for the card
+  //      account for the first time, or whether the user was resetting their
+  //      MPIN.
   //
   // MPIN Updated
   // : The validation of the current M-PIN of a user, and the updating to a new

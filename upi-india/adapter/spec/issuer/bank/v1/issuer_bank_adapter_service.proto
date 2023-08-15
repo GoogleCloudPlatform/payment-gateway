@@ -317,113 +317,6 @@ service BankAdapterService {
     };
   }
 
-  // **Note**: *Implementation of this Bank Adapter API is optional. Implement
-  // this API only if your bank wants to handle the unresolved payments all by
-  // itself.*
-  //
-  // Payment settlements done using the Bank Adapter service might fail because
-  // of various reasons such as time-out of the [SettlePayment][] API or network
-  // failure. In the event of such a failure, the Issuer Switch does not receive
-  // the final status of the payment settlement. To handle unresolved payments,
-  // you can configure the Issuer Switch in either `Search & Settle` or `Resolve
-  // Payment` mode.
-  //
-  // * `Search & Settle` - This is the default configuration of the Issuer
-  // Switch. In this mode, the Issuer Switch handles the orchestration using the
-  // [SearchPayments][] API to obtain the status of a payment settlement, and
-  // based on the state of the payment, it invokes the [SettlePayment][] API to
-  // settle the payments.
-  // * `Resolve Payment` - In this mode the Issuer Switch delegates the task of
-  // checking the current status of a payment settlement and its possible
-  // re-execution to the bank adapter service / bank's core services. Use this
-  // mode if your bank wants to handle the unresolved payments all by itself. To
-  // enable this mode, you must implement the [ResolvePayment][] API. If the
-  // Issuer Switch is configured in this mode, then the [ResolvePayment][] API
-  // is invoked for all the unresolved transactions.
-  //
-  // Based on the NPCI request, the Issuer Switch invokes the [ResolvePayment][]
-  // API to resolve the payment settlement transaction and obtain its final
-  // status. This API is invoked to resolve a unresolved payment settlement of
-  // the following types:
-  //
-  // * Debit Reversal
-  // * Credit
-  //
-  // **Note:** The Issuer Switch will not invoke this API if the final status of
-  // the payment settlement operation is already available with it.
-  //
-  // If the bank adapter service attempts to resolve the payment, but is unable
-  // to resolve it successfully, then this API must return a HTTP status of 200
-  // with the ResolvePaymentResponse containing [ResolutionStatus][] as FAILED
-  // and the appropriate error code in [ResolvePaymentResult][]. Specifically, a
-  // non-200 HTTP status must be returned only when the bank adapter service
-  // itself fails and not when the resolution of the payment settlement fails.
-  //
-  // The [ErrorReason][] values that are allowed in the
-  // [PaymentAdjustmentError][] in the [ResolvePaymentResult][] are:
-  //
-  //  * `ACCT_INACTIVE` = Indicates that the payer account is inactive, if the
-  // settlement request is for a _debit reversal_ or that the payee account is
-  // inactive, if the settlement request is for a _credit_.
-  //
-  // * `ACCT_FROZEN` = Indicates that the payer account is frozen, if the
-  // settlement request is for a _debit reversal_ or that the payee account is
-  // frozen, if the settlement request is for a _credit_.
-  //
-  // * `UNABLE_TO_UPDATE_BANK_SERVICES` = Indicates that the bank adapter
-  // service could not update the bank's services.
-  //
-  // * `PARTY_INSTRUCTIONS` = Indicates that the resolution of the payment
-  // failed due to party instructions.
-  //
-  // * `DUPLICATE_PROCESSING` = Indicates that the resolution request is a
-  // duplicate.
-  //
-  // * `DECRYPTION_FAILED` = Bank's systems were unable to decrypt the request
-  // payload.
-  //
-  // * `ENCRYPTION_FAILED` = Bank's systems were unable to encrypt the response
-  // payload.
-  //
-  // * `PAYMENT_UDIR_RET_114` = Indicates that the resolution failed due to
-  // error `114` as part of beneficiary bank attempting to resolve a `TCC`
-  // case.
-  //
-  // * `PAYMENT_UDIR_RET_115` = Indicates that the resolution failed due to
-  // error `115` as part of beneficiary bank attempting to resolve a `TCC`
-  // case.
-  //
-  // * `PAYMENT_UDIR_RET_116` = Indicates that the resolution failed due to
-  // error `116` as part of beneficiary bank attempting to resolve a `TCC`
-  // case.
-  //
-  // * `PAYMENT_UDIR_RET_117` = Indicates that the resolution failed due to
-  // error `117` as part of beneficiary bank attempting to resolve a `TCC`
-  // case.
-  //
-  // * `PAYMENT_UDIR_RET_118` = Indicates that the resolution failed due to
-  // error `118` as part of beneficiary bank attempting to resolve a `TCC`
-  // case.
-  //
-  // * `PAYMENT_UDIR_RET_119` = Indicates that the resolution failed due to
-  // error `119` as part of beneficiary bank attempting to resolve a `TCC`
-  // case.
-  //
-  // * `PAYMENT_UDIR_RET_120` = Indicates that the resolution failed due to
-  // error `120` as part of beneficiary bank attempting to resolve a `TCC`
-  // case.
-  //
-  // _Note:_ This API will be invoked as part of UPI's Online Dispute and Issue
-  // Resolution (`UDIR`) flows. Specifically, this API will be invoked in the
-  // UPI `ReqChkTxn` (transaction type `AUTOUPDATE`) and `ReqComplaint`
-  // (transaction type `Complaint`) API flow.
-  rpc ResolvePayment(ResolvePaymentRequest) returns (ResolvePaymentResponse) {
-    option (google.api.http) = {
-      post: "/v1/payments:resolveSingle"
-      body: "*"
-    };
-  }
-
   // Initiates the registration of a customer's bank account with UPI on the
   // issuer bank. Either a customer reference (such as a resident id, like
   // Aadhaar or a mobile phone number) must be specified, or a bank account
@@ -536,6 +429,14 @@ service BankAdapterService {
   //
   // There are a few scenarios when this API will be invoked by the issuer
   // switch.
+  //
+  // MPIN Provisioned
+  // : A user is to be notified when the user attempts to provision an MPIN for
+  // their account, irrespective of whether the provisioning fails or succeeds.
+  // The request payload will indicate the following information:
+  //    * A `state` to indicate if the MPIN provisioning succeeded or failed.
+  //    * A `type` indicating if the MPIN was being provisioned for the account
+  //      for the first time, or whether the user was resetting their MPIN.
   //
   // MPIN Updated
   // : The validation of the current M-PIN of a user, and the updating to a new

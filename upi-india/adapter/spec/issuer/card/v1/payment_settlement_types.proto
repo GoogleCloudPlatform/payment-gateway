@@ -26,15 +26,13 @@ option java_package = "com.google.cloud.paymentgateway.issuerswitch.adapter.card
 
 // Individual payment settlement request.
 message SettlePaymentRequest {
-  // Payload for settle payment request.
+  // Payload for payment settlement request.
   message Payload {
     // Type of settlement to execute.
     SettlementType settlement_type = 1 [(google.api.field_behavior) = REQUIRED];
     // Payer in the payment settlement transaction.
     SettlementParticipant payer = 2 [(google.api.field_behavior) = REQUIRED];
-    // Payee in the settlement payment transaction. This field is present in all
-    // requests, except when the *settlement type* is
-    // [DEBIT_REVERSAL][google.cloud.paymentgateway.issuerswitch.adapter.card.v1.SettlementType.DEBIT_REVERSAL].
+    // Payee in the payment settlement transaction.
     SettlementParticipant payee = 3;
     // Amount needed to complete payment settlement.
     Amount instructed_amount = 4 [(google.api.field_behavior) = REQUIRED];
@@ -205,10 +203,10 @@ message SettlePaymentError {
   ErrorReason error_reason = 1;
 }
 
-// Result of a settlement payment. Can be one of either a success or an error
+// Result of a payment settlement. Can be one of either a success or an error
 // response.
 message SettlePaymentResult {
-  // Settlement payment can be either success or error.
+  // Payment settlement can be either success or error.
   oneof settle_payment_result {
     // Successful settlement response.
     SettlePaymentInfo success = 1;
