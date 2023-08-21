@@ -452,112 +452,6 @@ message PaymentAdditionalInfo {
     REFUND = 3;
   }
 
-  // Specifies how the payment was inititated.
-  enum InitiationMode {
-    // Unspecified payment initation mode.
-    INITIATION_MODE_UNSPECIFIED = 0;
-    // Default.
-    DEFAULT_INITIATION_MODE = 1;
-    // QR Code.
-    QR_CODE = 2;
-    // Secure QR Code.
-    SECURE_QR_CODE = 3;
-    // Bharat QR Code.
-    BHARAT_QR_CODE = 4;
-    // Intent.
-    INTENT = 5;
-    // Secure Intent.
-    SECURE_INTENT = 6;
-    // NFC(Near Field Communication).
-    NFC = 7;
-    // BLE (Bluetooth).
-    BLUETOOTH = 8;
-    // UHF(Ultra High Frequency).
-    ULTRA_HIGH_FREQUENCY = 9;
-    // Aadhaar.
-    AADHAAR = 10;
-    // SDK (Software Development Kit).
-    SDK = 11;
-    // UPI-Mandate.
-    UPI_MANDATE = 12;
-    // FIR (Foreign Inward Remittance).
-    FOREIGN_INWARD_REMITTANCE = 13;
-    // QR Mandate.
-    QR_MANDATE = 14;
-    // BBPS.
-    BBPS = 15;
-    // Future purpose.
-    FUTURE_PURPOSE = 16;
-  }
-
-  // The purpose field is specially used for SEBI transactions.
-  enum Purpose {
-    // Unspecified purpose.
-    PURPOSE_UNSPECIFIED = 0;
-    // Default.
-    DEFAULT_PURPOSE = 1;
-    // SEBI.
-    SEBI = 2;
-    // AMC.
-    AMC = 3;
-    // Travel.
-    TRAVEL = 4;
-    // Hospitality.
-    HOSPITALITY = 5;
-    // Hospital.
-    HOSPITAL = 6;
-    // Telecom.
-    TELECOM = 7;
-    // Insurance.
-    INSURANCE = 8;
-    // Education.
-    EDUCATION = 9;
-    // Gifting.
-    GIFTING = 10;
-    // Others.
-    OTHER_PURPOSES = 11;
-    // Purpose type 11.
-    PURPOSE_TYPE_11 = 12;
-    // Purpose type 12.
-    PURPOSE_TYPE_12 = 13;
-    // Purpose type 13.
-    PURPOSE_TYPE_13 = 14;
-    // Purpose type 14.
-    PURPOSE_TYPE_14 = 15;
-    // Preapproved disbursement.
-    PREAPPROVED_DISBURSEMENT = 16;
-    // Enablement for UPI Lite with top up.
-    UPI_LITE_ENABLE_WITH_TOP_UP = 17;
-    // Top-up UPI Lite account.
-    UPI_LITE_TOP_UP_ACCOUNT = 18;
-    // Disablement from UPI Lite.
-    UPI_LITE_DISABLE = 19;
-    // Online Payment using UPI Lite.
-    UPI_LITE_ONLINE_PAYMENT = 20;
-    // Offline Payment using UPI Lite.
-    UPI_LITE_OFFLINE_PAYMENT = 21;
-    // Disable zero balance UPI Lite Reference Number (LRN).
-    UPI_LITE_DISABLE_LRN = 22;
-    // Purpose type 18
-    PURPOSE_TYPE_18 = 23;
-    // Purpose type 19
-    PURPOSE_TYPE_19 = 24;
-  }
-
-  // The category of the transaction.
-  enum ReferenceCategory {
-    // Unspecified reference category.
-    REFERENCE_CATEGORY_UNSPECIFIED = 0;
-    // Null.
-    NULL = 1;
-    // Advertisement.
-    ADVERTISEMENT = 2;
-    // Invoice.
-    INVOICE = 3;
-    // Others, for future use.
-    OTHER_REFERENCE_CATEGORIES = 4;
-  }
-
   // Consumer reference number to identify (like Loan number, etc).
   string consumer_reference_number = 1;
   // A reference URL for the settlement.
@@ -570,12 +464,12 @@ message PaymentAdditionalInfo {
   // (collect).
   SubType sub_type = 6 [(google.api.field_behavior) = REQUIRED];
   // Specifies how the payment was inititated.
-  InitiationMode initiation_mode = 7 [(google.api.field_behavior) = REQUIRED];
-  // The purpose field is specially used for SEBI txn.
-  Purpose purpose = 8 [(google.api.field_behavior) = REQUIRED];
+  string initiation_mode = 7 [(google.api.field_behavior) = REQUIRED];
+  // The purpose of the transaction.
+  string purpose = 8 [(google.api.field_behavior) = REQUIRED];
   // If **referenceLink** is present, then this field is mandatory. The field is
   // used to identify the category of the transaction.
-  ReferenceCategory reference_category = 10;
+  string reference_category = 10;
   // More information about the payment.
   map<string, string> miscellaneous = 11;
 }
@@ -729,28 +623,12 @@ message CaseDetails {
     CREDIT_ADJUSTMENT_BENEFICIARY_UNABLE_TO_UPDATE_CUSTOMER_ACCOUNT = 25;
   }
 
-  // Specifies how the case was raised.
-  enum InitiationMode {
-    // Initiation mode unspecified.
-    INITIATION_MODE_UNSPECIFIED = 0;
-    // This indicates that the complaint was auto-converted to dispute.
-    AUTO_CONVERSION = 1;
-    // Customer App.
-    CUSTOMER_APP = 2;
-    // Payments Service Provider.
-    PSP = 3;
-    // Bank.
-    BANK = 4;
-    // Customer relationship management system.
-    CRM = 5;
-  }
-
   // Type of the case raised.
   CaseType type = 1 [(google.api.field_behavior) = REQUIRED];
   // Reason of the case raised.
   CaseReason reason = 2 [(google.api.field_behavior) = REQUIRED];
   // Specifies how the case was raised,
-  InitiationMode initiation_mode = 3 [(google.api.field_behavior) = REQUIRED];
+  string initiation_mode = 3 [(google.api.field_behavior) = REQUIRED];
   // Specifies the amount to be adjusted.
   Amount adjustment_amount = 4 [(google.api.field_behavior) = REQUIRED];
   // Settlement code of the original unresolved transaction.
