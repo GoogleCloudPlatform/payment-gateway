@@ -226,6 +226,12 @@ message NotifyCustomerRequest {
         // Contains details about the recurring mandate pause operation.
         Pause pause = 10;
       }
+      // The name of the recurring mandate for which a notification is being
+      // sent.
+      string name = 11 [(google.api.field_behavior) = REQUIRED];
+      // The UPI response code returned by the issuer switch. This field will
+      // have a value only if the `state` field is set to `FAILED`.
+      string upi_response_code = 12;
     }
     // Details of the notification needed for
     // international activation transactions
